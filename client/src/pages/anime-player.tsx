@@ -37,7 +37,7 @@ interface Season {
 interface AnimeData {
   id: string;
   title: string;
-  description: string;
+  synopsis: string;
   image: string;
   genres: string[];
   status: string;
@@ -507,6 +507,14 @@ const AnimePlayerPage: React.FC = () => {
             <h3 className="text-gray-300 text-lg uppercase">{selectedSeason?.name}</h3>
           </div>
         </div>
+
+        {/* Synopsis */}
+        {animeData.synopsis && (
+          <div className="bg-gray-800 rounded-lg p-4">
+            <h3 className="text-white text-lg font-bold mb-2">Synopsis</h3>
+            <p className="text-gray-300 text-sm leading-relaxed">{animeData.synopsis}</p>
+          </div>
+        )}
 
         {/* Sélecteur de langue - Style anime-sama */}
         {selectedSeason && selectedSeason.languages.length > 1 && (
