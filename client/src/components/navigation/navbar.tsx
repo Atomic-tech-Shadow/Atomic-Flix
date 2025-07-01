@@ -32,11 +32,15 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-              <Film className="h-5 w-5 text-primary-foreground" />
+          <Link href="/" className="flex items-center space-x-3">
+            <div className="flex h-10 w-10 items-center justify-center">
+              <img 
+                src="/attached_assets/file_00000000c67861f9924b51d792b4b888_1751410240730.png" 
+                alt="ATOMIC FLIX Logo" 
+                className="h-8 w-8 object-contain"
+              />
             </div>
-            <span className="text-xl font-bold atomic-gradient-text">
+            <span className="hidden sm:block text-xl font-bold atomic-gradient-text">
               ATOMIC FLIX
             </span>
           </Link>
