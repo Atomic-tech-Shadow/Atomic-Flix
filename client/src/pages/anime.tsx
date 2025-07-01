@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight, ChevronDown, Play, AlertCircle, ArrowLeft, D
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'wouter';
 import MainLayout from '@/components/layout/main-layout';
+import { FloatingBackButton } from '@/components/navigation/floating-back-button';
+import { BreadcrumbNav } from '@/components/navigation/breadcrumb-nav';
 
 interface Episode {
   id: string;
@@ -208,8 +210,6 @@ const AnimePage: React.FC = () => {
             { label: animeData.title }
           ]} 
         />
-      
-        <div className="space-y-6">
 
       {/* Banner de l'anime */}
       <div className="relative">
