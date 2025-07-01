@@ -1,32 +1,18 @@
-import { Link, useLocation, useRoute } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, Home, Film, BookOpen, Menu, X } from "lucide-react";
+import { Home, Film, BookOpen, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
-  const [location, navigate] = useLocation();
+  const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const navigation = [
     { name: "Accueil", href: "/", icon: Home },
     { name: "Animes", href: "/anime-sama", icon: Film },
     { name: "Mangas", href: "/manga", icon: BookOpen },
   ];
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      // Navigation dynamique sans rechargement
-      const searchUrl = `/anime-sama?search=${encodeURIComponent(searchQuery.trim())}`;
-      navigate(searchUrl);
-      setIsSearchOpen(false);
-      setSearchQuery("");
-    }
-  };
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -64,35 +50,10 @@ export function Navbar() {
             })}
           </div>
 
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="hidden md:flex items-center space-x-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Rechercher un anime..."
-                className="w-64 pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Button type="submit" size="sm">
-              Rechercher
-            </Button>
-          </form>
+
 
           {/* Mobile Icons */}
           <div className="md:hidden flex items-center space-x-2">
-            {/* Search Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="atomic-hover-scale hover:text-cyan-400 transition-all duration-300"
-              onClick={() => setIsSearchOpen(!isSearchOpen)}
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-            
             {/* Menu Button */}
             <Button
               variant="ghost"
@@ -130,54 +91,11 @@ export function Navbar() {
               })}
             </div>
             
-            {/* Mobile Search */}
-            <div className="border-t pt-4 pb-3">
-              <form onSubmit={handleSearch} className="px-3">
-                <div className="flex space-x-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      type="search"
-                      placeholder="Rechercher un anime..."
-                      className="pl-10"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  <Button type="submit" size="sm">
-                    <Search className="h-4 w-4" />
-                  </Button>
-                </div>
-              </form>
-            </div>
+
           </div>
         )}
         
-        {/* Mobile Search Bar */}
-        {isSearchOpen && (
-          <div className="md:hidden border-t bg-background/95 backdrop-blur">
-            <div className="container mx-auto px-4 py-3">
-              <form onSubmit={handleSearch}>
-                <div className="flex space-x-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      type="search"
-                      placeholder="Rechercher un anime..."
-                      className="pl-10"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      autoFocus
-                    />
-                  </div>
-                  <Button type="submit" size="sm">
-                    <Search className="h-4 w-4" />
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+
       </div>
     </nav>
   );
