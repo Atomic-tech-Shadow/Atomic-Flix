@@ -4,7 +4,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
-import HomePage from "@/pages/home";
 import AnimeSamaPage from "@/pages/anime-sama";
 import AnimePage from "@/pages/anime";
 import AnimePlayerPage from "@/pages/anime-player";
@@ -13,7 +12,7 @@ import MangaReaderPage from "@/pages/manga-reader";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={HomePage} />
+      <Route path="/" component={AnimeSamaPage} />
       <Route path="/anime-sama" component={AnimeSamaPage} />
       <Route path="/anime/:id" component={AnimePage} />
       <Route path="/anime/:id/player" component={AnimePlayerPage} />
