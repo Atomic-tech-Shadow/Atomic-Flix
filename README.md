@@ -11,8 +11,10 @@
 
 2. **Configuration des variables d'environnement**
    Sur Vercel, ajoutez ces variables dans Settings > Environment Variables :
-   - `DATABASE_URL` : URL de votre base de données PostgreSQL
+   - `DATABASE_URL` : `postgresql://Shadow_owner:npg_PTOGd5J9ZluF@ep-tight-rice-a8sv8oq9-pooler.eastus2.azure.neon.tech/Shadow?sslmode=require&channel_binding=require`
    - `NODE_ENV` : `production`
+   
+   Note: L'URL de base de données est déjà configurée dans vercel.json
 
 3. **Déploiement automatique**
    - Vercel déploiera automatiquement à chaque push sur la branche main

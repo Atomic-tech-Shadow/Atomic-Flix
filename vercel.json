@@ -19,6 +19,7 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "DATABASE_URL": "postgresql://Shadow_owner:npg_PTOGd5J9ZluF@ep-tight-rice-a8sv8oq9-pooler.eastus2.azure.neon.tech/Shadow?sslmode=require&channel_binding=require"
   }
 }
