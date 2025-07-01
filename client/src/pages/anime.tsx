@@ -230,7 +230,22 @@ const AnimePage: React.FC = () => {
         <div className="absolute bottom-0 left-0 right-0 p-6 z-20 atomic-slide-in">
           <h2 className="text-xl sm:text-2xl font-bold atomic-gradient-text mb-2">{animeData.title}</h2>
           <p className="text-gray-300 text-sm mt-1 leading-relaxed">{animeData.synopsis}</p>
-          <div className="flex flex-wrap gap-2 mt-3">
+          
+          {/* Informations intégrées */}
+          <div className="flex flex-wrap items-center gap-3 mt-3 mb-3">
+            <div className="flex items-center space-x-2 bg-cyan-500/20 backdrop-blur-sm rounded-full px-3 py-1">
+              <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
+              <span className="text-cyan-300 text-xs font-medium">
+                {animeData.seasons.length} saisons
+              </span>
+            </div>
+            <div className="flex items-center space-x-2 bg-blue-500/20 backdrop-blur-sm rounded-full px-3 py-1">
+              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+              <span className="text-blue-300 text-xs font-medium">{animeData.year}</span>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
             {animeData.genres.map((genre, index) => (
               <span key={index} className="px-3 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-xs text-cyan-300 backdrop-blur-sm transition-all duration-300 hover:bg-cyan-500/30">
                 {genre}
@@ -256,22 +271,6 @@ const AnimePage: React.FC = () => {
             </button>
           </div>
         )}
-
-        {/* Informations de l'anime */}
-        <div className="atomic-card atomic-slide-in">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-            <div className="flex items-center justify-center sm:justify-start space-x-3 p-3 bg-cyan-500/10 rounded-lg">
-              <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
-              <span className="text-cyan-300 font-medium">
-                {animeData.seasons.length} saisons disponibles
-              </span>
-            </div>
-            <div className="flex items-center justify-center sm:justify-start space-x-3 p-3 bg-blue-500/10 rounded-lg">
-              <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-              <span className="text-blue-300 font-medium">Année: {animeData.year}</span>
-            </div>
-          </div>
-        </div>
 
         {/* Sélection des saisons */}
         <div className="atomic-fade-in">
