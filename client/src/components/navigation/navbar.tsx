@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 export function Navbar() {
   const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const navigation = [
@@ -23,6 +24,8 @@ export function Navbar() {
       const searchUrl = `/anime-sama?search=${encodeURIComponent(searchQuery.trim())}`;
       window.history.pushState({}, '', searchUrl);
       window.location.reload();
+      setIsSearchOpen(false);
+      setSearchQuery("");
     }
   };
 
@@ -79,15 +82,26 @@ export function Navbar() {
             </Button>
           </form>
 
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+          {/* Mobile Icons */}
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Search Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+            
+            {/* Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -127,6 +141,32 @@ export function Navbar() {
                       className="pl-10"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <Button type="submit" size="sm">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+        
+        {/* Mobile Search Bar */}
+        {isSearchOpen && (
+          <div className="md:hidden border-t bg-background/95 backdrop-blur">
+            <div className="container mx-auto px-4 py-3">
+              <form onSubmit={handleSearch}>
+                <div className="flex space-x-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder="Rechercher un anime..."
+                      className="pl-10"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      autoFocus
                     />
                   </div>
                   <Button type="submit" size="sm">
