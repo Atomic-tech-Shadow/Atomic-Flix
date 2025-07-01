@@ -313,81 +313,97 @@ const MangaReaderPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="min-h-screen bg-black text-white">
-        {/* Header fixe */}
-        <div className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-4">
+        {/* Header fixe optimisé mobile */}
+        <div className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-sm border-b border-gray-800">
+          <div className="flex items-center justify-between p-2 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
               <Link href="/anime-sama">
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+                  className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors flex-shrink-0"
                 >
-                  <ArrowLeft size={20} />
+                  <ArrowLeft size={18} />
                 </motion.button>
               </Link>
               
-              <div>
-                <h1 className="text-lg font-bold truncate max-w-[200px]">{mangaData?.title || 'Manga'}</h1>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-sm sm:text-lg font-bold truncate">{mangaData?.title || 'Manga'}</h1>
                 {selectedChapter && (
-                  <p className="text-sm text-gray-400">
-                    Chapitre {selectedChapter.number} - Page {currentPageIndex + 1}/{selectedChapter.pages?.length || 0}
+                  <p className="text-xs sm:text-sm text-gray-400 truncate">
+                    Ch. {selectedChapter.number} - Page {currentPageIndex + 1}/{selectedChapter.pages?.length || 0}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              {/* Contrôles de zoom */}
-              <button
-                onClick={zoomOut}
-                className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
-                title="Zoom arrière"
-              >
-                <ZoomOut size={16} />
-              </button>
-              
-              <span className="text-sm px-2">{Math.round(zoom * 100)}%</span>
-              
-              <button
-                onClick={zoomIn}
-                className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
-                title="Zoom avant"
-              >
-                <ZoomIn size={16} />
-              </button>
+            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+              {/* Contrôles de zoom - masqués sur très petit écran */}
+              <div className="hidden sm:flex items-center gap-1">
+                <button
+                  onClick={zoomOut}
+                  className="p-1.5 sm:p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+                  title="Zoom arrière"
+                >
+                  <ZoomOut size={14} />
+                </button>
+                
+                <span className="text-xs px-1">{Math.round(zoom * 100)}%</span>
+                
+                <button
+                  onClick={zoomIn}
+                  className="p-1.5 sm:p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+                  title="Zoom avant"
+                >
+                  <ZoomIn size={14} />
+                </button>
+              </div>
 
               {/* Liste des chapitres */}
               <button
                 onClick={() => setShowChapterList(!showChapterList)}
-                className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+                className="p-1.5 sm:p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors relative"
                 title="Liste des chapitres"
               >
                 <List size={16} />
+                {chapters.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    {chapters.length > 99 ? '99+' : chapters.length}
+                  </span>
+                )}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Liste des chapitres (sidebar) */}
+        {/* Liste des chapitres (sidebar responsive) */}
         <AnimatePresence>
           {showChapterList && (
             <motion.div
-              initial={{ x: 300 }}
+              initial={{ x: '100%' }}
               animate={{ x: 0 }}
-              exit={{ x: 300 }}
-              className="fixed top-0 right-0 h-full w-80 bg-gray-900 border-l border-gray-800 z-40 overflow-y-auto"
+              exit={{ x: '100%' }}
+              className="fixed top-0 right-0 h-full w-full sm:w-80 bg-gray-900 border-l border-gray-800 z-40 overflow-y-auto"
             >
-              <div className="p-4 border-b border-gray-800">
-                <h3 className="text-lg font-bold">Chapitres</h3>
-                <button
-                  onClick={() => setShowChapterList(false)}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-white"
-                >
-                  ✕
-                </button>
+              <div className="p-3 sm:p-4 border-b border-gray-800 sticky top-0 bg-gray-900">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold">Chapitres ({chapters.length})</h3>
+                  <button
+                    onClick={() => setShowChapterList(false)}
+                    className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+                {mangaSeasons.length > 1 && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-400">
+                      Type: {selectedSeason?.name || 'Scans'}
+                    </p>
+                  </div>
+                )}
               </div>
-              <div className="p-2">
+              <div className="p-2 pb-20">
                 {chapters.map((chapter, index) => (
                   <button
                     key={`chapter-${chapter.number}-${index}`}
@@ -403,7 +419,7 @@ const MangaReaderPage: React.FC = () => {
                     }`}
                   >
                     <div className="font-medium">Chapitre {chapter.number}</div>
-                    <div className="text-sm opacity-70">{chapter.title}</div>
+                    <div className="text-sm opacity-70 truncate">{chapter.title}</div>
                   </button>
                 ))}
               </div>
@@ -411,40 +427,41 @@ const MangaReaderPage: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Zone de lecture principale */}
-        <div className="pt-20 pb-4">
+        {/* Zone de lecture principale optimisée mobile */}
+        <div className="pt-14 sm:pt-20 pb-16 sm:pb-4">
           {loadingPages ? (
-            <div className="flex items-center justify-center h-96">
+            <div className="flex items-center justify-center min-h-[60vh]">
               <div className="text-center">
                 <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
                 <p className="text-white">Chargement des pages...</p>
               </div>
             </div>
           ) : selectedChapter && selectedChapter.pages?.length > 0 ? (
-            <div className="flex justify-center items-center min-h-[calc(100vh-6rem)]">
+            <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
               <div 
-                className="relative max-w-full overflow-auto"
+                className="relative max-w-full overflow-auto touch-pan-x touch-pan-y"
                 style={{ transform: `scale(${zoom})`, transformOrigin: 'center' }}
               >
                 <img
                   src={selectedChapter.pages[currentPageIndex]}
                   alt={`Page ${currentPageIndex + 1}`}
-                  className="max-w-full h-auto cursor-pointer"
+                  className="max-w-full h-auto cursor-pointer select-none"
                   onClick={nextPage}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = 'https://via.placeholder.com/800x1200/1a1a1a/ffffff?text=Page+Non+Disponible';
                     target.onerror = () => {};
                   }}
+                  draggable={false}
                 />
               </div>
             </div>
           ) : selectedChapter ? (
-            <div className="flex flex-col items-center justify-center h-96 text-center px-4">
-              <Book size={64} className="text-gray-600 mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">{selectedChapter.title}</h3>
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+              <Book size={48} className="text-gray-600 mb-4" />
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">{selectedChapter.title}</h3>
               <p className="text-gray-400 mb-4">Chapitre {selectedChapter.number}</p>
-              <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-4 max-w-md">
+              <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-3 sm:p-4 max-w-sm sm:max-w-md">
                 <p className="text-yellow-400 text-sm">
                   Les pages de ce chapitre seront bientôt disponibles. 
                   L'API des images de manga est en cours de développement.
@@ -462,26 +479,66 @@ const MangaReaderPage: React.FC = () => {
               )}
             </div>
           ) : chapters.length > 0 ? (
-            <div className="flex flex-col items-center justify-center h-96 text-center px-4">
-              <List size={64} className="text-gray-600 mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">Sélectionnez un chapitre</h3>
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+              <List size={48} className="text-gray-600 mb-4" />
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">Sélectionnez un chapitre</h3>
               <p className="text-gray-400 mb-4">{chapters.length} chapitres disponibles</p>
               <button
                 onClick={() => setShowChapterList(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
               >
+                <List size={16} />
                 Voir la liste des chapitres
               </button>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-96">
+            <div className="flex items-center justify-center min-h-[60vh]">
               <p className="text-gray-400">Aucun chapitre disponible</p>
             </div>
           )}
         </div>
 
-        {/* Contrôles de navigation en bas */}
-        <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-t border-gray-800">
+        {/* Contrôles de navigation en bas optimisés mobile */}
+        <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-sm border-t border-gray-800 sm:hidden">
+          <div className="flex items-center justify-between p-2">
+            <button
+              onClick={prevPage}
+              disabled={currentPageIndex === 0}
+              className="flex items-center gap-1 px-3 py-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors text-sm"
+            >
+              <ChevronLeft size={14} />
+              <span className="hidden xs:inline">Préc</span>
+            </button>
+
+            <div className="flex items-center gap-2 flex-1 justify-center">
+              <span className="text-xs text-gray-400">
+                {currentPageIndex + 1} / {selectedChapter?.pages?.length || 0}
+              </span>
+              
+              {/* Barre de progression */}
+              <div className="w-20 sm:w-32 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-blue-600 transition-all duration-300"
+                  style={{ 
+                    width: `${((currentPageIndex + 1) / (selectedChapter?.pages?.length || 1)) * 100}%` 
+                  }}
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={nextPage}
+              disabled={!selectedChapter || (currentPageIndex === selectedChapter.pages.length - 1)}
+              className="flex items-center gap-1 px-3 py-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors text-sm"
+            >
+              <span className="hidden xs:inline">Suiv</span>
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
+
+        {/* Contrôles desktop */}
+        <div className="hidden sm:block fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-t border-gray-800">
           <div className="flex items-center justify-between p-4">
             <button
               onClick={prevPage}
