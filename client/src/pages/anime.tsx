@@ -208,15 +208,15 @@ const AnimePage: React.FC = () => {
 
   return (
     <MainLayout>
-      <div>
+      <div className="-mx-4 -my-6">
         {/* Bouton de retour flottant */}
         <FloatingBackButton 
           onClick={() => navigate('/anime-sama')}
           show={true}
         />
 
-      {/* Banner de l'anime */}
-      <div className="relative atomic-fade-in overflow-hidden">
+        {/* Banner de l'anime */}
+        <div className="relative atomic-fade-in overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent z-10" />
         <img 
           src={animeData.image} 
@@ -279,13 +279,11 @@ const AnimePage: React.FC = () => {
           </h3>
           <div className="grid grid-cols-2 gap-4">
             {animeData.seasons.map((season, index) => {
-              // Détecter si c'est un manga/scan
               const isManga = season.name.toLowerCase().includes('scan') || 
                              season.name.toLowerCase().includes('manga') ||
                              season.name.toLowerCase().includes('tome') ||
                              season.name.toLowerCase().includes('chapitre');
               
-              // Couleur de bordure selon le type
               const borderColor = isManga ? 'border-orange-400 hover:border-orange-300 hover:shadow-orange-500/25' : 'border-cyan-400 hover:border-cyan-300 hover:shadow-cyan-500/25';
               
               return (
@@ -299,17 +297,14 @@ const AnimePage: React.FC = () => {
                   onClick={() => goToPlayer(season)}
                   className={`relative overflow-hidden rounded-2xl h-28 group transition-all duration-300 border-2 ${borderColor} atomic-hover-glow backdrop-blur-sm bg-gray-900/30`}
                 >
-                  {/* Image de fond */}
                   <div 
                     className="absolute inset-0 bg-cover bg-center transform group-hover:scale-105 transition-transform duration-300"
                     style={{
                       backgroundImage: `url(${animeData.image})`,
                     }}
                   />
-                  {/* Overlay avec gradient sombre */}
                   <div className="absolute inset-0 bg-black/60" />
                   
-                  {/* Contenu centré */}
                   <div className="absolute inset-0 flex items-center justify-center p-4">
                     <div className="text-center">
                       <div className="text-white font-bold text-sm sm:text-base leading-tight drop-shadow-lg group-hover:scale-105 transition-transform duration-300">
