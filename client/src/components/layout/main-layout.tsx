@@ -1,4 +1,5 @@
 import React from 'react';
+import { Navbar } from '@/components/navigation/navbar';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -6,8 +7,11 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-900">
-      {children}
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
+      <main className="container mx-auto px-4 py-6">
+        {children}
+      </main>
     </div>
   );
 };
