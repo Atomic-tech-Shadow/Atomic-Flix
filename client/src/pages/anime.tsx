@@ -36,7 +36,7 @@ interface Season {
 interface AnimeData {
   id: string;
   title: string;
-  description: string;
+  synopsis: string;
   image: string;
   genres: string[];
   status: string;
@@ -118,7 +118,8 @@ const AnimePage: React.FC = () => {
         const apiResponse = await apiRequest(`/api/anime/${id}`, 20000);
         
         if (!apiResponse || !apiResponse.success) {
-          throw new Error('Anime non trouvé dans la base de données');
+          const errorMsg = apiResponse?.error || apiResponse?.message || 'Anime non trouvé dans la base de données';
+          throw new Error(errorMsg);
         }
         
         setAnimeData(apiResponse.data);
@@ -214,7 +215,7 @@ const AnimePage: React.FC = () => {
         />
         <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
           <h2 className="text-xl sm:text-2xl font-bold">{animeData.title}</h2>
-          <p className="text-gray-300 text-sm mt-1">{animeData.description}</p>
+          <p className="text-gray-300 text-sm mt-1">{animeData.synopsis}</p>
           <div className="flex flex-wrap gap-2 mt-2">
             {animeData.genres.map((genre, index) => (
               <span key={index} className="px-2 py-1 bg-gray-800/80 rounded text-xs">
