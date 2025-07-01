@@ -763,7 +763,7 @@ const AnimePlayerPage: React.FC = () => {
         {/* Message d'erreur de pub */}
         {selectedEpisode && (
           <div className="text-center text-gray-300 text-sm italic">
-            Pub insistante ou vidéo indisponible ?<br />
+            ⚛️I AM ATOMIC⚛️<br />
             <span className="font-bold">Changez de lecteur.</span>
           </div>
         )}
