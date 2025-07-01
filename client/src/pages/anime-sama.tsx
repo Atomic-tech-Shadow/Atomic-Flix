@@ -251,9 +251,9 @@ const AnimeSamaPage: React.FC = () => {
                   )}
                   
                   {/* Titre superposé sur l'image */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">
-                    <h3 className="text-white font-medium text-sm line-clamp-2 group-hover:text-cyan-400 transition-all duration-300">{anime.title}</h3>
-                    <div className="flex justify-between items-center mt-1">
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-4 pb-3">
+                    <h3 className="text-white font-semibold text-sm leading-tight mb-2 group-hover:text-cyan-400 transition-all duration-300">{anime.title}</h3>
+                    <div className="flex justify-between items-center">
                       <p className="text-gray-300 text-xs uppercase tracking-wide">{anime.status}</p>
                       <p className="text-cyan-400/80 text-xs font-medium">{anime.type || 'anime'}</p>
                     </div>
@@ -325,13 +325,13 @@ const AnimeSamaPage: React.FC = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                       
                       {/* Titre superposé sur l'image */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">
-                        <h3 className="text-white font-medium text-sm line-clamp-2 group-hover:text-cyan-400 transition-colors">
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-4 pb-3">
+                        <h3 className="text-white font-semibold text-sm leading-tight mb-2 group-hover:text-cyan-400 transition-colors">
                           {anime.title}
                         </h3>
-                        <div className="flex justify-between items-center mt-1">
+                        <div className="flex justify-between items-center">
                           <p className="text-gray-300 text-xs">{anime.status}</p>
-                          <div className="text-cyan-400 text-xs">#{index + 1}</div>
+                          <div className="text-cyan-400 text-xs font-medium">#{index + 1}</div>
                         </div>
                       </div>
                     </motion.div>
