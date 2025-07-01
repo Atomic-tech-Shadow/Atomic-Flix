@@ -220,13 +220,12 @@ const AnimeSamaPage: React.FC = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
                   onClick={() => loadAnimeDetails(anime.id, anime.type)}
-                  className="atomic-card cursor-pointer group overflow-hidden h-80 sm:h-96 flex flex-col"
+                  className="cursor-pointer group overflow-hidden atomic-hover-scale h-80 sm:h-96 rounded-lg relative"
                 >
-                <div className="relative flex-1">
                   <img
                     src={anime.image}
                     alt={anime.title}
-                    className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                    className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = 'https://via.placeholder.com/300x400/1a1a1a/ffffff?text=Image+Non+Disponible';
@@ -259,7 +258,6 @@ const AnimeSamaPage: React.FC = () => {
                       <p className="text-cyan-400/80 text-xs font-medium">{anime.type || 'anime'}</p>
                     </div>
                   </div>
-                </div>
                 </motion.div>
               ))}
             </motion.div>
@@ -295,47 +293,45 @@ const AnimeSamaPage: React.FC = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.1, duration: 0.3 }}
                       onClick={() => loadAnimeDetails(anime.id, anime.type)}
-                      className="atomic-card cursor-pointer group overflow-hidden atomic-hover-scale h-80 sm:h-96 flex flex-col"
+                      className="cursor-pointer group overflow-hidden atomic-hover-scale h-80 sm:h-96 rounded-lg relative"
                     >
-                      <div className="relative flex-1">
-                        <img
-                          src={anime.image}
-                          alt={anime.title}
-                          className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = 'https://via.placeholder.com/300x400/1a1a1a/ffffff?text=Image+Non+Disponible';
-                            target.onerror = null; // Prevent infinite loop
-                          }}
-                        />
-                        {/* Badge type de contenu */}
-                        <div className={`absolute top-2 left-2 text-white text-xs px-2 py-1 rounded-full font-semibold ${
-                          anime.type === 'manga' ? 'bg-orange-500' :
-                          anime.type === 'film' ? 'bg-purple-500' :
-                          anime.type === 'movie' ? 'bg-purple-500' :
-                          'bg-blue-500'
-                        }`}>
-                          {anime.type === 'manga' ? 'MANGA' :
-                           anime.type === 'film' || anime.type === 'movie' ? 'FILM' :
-                           'ANIME'}
+                      <img
+                        src={anime.image}
+                        alt={anime.title}
+                        className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://via.placeholder.com/300x400/1a1a1a/ffffff?text=Image+Non+Disponible';
+                          target.onerror = null;
+                        }}
+                      />
+                      {/* Badge type de contenu */}
+                      <div className={`absolute top-2 left-2 text-white text-xs px-2 py-1 rounded-full font-semibold ${
+                        anime.type === 'manga' ? 'bg-orange-500' :
+                        anime.type === 'film' ? 'bg-purple-500' :
+                        anime.type === 'movie' ? 'bg-purple-500' :
+                        'bg-blue-500'
+                      }`}>
+                        {anime.type === 'manga' ? 'MANGA' :
+                         anime.type === 'film' || anime.type === 'movie' ? 'FILM' :
+                         'ANIME'}
+                      </div>
+                      
+                      {watchHistory[anime.id] && (
+                        <div className="absolute top-2 right-2 bg-cyan-500 text-white text-xs px-2 py-1 rounded-full">
+                          Ep {watchHistory[anime.id]}
                         </div>
-                        
-                        {watchHistory[anime.id] && (
-                          <div className="absolute top-2 right-2 bg-cyan-500 text-white text-xs px-2 py-1 rounded-full">
-                            Ep {watchHistory[anime.id]}
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        
-                        {/* Titre superposé sur l'image */}
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">
-                          <h3 className="text-white font-medium text-sm line-clamp-2 group-hover:text-cyan-400 transition-colors">
-                            {anime.title}
-                          </h3>
-                          <div className="flex justify-between items-center mt-1">
-                            <p className="text-gray-300 text-xs">{anime.status}</p>
-                            <div className="text-cyan-400 text-xs">#{index + 1}</div>
-                          </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      
+                      {/* Titre superposé sur l'image */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">
+                        <h3 className="text-white font-medium text-sm line-clamp-2 group-hover:text-cyan-400 transition-colors">
+                          {anime.title}
+                        </h3>
+                        <div className="flex justify-between items-center mt-1">
+                          <p className="text-gray-300 text-xs">{anime.status}</p>
+                          <div className="text-cyan-400 text-xs">#{index + 1}</div>
                         </div>
                       </div>
                     </motion.div>
