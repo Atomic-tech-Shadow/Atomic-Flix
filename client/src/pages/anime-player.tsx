@@ -4,6 +4,9 @@ import { ChevronLeft, ChevronRight, ChevronDown, Play, ArrowLeft, Download } fro
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'wouter';
 import MainLayout from '@/components/layout/main-layout';
+import { SectionLoading, PageLoading } from '@/components/ui/loading-spinner';
+import { FloatingBackButton } from '@/components/navigation/floating-back-button';
+import { BreadcrumbNav } from '@/components/navigation/breadcrumb-nav';
 
 interface Episode {
   id: string;
@@ -490,19 +493,29 @@ const AnimePlayerPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header avec bouton retour */}
+      {/* Header avec navigation et titre */}
       <div className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
-        <div className="flex items-center p-4">
-          <Link href={`/anime/${id}`} className="mr-4">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700"
-            >
-              <ArrowLeft size={20} />
-            </motion.button>
-          </Link>
-          <h1 className="text-lg font-semibold truncate">{animeData.title}</h1>
+        <div className="p-4">
+          <BreadcrumbNav 
+            items={[
+              { label: 'ATOMIC FLIX', href: '/anime-sama' },
+              { label: animeData.title, href: `/anime/${animeData.id}` },
+              { label: `${selectedSeason?.name || 'Saison 1'} - ${selectedLanguage}` }
+            ]}
+          />
+          <div className="flex items-center justify-between mt-3">
+            <Link href={`/anime/${id}`}>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 atomic-hover-scale"
+              >
+                <ArrowLeft size={20} />
+              </motion.button>
+            </Link>
+            <h1 className="text-lg font-semibold truncate atomic-gradient-text">{animeData.title}</h1>
+            <div className="w-10"></div> {/* Spacer pour équilibrer */}
+          </div>
         </div>
       </div>
 
@@ -682,12 +695,18 @@ const AnimePlayerPage: React.FC = () => {
           </motion.div>
         )}
 
-        {episodeLoading && (
-          <div className="text-center py-8">
-            <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-            <div className="text-gray-400">Chargement des épisodes...</div>
-          </div>
-        )}
+        <AnimatePresence>
+          {episodeLoading && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+            >
+              <SectionLoading message="Chargement des épisodes..." />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Gestion des erreurs */}
         {error && episodeDetails === null && (

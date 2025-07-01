@@ -12,18 +12,20 @@ export function FloatingBackButton({ onClick, show = true }: FloatingBackButtonP
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.8 }}
-      className="fixed top-20 left-4 z-40"
+      initial={{ opacity: 0, scale: 0.8, x: -50 }}
+      animate={{ opacity: 1, scale: 1, x: 0 }}
+      exit={{ opacity: 0, scale: 0.8, x: -50 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      className="fixed top-20 left-4 z-50"
     >
-      <Button
+      <motion.button
         onClick={onClick}
-        size="icon"
-        className="h-12 w-12 rounded-full bg-background/80 backdrop-blur-sm border shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        className="h-12 w-12 rounded-full atomic-card atomic-hover-scale atomic-hover-glow border-2 border-cyan-500/30 hover:border-cyan-400/50 shadow-lg hover:shadow-cyan-500/25"
       >
-        <ArrowLeft className="h-5 w-5" />
-      </Button>
+        <ArrowLeft className="h-5 w-5 text-cyan-400" />
+      </motion.button>
     </motion.div>
   );
 }

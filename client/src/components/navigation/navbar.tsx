@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useRoute } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Home, Film, BookOpen, Menu, X } from "lucide-react";
@@ -6,7 +6,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,10 +20,9 @@ export function Navbar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Use proper routing instead of window.location
+      // Navigation dynamique sans rechargement
       const searchUrl = `/anime-sama?search=${encodeURIComponent(searchQuery.trim())}`;
-      window.history.pushState({}, '', searchUrl);
-      window.location.reload();
+      navigate(searchUrl);
       setIsSearchOpen(false);
       setSearchQuery("");
     }

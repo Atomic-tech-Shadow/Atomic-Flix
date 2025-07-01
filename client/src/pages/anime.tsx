@@ -4,6 +4,9 @@ import { ChevronLeft, ChevronRight, ChevronDown, Play, AlertCircle, ArrowLeft, D
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'wouter';
 import MainLayout from '@/components/layout/main-layout';
+import { SectionLoading, PageLoading } from '@/components/ui/loading-spinner';
+import { FloatingBackButton } from '@/components/navigation/floating-back-button';
+import { BreadcrumbNav } from '@/components/navigation/breadcrumb-nav';
 
 interface Episode {
   id: string;
@@ -194,9 +197,33 @@ const AnimePage: React.FC = () => {
     );
   }
 
+  // État de chargement global
+  if (loading && !animeData) {
+    return (
+      <MainLayout>
+        <PageLoading message="Chargement des détails de l'anime..." />
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
       <div className="space-y-6">
+        {/* Navigation Breadcrumb */}
+        <div className="p-4">
+          <BreadcrumbNav 
+            items={[
+              { label: 'ATOMIC FLIX', href: '/anime-sama' },
+              { label: animeData?.title || 'Anime' }
+            ]}
+          />
+        </div>
+
+        {/* Bouton de retour flottant */}
+        <FloatingBackButton 
+          onClick={() => navigate('/anime-sama')}
+          show={true}
+        />
 
       {/* Banner de l'anime */}
       <div className="relative atomic-fade-in rounded-xl overflow-hidden">

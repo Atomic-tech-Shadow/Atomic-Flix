@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ArrowLeft } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import MainLayout from '@/components/layout/main-layout';
+import { SectionLoading } from '@/components/ui/loading-spinner';
 
 interface SearchResult {
   id: string;
@@ -36,16 +37,20 @@ const AnimeSamaPage: React.FC = () => {
       setWatchHistory(JSON.parse(savedHistory));
     }
     
-    // Vérifier s'il y a un paramètre de recherche dans l'URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchParam = urlParams.get('search');
-    if (searchParam) {
-      setSearchQuery(searchParam);
-    }
-    
     // Charger les animes populaires au démarrage
     loadPopularAnimes();
   }, []);
+
+  // Écouter les changements d'URL pour les paramètres de recherche
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParam = urlParams.get('search');
+    if (searchParam && searchParam !== searchQuery) {
+      setSearchQuery(searchParam);
+    } else if (!searchParam && searchQuery) {
+      setSearchQuery('');
+    }
+  }, [window.location.search]);
 
   // Charger tout le contenu populaire depuis l'API
   const loadPopularAnimes = async () => {
@@ -194,15 +199,29 @@ const AnimeSamaPage: React.FC = () => {
         )}
 
         {/* Résultats de recherche */}
-        {searchResults.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 atomic-fade-in">
-            {searchResults.map((anime, index) => (
-              <div
-                key={`search-${anime.id}-${index}`}
-                onClick={() => loadAnimeDetails(anime.id, anime.type)}
-                className="atomic-card cursor-pointer group overflow-hidden"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
+        <AnimatePresence mode="wait">
+          {loading && searchQuery && (
+            <SectionLoading message="Recherche en cours..." />
+          )}
+          
+          {searchResults.length > 0 && !loading && (
+            <motion.div 
+              key="search-results"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+            >
+              {searchResults.map((anime, index) => (
+                <motion.div
+                  key={`search-${anime.id}-${index}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                  onClick={() => loadAnimeDetails(anime.id, anime.type)}
+                  className="atomic-card cursor-pointer group overflow-hidden"
+                >
                 <div className="relative">
                   <img
                     src={anime.image}
@@ -239,34 +258,42 @@ const AnimeSamaPage: React.FC = () => {
                     <p className="text-cyan-400/80 text-xs font-medium">{anime.type || 'anime'}</p>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {!searchQuery && !searchResults.length && (
           <div>
             {/* Section Animes Populaires */}
             {popularAnimes.length > 0 && (
-              <div className="mb-8 atomic-fade-in">
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8"
+              >
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="atomic-gradient-text text-xl font-bold flex items-center gap-2">
                     🔥 Contenu Populaire 📈
                   </h2>
                   <button 
                     onClick={() => loadPopularAnimes()}
-                    className="text-cyan-400 text-sm hover:text-cyan-300 transition-all duration-300 px-3 py-1 rounded border border-cyan-500/30 hover:border-cyan-400/50 hover:bg-cyan-500/10"
+                    className="text-cyan-400 text-sm hover:text-cyan-300 transition-all duration-300 px-3 py-1 rounded border border-cyan-500/30 hover:border-cyan-400/50 hover:bg-cyan-500/10 atomic-hover-scale"
                   >
                     Actualiser
                   </button>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {popularAnimes.map((anime, index) => (
-                    <div
+                    <motion.div
                       key={`popular-${anime.id}-${index}`}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.1, duration: 0.3 }}
                       onClick={() => loadAnimeDetails(anime.id, anime.type)}
-                      className="rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform group"
-                      style={{ backgroundColor: '#1a1a1a' }}
+                      className="atomic-card cursor-pointer group overflow-hidden atomic-hover-scale"
                     >
                       <div className="relative">
                         <img
@@ -307,10 +334,10 @@ const AnimeSamaPage: React.FC = () => {
                           <div className="text-cyan-400 text-xs">#{index + 1}</div>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {/* Message de chargement */}
