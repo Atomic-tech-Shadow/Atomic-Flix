@@ -213,22 +213,21 @@ const AnimePage: React.FC = () => {
 
         {/* Banner de l'anime */}
         <div className="relative atomic-fade-in overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent z-10" />
         <img 
           src={animeData.image} 
           alt={animeData.title}
-          className="w-full h-72 sm:h-80 md:h-96 object-cover transition-transform duration-700 hover:scale-105"
+          className="w-full h-56 sm:h-64 md:h-72 object-cover transition-transform duration-700 hover:scale-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = 'https://via.placeholder.com/800x400/1a1a1a/ffffff?text=Image+Non+Disponible';
           }}
         />
-        <div className="absolute bottom-0 left-0 right-0 p-6 z-20 atomic-slide-in">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
           <h2 className="text-xl sm:text-2xl font-bold atomic-gradient-text mb-2">{animeData.title}</h2>
-          <p className="text-gray-300 text-sm mt-1 leading-relaxed">{animeData.synopsis}</p>
           
           {/* Informations intégrées */}
-          <div className="flex flex-wrap items-center gap-3 mt-3 mb-3">
+          <div className="flex flex-wrap items-center gap-3 mb-3">
             <div className="flex items-center space-x-2 bg-cyan-500/20 backdrop-blur-sm rounded-full px-3 py-1">
               <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
               <span className="text-cyan-300 text-xs font-medium">
@@ -251,7 +250,15 @@ const AnimePage: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-4 pt-0 space-y-6">
+      {/* Synopsis séparé pour une meilleure lisibilité */}
+      <div className="p-4 pt-6">
+        <div className="atomic-glass p-4 rounded-lg mb-6">
+          <h3 className="text-lg font-semibold atomic-gradient-text mb-3">📖 Synopsis</h3>
+          <p className="text-gray-300 text-sm leading-relaxed">{animeData.synopsis}</p>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-6">
         {/* Message d'erreur/info avec possibilité de réessayer */}
         {error && (
           <div className="bg-red-600/20 border border-red-600/30 rounded-lg p-4">
