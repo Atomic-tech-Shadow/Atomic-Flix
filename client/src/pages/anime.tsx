@@ -116,36 +116,16 @@ const AnimePage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // Charger les détails de base de l'anime
+        // Essayer uniquement l'endpoint direct des détails anime
         console.log('Chargement des détails pour:', id);
-        const animeResponse = await apiRequest(`/api/anime/${id}`, 20000);
+        const apiResponse = await apiRequest(`/api/anime/${id}`, 20000);
         
-        if (!animeResponse || !animeResponse.success) {
-          const errorMsg = animeResponse?.error || animeResponse?.message || 'Anime non trouvé dans la base de données';
+        if (!apiResponse || !apiResponse.success) {
+          const errorMsg = apiResponse?.error || apiResponse?.message || 'Anime non trouvé dans la base de données';
           throw new Error(errorMsg);
         }
         
-        // Charger les saisons (incluant les scans)
-        console.log('Chargement des saisons pour:', id);
-        const seasonsResponse = await apiRequest(`https://anime-sama-scraper.vercel.app/api/seasons/${id}`, 20000);
-        
-        let allSeasons = animeResponse.data.seasons || [];
-        
-        // Si on a des saisons supplémentaires depuis l'API seasons, les ajouter
-        if (seasonsResponse && seasonsResponse.success && seasonsResponse.seasons) {
-          // Combiner les saisons existantes avec les nouvelles (éviter les doublons)
-          const existingValues = allSeasons.map((s: any) => s.value);
-          const newSeasons = seasonsResponse.seasons.filter((s: any) => !existingValues.includes(s.value));
-          allSeasons = [...allSeasons, ...newSeasons];
-        }
-        
-        // Mettre à jour les données avec toutes les saisons
-        const updatedAnimeData = {
-          ...animeResponse.data,
-          seasons: allSeasons
-        };
-        
-        setAnimeData(updatedAnimeData);
+        setAnimeData(apiResponse.data);
         
       } catch (err) {
         console.error('Erreur chargement anime:', err);
@@ -172,9 +152,8 @@ const AnimePage: React.FC = () => {
   const goToPlayer = (season: Season) => {
     if (!id) return;
     
-    // Vérifier si c'est un manga/scan basé sur contentType ou nom de la saison
-    const isManga = (season as any).contentType === 'manga' ||
-                   season.name.toLowerCase().includes('scan') || 
+    // Vérifier si c'est un manga/scan basé sur le nom de la saison
+    const isManga = season.name.toLowerCase().includes('scan') || 
                    season.name.toLowerCase().includes('manga') ||
                    season.name.toLowerCase().includes('tome') ||
                    season.name.toLowerCase().includes('chapitre');
@@ -303,8 +282,7 @@ const AnimePage: React.FC = () => {
           </h3>
           <div className="grid grid-cols-2 gap-4">
             {animeData.seasons.map((season, index) => {
-              const isManga = (season as any).contentType === 'manga' ||
-                             season.name.toLowerCase().includes('scan') || 
+              const isManga = season.name.toLowerCase().includes('scan') || 
                              season.name.toLowerCase().includes('manga') ||
                              season.name.toLowerCase().includes('tome') ||
                              season.name.toLowerCase().includes('chapitre');
