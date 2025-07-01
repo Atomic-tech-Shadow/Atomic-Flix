@@ -221,7 +221,7 @@ const AnimePage: React.FC = () => {
         <img 
           src={animeData.image} 
           alt={animeData.title}
-          className="w-full h-48 sm:h-64 object-cover transition-transform duration-700 hover:scale-105"
+          className="w-full h-72 sm:h-80 md:h-96 object-cover transition-transform duration-700 hover:scale-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = 'https://via.placeholder.com/800x400/1a1a1a/ffffff?text=Image+Non+Disponible';
