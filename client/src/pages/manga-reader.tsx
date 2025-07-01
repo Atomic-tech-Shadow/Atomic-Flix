@@ -438,26 +438,65 @@ const MangaReaderPage: React.FC = () => {
               </div>
             </div>
           ) : selectedChapter ? (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-              <Book size={48} className="text-gray-600 mb-4" />
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">{selectedChapter.title}</h3>
-              <p className="text-gray-400 mb-4">Chapitre {selectedChapter.number}</p>
-              <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-3 sm:p-4 max-w-sm sm:max-w-md">
-                <p className="text-yellow-400 text-sm">
+            <div className="max-w-4xl mx-auto p-4">
+              {/* Header du chapitre */}
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold atomic-gradient-text mb-2">{selectedChapter.title}</h2>
+                <p className="text-gray-400">Chapitre {selectedChapter.number}</p>
+              </div>
+
+              {/* Message informatif */}
+              <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-4 mb-6 text-center">
+                <p className="text-yellow-400 text-sm mb-3">
                   Les pages de ce chapitre seront bientôt disponibles. 
                   L'API des images de manga est en cours de développement.
                 </p>
+                {selectedChapter.url && (
+                  <a 
+                    href={selectedChapter.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-2"
+                  >
+                    <Book size={16} />
+                    Lire sur anime-sama.fr
+                  </a>
+                )}
               </div>
-              {selectedChapter.url && (
-                <a 
-                  href={selectedChapter.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+
+              {/* Navigation entre chapitres */}
+              <div className="flex items-center justify-between gap-4 mb-6">
+                <button
+                  onClick={prevChapter}
+                  disabled={!chapters.length || chapters.findIndex(c => c.id === selectedChapter.id) === 0}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                 >
-                  Lire sur anime-sama.fr
-                </a>
-              )}
+                  <ChevronLeft size={16} />
+                  Chapitre précédent
+                </button>
+
+                <button
+                  onClick={() => setShowChapterList(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                >
+                  <List size={16} />
+                  Liste des chapitres
+                </button>
+
+                <button
+                  onClick={nextChapter}
+                  disabled={!chapters.length || chapters.findIndex(c => c.id === selectedChapter.id) === chapters.length - 1}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                >
+                  Chapitre suivant
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+
+              {/* Informations sur la progression */}
+              <div className="text-center text-sm text-gray-500">
+                Chapitre {chapters.findIndex(c => c.id === selectedChapter.id) + 1} sur {chapters.length}
+              </div>
             </div>
           ) : chapters.length > 0 ? (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
