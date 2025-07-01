@@ -510,42 +510,40 @@ const AnimePlayerPage: React.FC = () => {
 
       <div className="p-4 space-y-6">
 
-        {/* Sélecteur de langue - Style avec drapeaux circulaires */}
+        {/* Sélecteur de langue - Style anime-sama rectangulaire */}
         {selectedSeason && selectedSeason.languages.length > 1 && (
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             {selectedSeason.languages.map((lang) => (
               <motion.button
                 key={lang}
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => changeLanguage(lang as 'VF' | 'VOSTFR')}
-                className={`relative w-16 h-16 rounded-full overflow-hidden border-3 transition-all ${
+                className={`relative px-4 py-2 rounded-md font-bold text-sm border-2 transition-all overflow-hidden ${
                   selectedLanguage === lang
-                    ? 'border-white shadow-lg shadow-white/25'
-                    : 'border-gray-500 opacity-70 hover:opacity-100 hover:border-gray-300'
+                    ? 'border-white text-white shadow-lg'
+                    : 'border-gray-500 text-gray-300 hover:border-gray-300'
                 }`}
               >
                 {/* Drapeau de fond */}
                 {lang === 'VF' ? (
-                  <div className="w-full h-full flex">
+                  <div className="absolute inset-0 flex">
                     <div className="w-1/3 bg-blue-600"></div>
                     <div className="w-1/3 bg-white"></div>
                     <div className="w-1/3 bg-red-600"></div>
                   </div>
                 ) : (
-                  <div className="w-full h-full bg-red-600 flex items-center justify-center">
-                    <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                      <div className="w-6 h-6 bg-red-600 rounded-full"></div>
+                  <div className="absolute inset-0 bg-red-600 flex items-center justify-center">
+                    <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                      <div className="w-4 h-4 bg-red-600 rounded-full"></div>
                     </div>
                   </div>
                 )}
                 
                 {/* Texte de la langue */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-white font-bold text-xs bg-black/50 px-1 rounded">
-                    {lang}
-                  </span>
-                </div>
+                <span className="relative z-10 text-white font-bold drop-shadow-lg">
+                  {lang}
+                </span>
               </motion.button>
             ))}
           </div>
