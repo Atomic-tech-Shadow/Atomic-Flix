@@ -145,11 +145,23 @@ const AnimePage: React.FC = () => {
     loadAnimeData();
   }, [id]);
 
-  // Navigation vers la page de lecteur avec auto-play du premier épisode
+  // Navigation vers la page de lecteur appropriée
   const goToPlayer = (season: Season) => {
     if (!id) return;
-    // Naviguer vers le lecteur avec les paramètres de la saison sélectionnée - utiliser season.value pas season.number
-    navigate(`/anime/${id}/player?season=${season.value}&episode=1&lang=vostfr`);
+    
+    // Vérifier si c'est un manga/scan basé sur le nom de la saison
+    const isManga = season.name.toLowerCase().includes('scan') || 
+                   season.name.toLowerCase().includes('manga') ||
+                   season.name.toLowerCase().includes('tome') ||
+                   season.name.toLowerCase().includes('chapitre');
+    
+    if (isManga) {
+      // Rediriger vers le lecteur de manga
+      navigate(`/manga/${id}/reader?season=${season.value}`);
+    } else {
+      // Rediriger vers le lecteur vidéo
+      navigate(`/anime/${id}/player?season=${season.value}&episode=1&lang=vostfr`);
+    }
   };
 
 
@@ -215,7 +227,7 @@ const AnimePage: React.FC = () => {
         />
         <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
           <h2 className="text-xl sm:text-2xl font-bold">{animeData.title}</h2>
-          <p className="text-gray-300 text-sm mt-1">{animeData.synopsis}</p>
+          <p className="text-gray-300 text-sm mt-1 leading-relaxed">{animeData.synopsis}</p>
           <div className="flex flex-wrap gap-2 mt-2">
             {animeData.genres.map((genre, index) => (
               <span key={index} className="px-2 py-1 bg-gray-800/80 rounded text-xs">
@@ -261,34 +273,45 @@ const AnimePage: React.FC = () => {
         <div>
           <h3 className="text-lg font-semibold mb-4">Saisons et Films</h3>
           <div className="grid grid-cols-2 gap-4">
-            {animeData.seasons.map((season, index) => (
-              <motion.button
-                key={`season-${index}-${season.name}`}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                onClick={() => goToPlayer(season)}
-                className="relative overflow-hidden rounded-2xl h-24 group transition-all duration-300 border-4 border-blue-400 hover:border-blue-300 hover:shadow-lg"
-              >
-                {/* Image de fond */}
-                <div 
-                  className="absolute inset-0 bg-cover bg-center transform group-hover:scale-105 transition-transform duration-300"
-                  style={{
-                    backgroundImage: `url(${animeData.image})`,
-                  }}
-                />
-                {/* Overlay avec gradient sombre */}
-                <div className="absolute inset-0 bg-black/60" />
-                
-                {/* Contenu centré */}
-                <div className="absolute inset-0 flex items-center justify-center p-4">
-                  <div className="text-center">
-                    <div className="text-white font-bold text-lg drop-shadow-lg">
-                      {season.name}
+            {animeData.seasons.map((season, index) => {
+              // Détecter si c'est un manga/scan
+              const isManga = season.name.toLowerCase().includes('scan') || 
+                             season.name.toLowerCase().includes('manga') ||
+                             season.name.toLowerCase().includes('tome') ||
+                             season.name.toLowerCase().includes('chapitre');
+              
+              // Couleur de bordure selon le type
+              const borderColor = isManga ? 'border-orange-400 hover:border-orange-300' : 'border-blue-400 hover:border-blue-300';
+              
+              return (
+                <motion.button
+                  key={`season-${index}-${season.name}`}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  onClick={() => goToPlayer(season)}
+                  className={`relative overflow-hidden rounded-2xl h-24 group transition-all duration-300 border-4 ${borderColor} hover:shadow-lg`}
+                >
+                  {/* Image de fond */}
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center transform group-hover:scale-105 transition-transform duration-300"
+                    style={{
+                      backgroundImage: `url(${animeData.image})`,
+                    }}
+                  />
+                  {/* Overlay avec gradient sombre */}
+                  <div className="absolute inset-0 bg-black/60" />
+                  
+                  {/* Contenu centré */}
+                  <div className="absolute inset-0 flex items-center justify-center p-3">
+                    <div className="text-center">
+                      <div className="text-white font-bold text-sm sm:text-base leading-tight drop-shadow-lg shadow-black/50">
+                        {season.name}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.button>
-            ))}
+                </motion.button>
+              );
+            })}
           </div>
         </div>
 
