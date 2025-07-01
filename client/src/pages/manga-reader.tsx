@@ -158,20 +158,17 @@ const MangaReaderPage: React.FC = () => {
         setChapters(chapterList);
         
         if (chapterList.length > 0) {
-          // Sélectionner le chapitre demandé ou le premier disponible
-          let chapterToSelect = chapterList[0];
-          
+          // Si un chapitre spécifique est demandé, le sélectionner
           if (targetChapter) {
             const requestedChapter = chapterList.find(
               (c: any) => c.number === parseInt(targetChapter)
             );
             if (requestedChapter) {
-              chapterToSelect = requestedChapter;
+              setSelectedChapter(requestedChapter);
+              await loadChapterPages(requestedChapter);
             }
           }
-          
-          setSelectedChapter(chapterToSelect);
-          await loadChapterPages(chapterToSelect);
+          // Sinon, laisser l'utilisateur choisir depuis la liste
         }
       } else {
         setError('Aucun chapitre trouvé pour ce scan');
@@ -391,9 +388,9 @@ const MangaReaderPage: React.FC = () => {
                 </button>
               </div>
               <div className="p-2">
-                {chapters.map((chapter) => (
+                {chapters.map((chapter, index) => (
                   <button
-                    key={chapter.id}
+                    key={`chapter-${chapter.number}-${index}`}
                     onClick={() => {
                       setSelectedChapter(chapter);
                       loadChapterPages(chapter);
