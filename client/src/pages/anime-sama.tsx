@@ -29,12 +29,20 @@ const AnimeSamaPage: React.FC = () => {
   const [watchHistory, setWatchHistory] = useState<{[key: string]: number}>({});
   const [popularAnimes, setPopularAnimes] = useState<SearchResult[]>([]);
 
-  // Charger l'historique au démarrage
+  // Charger l'historique au démarrage et vérifier les paramètres de recherche
   useEffect(() => {
     const savedHistory = localStorage.getItem('animeWatchHistory');
     if (savedHistory) {
       setWatchHistory(JSON.parse(savedHistory));
     }
+    
+    // Vérifier s'il y a un paramètre de recherche dans l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParam = urlParams.get('search');
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    }
+    
     // Charger les animes populaires au démarrage
     loadPopularAnimes();
   }, []);
@@ -159,61 +167,28 @@ const AnimeSamaPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="min-h-screen text-white" style={{ backgroundColor: '#0a0a0a' }}>
-      {/* Header avec barre de recherche */}
-      <div 
-        className="sticky top-0 z-50 p-4 border-b border-gray-800"
-        style={{ backgroundColor: '#1a1a1a' }}
-      >
-        <div className="flex items-center gap-4">
-          <Link to="/" className="text-white hover:text-gray-300 transition-colors">
-            <ArrowLeft size={24} />
-          </Link>
-          <div className="flex-1 relative">
-            {searchQuery ? (
-              <div className="flex items-center gap-3">
-                <Search size={20} className="text-gray-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Rechercher des animes..."
-                  className="flex-1 bg-transparent text-white placeholder-gray-400 border-none outline-none text-lg"
-                  autoFocus
-                />
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center">
-                <div className="text-white font-bold text-lg mr-2">🔍</div>
-                <span className="text-white font-medium text-sm uppercase tracking-wide">
-                  ATOMIC FLIX
-                </span>
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-2 ml-3">
-            <div className="text-white text-xl">🇹🇬</div>
-          </div>
-        </div>
-      </div>
 
       {/* Page principale */}
       <div className="p-4">
-        {/* Barre de recherche si pas déjà focusée */}
-        {!searchQuery && (
+        {/* Barre de recherche locale */}
+        {searchQuery && (
           <div className="mb-6">
-            <div 
-              onClick={() => setSearchQuery(' ')}
-              className="flex items-center gap-3 p-4 rounded-lg cursor-text border border-gray-700 hover:border-gray-600 transition-colors"
-              style={{ backgroundColor: '#1a1a1a' }}
-            >
+            <div className="flex items-center gap-3 p-4 rounded-lg border border-gray-700" style={{ backgroundColor: '#1a1a1a' }}>
               <Search size={20} className="text-gray-400" />
-              <span className="text-gray-400">Rechercher des animes...</span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Rechercher des animes..."
+                className="flex-1 bg-transparent text-white placeholder-gray-400 border-none outline-none"
+                autoFocus
+              />
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
             </div>
           </div>
         )}
