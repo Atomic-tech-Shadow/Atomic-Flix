@@ -39,15 +39,15 @@ const AnimeSamaPage: React.FC = () => {
     loadPopularAnimes();
   }, []);
 
-  // Charger les animes populaires depuis l'API
+  // Charger tout le contenu populaire depuis l'API
   const loadPopularAnimes = async () => {
     try {
       const response = await apiRequest('/api/trending');
       
       if (response && response.success && response.results) {
-        // Utiliser uniquement les données de l'API sans fallback
-        setPopularAnimes(response.results.slice(0, 12));
-        console.log('Animes populaires chargés:', response.results.length);
+        // Afficher tous les types de contenu de l'API : animes, mangas, films
+        setPopularAnimes(response.results.slice(0, 24)); // Augmenter le nombre d'éléments affichés
+        console.log('Contenu populaire chargé:', response.results.length, 'éléments');
       } else {
         console.warn('Réponse API trending échouée:', response);
         setPopularAnimes([]);
@@ -108,9 +108,8 @@ const AnimeSamaPage: React.FC = () => {
       if (response && response.success) {
         const results = response.results || [];
         if (Array.isArray(results)) {
-          // Filtrer seulement les animes (pas les mangas) et utiliser uniquement les données API
-          const animeOnly = results.filter((item: any) => item.type !== 'manga');
-          setSearchResults(animeOnly);
+          // Afficher tout le contenu de l'API : animes, mangas, films, etc.
+          setSearchResults(results);
         } else {
           console.warn('Pas de résultats dans la réponse:', response);
           setSearchResults([]);
@@ -221,27 +220,43 @@ const AnimeSamaPage: React.FC = () => {
               <div
                 key={`search-${anime.id}-${index}`}
                 onClick={() => loadAnimeDetails(anime.id)}
-                className="rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                className="rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform group"
                 style={{ backgroundColor: '#1a1a1a' }}
               >
-                <img
-                  src={anime.image}
-                  alt={anime.title}
-                  className="w-full aspect-[3/4] object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'https://via.placeholder.com/300x400/1a1a1a/ffffff?text=Image+Non+Disponible';
-                  }}
-                />
+                <div className="relative">
+                  <img
+                    src={anime.image}
+                    alt={anime.title}
+                    className="w-full aspect-[3/4] object-cover group-hover:opacity-90 transition-opacity"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://via.placeholder.com/300x400/1a1a1a/ffffff?text=Image+Non+Disponible';
+                      target.onerror = null;
+                    }}
+                  />
+                  {/* Badge type de contenu */}
+                  <div className={`absolute top-2 left-2 text-white text-xs px-2 py-1 rounded-full font-semibold ${
+                    anime.type === 'manga' ? 'bg-orange-500' :
+                    anime.type === 'film' ? 'bg-purple-500' :
+                    anime.type === 'movie' ? 'bg-purple-500' :
+                    'bg-blue-500'
+                  }`}>
+                    {anime.type === 'manga' ? 'MANGA' :
+                     anime.type === 'film' || anime.type === 'movie' ? 'FILM' :
+                     'ANIME'}
+                  </div>
+                  
+                  {watchHistory[anime.id] && (
+                    <div className="absolute top-2 right-2 bg-cyan-500 text-white text-xs px-2 py-1 rounded-full">
+                      Ep {watchHistory[anime.id]}
+                    </div>
+                  )}
+                </div>
                 <div className="p-3">
-                  <h3 className="text-white font-medium text-sm line-clamp-2">{anime.title}</h3>
+                  <h3 className="text-white font-medium text-sm line-clamp-2 group-hover:text-cyan-400 transition-colors">{anime.title}</h3>
                   <div className="flex justify-between items-center mt-1">
                     <p className="text-gray-400 text-xs">{anime.status}</p>
-                    {watchHistory[anime.id] && (
-                      <span className="text-cyan-400 text-xs bg-cyan-900/30 px-1 rounded">
-                        Ep {watchHistory[anime.id]}
-                      </span>
-                    )}
+                    <p className="text-gray-500 text-xs">{anime.type || 'anime'}</p>
                   </div>
                 </div>
               </div>
@@ -255,7 +270,7 @@ const AnimeSamaPage: React.FC = () => {
             {popularAnimes.length > 0 && (
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-white text-lg font-bold">🔥🎌Animes📈Populaires🎌🔥</h2>
+                  <h2 className="text-white text-lg font-bold">🔥 Contenu Populaire 📈</h2>
                   <button 
                     onClick={() => loadPopularAnimes()}
                     className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors"
@@ -282,6 +297,18 @@ const AnimeSamaPage: React.FC = () => {
                             target.onerror = null; // Prevent infinite loop
                           }}
                         />
+                        {/* Badge type de contenu */}
+                        <div className={`absolute top-2 left-2 text-white text-xs px-2 py-1 rounded-full font-semibold ${
+                          anime.type === 'manga' ? 'bg-orange-500' :
+                          anime.type === 'film' ? 'bg-purple-500' :
+                          anime.type === 'movie' ? 'bg-purple-500' :
+                          'bg-blue-500'
+                        }`}>
+                          {anime.type === 'manga' ? 'MANGA' :
+                           anime.type === 'film' || anime.type === 'movie' ? 'FILM' :
+                           'ANIME'}
+                        </div>
+                        
                         {watchHistory[anime.id] && (
                           <div className="absolute top-2 right-2 bg-cyan-500 text-white text-xs px-2 py-1 rounded-full">
                             Ep {watchHistory[anime.id]}
@@ -328,15 +355,15 @@ const AnimeSamaPage: React.FC = () => {
               </div>
             )}
 
-            {/* Message vide si pas d'animes populaires et pas de chargement */}
+            {/* Message vide si pas de contenu populaire et pas de chargement */}
             {!loading && !error && popularAnimes.length === 0 && (
               <div className="text-center py-8">
-                <p className="text-gray-400">Aucun anime populaire trouvé</p>
+                <p className="text-gray-400">Aucun contenu populaire trouvé</p>
                 <button 
                   onClick={() => loadPopularAnimes()}
                   className="mt-2 text-cyan-400 hover:text-cyan-300 transition-colors"
                 >
-                  Charger les animes populaires
+                  Charger le contenu populaire
                 </button>
               </div>
             )}

@@ -5,7 +5,7 @@ import { storage } from "./storage";
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes pour ATOMIC FLIX
   
-  // Route pour les animes tendances (suppression de toute configuration locale)
+  // Route pour les contenus tendances (animes, mangas, films, etc.)
   app.get('/api/trending', async (req, res) => {
     try {
       const response = await fetch('https://anime-sama-scraper.vercel.app/api/trending');
@@ -13,6 +13,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(data);
     } catch (error) {
       console.error('Erreur API trending:', error);
+      res.status(500).json({ success: false, error: 'Service externe indisponible' });
+    }
+  });
+
+  // Route pour tous les contenus populaires (pas seulement trending)
+  app.get('/api/popular', async (req, res) => {
+    try {
+      const response = await fetch('https://anime-sama-scraper.vercel.app/api/popular');
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error('Erreur API popular:', error);
       res.status(500).json({ success: false, error: 'Service externe indisponible' });
     }
   });
