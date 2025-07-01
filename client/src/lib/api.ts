@@ -1,19 +1,22 @@
-// Configuration API centralisée pour ATOMIC FLIX
+// Configuration API pour ATOMIC FLIX - API externe uniquement
 export const API_CONFIG = {
   // API externe pour les données anime/manga
   EXTERNAL_API: 'https://anime-sama-scraper.vercel.app/api',
+  
+  // Configuration locale pour Vercel
+  LOCAL_API: '/api',
   
   // Timeout par défaut
   TIMEOUT: 15000,
   
   // Retry configuration
-  MAX_RETRIES: 1,
-  RETRY_DELAY: 500
+  MAX_RETRIES: 2,
+  RETRY_DELAY: 1000
 };
 
-// Fonction utilitaire pour les requêtes API avec retry automatique
+// Fonction utilitaire pour les requêtes API
 export const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-  const { MAX_RETRIES, RETRY_DELAY, TIMEOUT, EXTERNAL_API } = API_CONFIG;
+  const { MAX_RETRIES, RETRY_DELAY, TIMEOUT, LOCAL_API } = API_CONFIG;
   let attempt = 0;
   
   while (attempt < MAX_RETRIES) {
@@ -21,7 +24,8 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
       
-      const url = endpoint.startsWith('http') ? endpoint : `${EXTERNAL_API}${endpoint}`;
+      // Utiliser l'API locale pour Vercel qui fait proxy vers l'API externe
+      const url = `${LOCAL_API}${endpoint}`;
       
       const response = await fetch(url, {
         method: 'GET',
@@ -41,7 +45,7 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
       return await response.json();
     } catch (error) {
       attempt++;
-      console.log(`Tentative ${attempt}/${MAX_RETRIES} échouée:`, error);
+      console.error(`Tentative ${attempt}/${MAX_RETRIES} échouée:`, error);
       
       if (attempt >= MAX_RETRIES) {
         console.error('Erreur API après', MAX_RETRIES, 'tentatives:', error);
@@ -53,172 +57,45 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
   }
 };
 
-// Données de démonstration pour Vercel
-const DEMO_DATA = {
-  trending: {
-    success: true,
-    results: [
-      {
-        id: "one-piece",
-        title: "One Piece",
-        image: "https://cdn.myanimelist.net/images/anime/6/73245.jpg",
-        type: "Anime",
-        status: "En cours",
-        url: "https://anime-sama.fr/catalogue/one-piece/"
-      },
-      {
-        id: "demon-slayer",
-        title: "Demon Slayer",
-        image: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg",
-        type: "Anime", 
-        status: "Terminé",
-        url: "https://anime-sama.fr/catalogue/demon-slayer/"
-      },
-      {
-        id: "attack-on-titan",
-        title: "Attack on Titan",
-        image: "https://cdn.myanimelist.net/images/anime/10/47347.jpg",
-        type: "Anime",
-        status: "Terminé", 
-        url: "https://anime-sama.fr/catalogue/attack-on-titan/"
-      },
-      {
-        id: "naruto",
-        title: "Naruto",
-        image: "https://cdn.myanimelist.net/images/anime/13/17405.jpg",
-        type: "Anime",
-        status: "Terminé",
-        url: "https://anime-sama.fr/catalogue/naruto/"
-      },
-      {
-        id: "dragon-ball-z",
-        title: "Dragon Ball Z", 
-        image: "https://cdn.myanimelist.net/images/anime/1277/142725.jpg",
-        type: "Anime",
-        status: "Terminé",
-        url: "https://anime-sama.fr/catalogue/dragon-ball-z/"
-      },
-      {
-        id: "my-hero-academia",
-        title: "My Hero Academia",
-        image: "https://cdn.myanimelist.net/images/anime/10/78745.jpg",
-        type: "Anime",
-        status: "En cours",
-        url: "https://anime-sama.fr/catalogue/my-hero-academia/"
-      }
-    ]
-  }
-};
-
-// Fonctions API spécialisées pour ATOMIC FLIX avec fallback
+// Fonctions API spécialisées pour ATOMIC FLIX
 export const animeAPI = {
-  // Récupérer les animes tendance avec fallback
+  // Récupérer les animes tendance
   getTrending: async () => {
-    try {
-      const response = await apiRequest('/trending');
-      return response;
-    } catch (error) {
-      console.log('API externe indisponible, utilisation des données de démonstration');
-      return DEMO_DATA.trending;
-    }
+    return await apiRequest('/trending');
   },
   
-  // Rechercher des animes avec fallback
+  // Récupérer les animes populaires
+  getPopular: async () => {
+    return await apiRequest('/popular');
+  },
+  
+  // Rechercher des animes
   search: async (query: string) => {
-    try {
-      const response = await apiRequest(`/search?query=${encodeURIComponent(query)}`);
-      return response;
-    } catch (error) {
-      console.log('Recherche indisponible, filtrage des données locales');
-      const filtered = DEMO_DATA.trending.results.filter(anime => 
-        anime.title.toLowerCase().includes(query.toLowerCase())
-      );
-      return { success: true, results: filtered };
-    }
+    return await apiRequest(`/search?query=${encodeURIComponent(query)}`);
   },
   
-  // Détails d'un anime avec fallback
+  // Détails d'un anime
   getDetails: async (id: string) => {
-    try {
-      const response = await apiRequest(`/anime/${id}`);
-      return response;
-    } catch (error) {
-      const anime = DEMO_DATA.trending.results.find(a => a.id === id);
-      if (anime) {
-        return {
-          success: true,
-          data: {
-            ...anime,
-            synopsis: `Synopsis de ${anime.title} - Cette série est actuellement en démonstration.`,
-            genres: ["Action", "Aventure", "Shonen"],
-            year: "2023",
-            seasons: [
-              {
-                number: 1,
-                name: "Saison 1",
-                value: "saison1",
-                languages: ["VOSTFR", "VF"],
-                episodeCount: 24,
-                url: "saison1/vostfr",
-                available: true
-              }
-            ]
-          }
-        };
-      }
-      throw error;
-    }
+    return await apiRequest(`/anime/${id}`);
   },
   
-  // Épisodes d'une saison avec fallback
+  // Épisodes d'une saison
   getEpisodes: async (animeId: string, season: string, language: string) => {
-    try {
-      const response = await apiRequest(`/episodes/${animeId}?season=${season}&language=${language.toLowerCase()}`);
-      return response;
-    } catch (error) {
-      return {
-        success: true,
-        animeId,
-        season,
-        language: language.toLowerCase(),
-        episodes: Array.from({length: 12}, (_, i) => ({
-          number: i + 1,
-          title: `Épisode ${i + 1}`,
-          url: `https://anime-sama.fr/catalogue/${animeId}/${season}/${language.toLowerCase()}/episode-${i + 1}`,
-          streamingSources: [
-            {
-              server: "Demo Player",
-              url: "#demo",
-              quality: "HD",
-              serverNumber: 1
-            }
-          ],
-          language: language.toUpperCase(),
-          available: true
-        }))
-      };
-    }
+    return await apiRequest(`/episodes/${animeId}?season=${season}&language=${language}`);
   },
   
-  // Sources de streaming avec fallback
+  // Sources de streaming
   getEmbedSources: async (episodeUrl: string) => {
-    try {
-      const response = await apiRequest(`/embed?url=${encodeURIComponent(episodeUrl)}`);
-      return response;
-    } catch (error) {
-      return {
-        success: true,
-        url: episodeUrl,
-        sources: [
-          {
-            server: "Demo Player",
-            url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-            quality: "HD",
-            type: "streaming",
-            serverNumber: 1
-          }
-        ]
-      };
-    }
+    return await apiRequest(`/embed?url=${encodeURIComponent(episodeUrl)}`);
+  },
+  
+  // Chapitres de manga
+  getMangaChapters: async (mangaId: string) => {
+    return await apiRequest(`/manga/${mangaId}/chapters`);
+  },
+  
+  // Pages d'un chapitre de manga
+  getChapterPages: async (chapterId: string) => {
+    return await apiRequest(`/manga/chapter/${chapterId}`);
   }
 };

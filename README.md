@@ -1,43 +1,103 @@
-# ATOMIC FLIX - Déploiement sur Vercel
+# ATOMIC FLIX - Anime Streaming Platform
 
-## Configuration du déploiement
+Plateforme de streaming d'anime moderne construite avec React, TypeScript et API externe.
 
-### Étapes pour déployer sur Vercel :
+## 🚀 Déploiement Vercel
 
-1. **Connectez votre dépôt GitHub à Vercel**
-   - Allez sur [vercel.com](https://vercel.com)
-   - Connectez-vous avec votre compte GitHub
-   - Cliquez sur "New Project" et sélectionnez votre dépôt
+### Prérequis
+- Compte Vercel
+- Repository Git (GitHub, GitLab, etc.)
 
-2. **Redéploiement nécessaire**
-   Le site est en ligne mais les assets ne se chargent pas correctement.
-   Après avoir commité les corrections de configuration, redéployez sur Vercel.
-   
-   La configuration corrigée utilise `rewrites` au lieu de `routes` pour permettre
-   le chargement correct des fichiers CSS et JavaScript.
+### Configuration de déploiement
 
-3. **Déploiement automatique**
-   - Vercel déploiera automatiquement à chaque push sur la branche main
-   - Le build utilisera la commande `npm run build`
-   - L'application sera accessible via votre domaine Vercel
+1. **Connectez votre repository à Vercel**
+   - Importez votre projet sur [vercel.com](https://vercel.com)
+   - Sélectionnez votre repository
 
-### Structure du projet pour Vercel :
-- `/api/index.ts` : Point d'entrée pour les fonctions serverless
-- `/vercel.json` : Configuration Vercel
-- `/dist/public` : Fichiers statiques buildés du frontend
+2. **Configuration automatique**
+   - Vercel détectera automatiquement la configuration grâce au fichier `vercel.json`
+   - Aucune configuration manuelle requise
 
-### Commandes importantes :
+3. **Variables d'environnement (optionnel)**
+   - Aucune variable requise pour le fonctionnement de base
+   - L'application utilise uniquement l'API externe `anime-sama-scraper.vercel.app`
+
+### Commandes de build
+
 ```bash
-npm run build    # Build l'application pour production
-npm run dev      # Développement local
-npm run start    # Démarrage en production
+# Développement local
+npm run dev
+
+# Build pour production
+npm run build
+
+# Type checking
+npm run check
 ```
 
-## Architecture de déploiement
+## 🏗️ Architecture
 
-L'application utilise :
-- **Frontend** : React/Vite buildé en fichiers statiques
-- **Backend** : API Express.js en tant que fonctions serverless Vercel
-- **Base de données** : PostgreSQL (recommandé : Vercel Postgres ou Neon)
+### Frontend
+- **React 18** avec TypeScript
+- **Vite** pour le build et dev server
+- **Tailwind CSS** pour le styling
+- **TanStack Query** pour la gestion d'état
+- **Wouter** pour le routing
 
-Votre application sera disponible sur `https://votre-projet.vercel.app`
+### Backend
+- **API Serverless** (Vercel Functions)
+- **Proxy vers API externe** (anime-sama-scraper.vercel.app)
+- **Pas de base de données locale** (données externes uniquement)
+
+### Structure du projet
+```
+├── client/               # Frontend React
+│   ├── src/
+│   │   ├── components/   # Composants UI
+│   │   ├── pages/        # Pages de l'application
+│   │   └── lib/          # Utilitaires et configuration API
+├── api/                  # Fonctions serverless Vercel
+│   └── index.js          # Proxy vers API externe
+├── shared/               # Types TypeScript partagés
+└── vercel.json           # Configuration Vercel
+```
+
+## 🔧 Fonctionnalités
+
+- **Recherche d'anime** en temps réel
+- **Lecteur vidéo** intégré
+- **Lecteur de manga** avec navigation
+- **Interface responsive** (mobile/desktop)
+- **Thème sombre** moderne
+- **Navigation fluide** sans rechargement de page
+
+## 🌐 API
+
+L'application utilise exclusivement l'API externe :
+- `https://anime-sama-scraper.vercel.app/api`
+
+Aucune base de données locale ou données de démonstration.
+
+## 📱 Interface
+
+- Design moderne avec effets glassmorphism
+- Animations fluides avec Framer Motion
+- Composants UI basés sur Radix UI
+- Responsive design pour tous les appareils
+
+## 🔒 Sécurité
+
+- Séparation client/serveur stricte
+- Pas de données sensibles stockées localement
+- Proxy API pour éviter les problèmes CORS
+- Configuration Vercel sécurisée
+
+## 📝 Déploiement réussi
+
+✅ Build optimisé pour Vercel  
+✅ Configuration serverless  
+✅ API externe uniquement  
+✅ Pas de base de données requise  
+✅ Interface responsive complète  
+
+**URL de démonstration :** Disponible après déploiement Vercel
