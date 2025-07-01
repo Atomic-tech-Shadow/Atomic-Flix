@@ -510,35 +510,42 @@ const AnimePlayerPage: React.FC = () => {
 
       <div className="p-4 space-y-6">
 
-        {/* Sélecteur de langue - Style anime-sama */}
+        {/* Sélecteur de langue - Style avec drapeaux circulaires */}
         {selectedSeason && selectedSeason.languages.length > 1 && (
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {selectedSeason.languages.map((lang) => (
               <motion.button
                 key={lang}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => changeLanguage(lang as 'VF' | 'VOSTFR')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm border-2 transition-all ${
+                className={`relative w-16 h-16 rounded-full overflow-hidden border-3 transition-all ${
                   selectedLanguage === lang
-                    ? 'bg-red-600 border-red-600 text-white'
-                    : 'bg-transparent border-gray-600 text-gray-300 hover:border-gray-400'
+                    ? 'border-white shadow-lg shadow-white/25'
+                    : 'border-gray-500 opacity-70 hover:opacity-100 hover:border-gray-300'
                 }`}
               >
-                {/* Drapeau selon la langue */}
+                {/* Drapeau de fond */}
                 {lang === 'VF' ? (
-                  <div className="w-6 h-4 bg-white rounded border border-gray-300 flex">
-                    <div className="w-1/3 bg-blue-500 rounded-l"></div>
+                  <div className="w-full h-full flex">
+                    <div className="w-1/3 bg-blue-600"></div>
                     <div className="w-1/3 bg-white"></div>
-                    <div className="w-1/3 bg-red-500 rounded-r"></div>
+                    <div className="w-1/3 bg-red-600"></div>
                   </div>
                 ) : (
-                  <div className="w-6 h-4 bg-white rounded border border-gray-300 flex items-center justify-center relative overflow-hidden">
-                    <div className="w-4 h-4 bg-red-600 rounded-full absolute"></div>
-                    <div className="w-2 h-2 bg-white rounded-full absolute z-10"></div>
+                  <div className="w-full h-full bg-red-600 flex items-center justify-center">
+                    <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                      <div className="w-6 h-6 bg-red-600 rounded-full"></div>
+                    </div>
                   </div>
                 )}
-                {lang}
+                
+                {/* Texte de la langue */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-white font-bold text-xs bg-black/50 px-1 rounded">
+                    {lang}
+                  </span>
+                </div>
               </motion.button>
             ))}
           </div>
