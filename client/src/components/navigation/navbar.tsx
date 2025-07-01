@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Home, Film, BookOpen, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import atomicLogo from "@assets/file_00000000c67861f9924b51d792b4b888_1751410240730.png";
 
 export function Navbar() {
   const [location, navigate] = useLocation();
@@ -35,7 +36,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center space-x-3">
             <div className="flex h-10 w-10 items-center justify-center">
               <img 
-                src="/attached_assets/file_00000000c67861f9924b51d792b4b888_1751410240730.png" 
+                src={atomicLogo} 
                 alt="ATOMIC FLIX Logo" 
                 className="h-8 w-8 object-contain"
               />
