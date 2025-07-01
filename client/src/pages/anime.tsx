@@ -209,16 +209,6 @@ const AnimePage: React.FC = () => {
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Navigation Breadcrumb */}
-        <div className="p-4">
-          <BreadcrumbNav 
-            items={[
-              { label: 'ATOMIC FLIX', href: '/anime-sama' },
-              { label: animeData?.title || 'Anime' }
-            ]}
-          />
-        </div>
-
         {/* Bouton de retour flottant */}
         <FloatingBackButton 
           onClick={() => navigate('/anime-sama')}
