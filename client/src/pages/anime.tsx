@@ -269,16 +269,16 @@ const AnimePage: React.FC = () => {
 
         {/* Informations de l'anime */}
         <div className="atomic-card atomic-slide-in">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-              <span className="text-gray-400 uppercase tracking-wide">Statut:</span>
-              <span className="text-white font-medium">{animeData.status}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center justify-center sm:justify-start space-x-3 p-3 bg-cyan-500/10 rounded-lg">
+              <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
+              <span className="text-cyan-300 font-medium">
+                {animeData.seasons.length} saisons disponibles
+              </span>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-              <span className="text-gray-400 uppercase tracking-wide">Année:</span>
-              <span className="text-white font-medium">{animeData.year}</span>
+            <div className="flex items-center justify-center sm:justify-start space-x-3 p-3 bg-blue-500/10 rounded-lg">
+              <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+              <span className="text-blue-300 font-medium">Année: {animeData.year}</span>
             </div>
           </div>
         </div>

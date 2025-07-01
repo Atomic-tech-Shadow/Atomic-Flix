@@ -16,7 +16,7 @@ export function FloatingBackButton({ onClick, show = true }: FloatingBackButtonP
       animate={{ opacity: 1, scale: 1, x: 0 }}
       exit={{ opacity: 0, scale: 0.8, x: -50 }}
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
-      className="fixed top-20 left-4 z-50"
+      className="fixed top-24 left-6 z-50"
     >
       <motion.button
         onClick={onClick}
