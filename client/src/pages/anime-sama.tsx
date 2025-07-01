@@ -174,7 +174,7 @@ const AnimeSamaPage: React.FC = () => {
       <div className="min-h-screen text-white atomic-fade-in" style={{ backgroundColor: 'var(--atomic-dark)' }}>
 
       {/* Page principale */}
-      <div className="p-2">
+      <div className="px-2 pt-1 pb-2">
         {/* Barre de recherche locale */}
         {searchQuery && (
           <div className="mb-6 atomic-slide-in">
@@ -272,9 +272,9 @@ const AnimeSamaPage: React.FC = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="mb-8"
+                className="mb-4"
               >
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <h2 className="atomic-gradient-text text-xl font-bold flex items-center gap-2">
                     🔥 Contenu Populaire 📈
                   </h2>
