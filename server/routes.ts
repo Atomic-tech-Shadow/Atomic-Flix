@@ -103,6 +103,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Route pour les chapitres de manga (uniquement API externe)
+  app.get('/api/manga/chapter/:chapterId', async (req, res) => {
+    try {
+      const { chapterId } = req.params;
+      
+      const response = await fetch(
+        `https://anime-sama-scraper.vercel.app/api/manga/chapter/${chapterId}`
+      );
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error('Erreur API manga chapter:', error);
+      res.status(500).json({ success: false, error: 'Service externe indisponible' });
+    }
+  });
+
+  // Route pour les pages de scan manga (uniquement API externe)
+  app.get('/api/manga/:mangaId/chapters', async (req, res) => {
+    try {
+      const { mangaId } = req.params;
+      
+      const response = await fetch(
+        `https://anime-sama-scraper.vercel.app/api/manga/${mangaId}/chapters`
+      );
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error('Erreur API manga chapters:', error);
+      res.status(500).json({ success: false, error: 'Service externe indisponible' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

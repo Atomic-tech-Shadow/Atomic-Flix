@@ -134,9 +134,14 @@ const AnimeSamaPage: React.FC = () => {
     }
   };
 
-  // Naviguer vers la page anime dédiée
-  const loadAnimeDetails = async (animeId: string) => {
-    navigate(`/anime/${animeId}`);
+  // Naviguer vers la page dédiée (anime ou manga)
+  const loadAnimeDetails = async (animeId: string, contentType?: string) => {
+    // Détecter si c'est un manga pour rediriger vers le lecteur approprié
+    if (contentType === 'manga') {
+      navigate(`/manga/${animeId}/reader`);
+    } else {
+      navigate(`/anime/${animeId}`);
+    }
   };
 
   // Gérer la recherche en temps réel
@@ -219,7 +224,7 @@ const AnimeSamaPage: React.FC = () => {
             {searchResults.map((anime, index) => (
               <div
                 key={`search-${anime.id}-${index}`}
-                onClick={() => loadAnimeDetails(anime.id)}
+                onClick={() => loadAnimeDetails(anime.id, anime.type)}
                 className="rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform group"
                 style={{ backgroundColor: '#1a1a1a' }}
               >
@@ -282,7 +287,7 @@ const AnimeSamaPage: React.FC = () => {
                   {popularAnimes.map((anime, index) => (
                     <div
                       key={`popular-${anime.id}-${index}`}
-                      onClick={() => loadAnimeDetails(anime.id)}
+                      onClick={() => loadAnimeDetails(anime.id, anime.type)}
                       className="rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform group"
                       style={{ backgroundColor: '#1a1a1a' }}
                     >

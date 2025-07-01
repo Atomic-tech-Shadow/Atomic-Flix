@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import AnimeSamaPage from "@/pages/anime-sama";
 import AnimePage from "@/pages/anime";
 import AnimePlayerPage from "@/pages/anime-player";
+import MangaReaderPage from "@/pages/manga-reader";
 
 function Router() {
   return (
@@ -14,6 +15,7 @@ function Router() {
       <Route path="/anime-sama" component={AnimeSamaPage} />
       <Route path="/anime/:id" component={AnimePage} />
       <Route path="/anime/:id/player" component={AnimePlayerPage} />
+      <Route path="/manga/:id/reader" component={MangaReaderPage} />
       <Route path="/" component={AnimeSamaPage} />
       <Route component={NotFound} />
     </Switch>
