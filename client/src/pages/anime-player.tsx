@@ -81,37 +81,24 @@ const AnimePlayerPage: React.FC = () => {
   const [episodeLoading, setEpisodeLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Configuration API externe
-  const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
-
-  // Fonction pour les requêtes API externes
-  const apiRequest = async (endpoint: string, options = {}) => {
-    const maxRetries = 2;
-    let attempt = 0;
-    
-    while (attempt < maxRetries) {
-      try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-          method: 'GET',
-          ...options
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  // Fonction pour les requêtes API externes uniquement
+  const apiRequest = async (endpoint: string) => {
+    try {
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         }
-        
-        return await response.json();
-      } catch (error) {
-        attempt++;
-        console.log(`Tentative ${attempt}/${maxRetries} échouée:`, error);
-        
-        if (attempt >= maxRetries) {
-          console.error('Erreur API après', maxRetries, 'tentatives:', error);
-          throw error;
-        }
-        
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Service externe indisponible: ${response.status}`);
       }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Erreur API:', error);
+      throw error;
     }
   };
 
@@ -200,7 +187,7 @@ const AnimePlayerPage: React.FC = () => {
 
 
 
-  // Fonction pour charger les épisodes avec données anime - utilise uniquement l'API
+  // Fonction pour charger les épisodes via API externe uniquement
   const loadSeasonEpisodesDirectly = async (animeDataObj: any, season: Season, autoLoadEpisode = false) => {
     try {
       setEpisodeLoading(true);
@@ -208,7 +195,7 @@ const AnimePlayerPage: React.FC = () => {
       
       console.log('Chargement épisodes pour:', animeDataObj.id, 'saison:', season.value, 'langue:', selectedLanguage);
       
-      // Utiliser uniquement l'API selon la documentation
+      // Utiliser uniquement l'API externe
       const data = await apiRequest(`/api/episodes/${animeDataObj.id}?season=${season.value}&language=${languageCode}`);
       console.log('Épisodes reçus de l\'API:', data);
       

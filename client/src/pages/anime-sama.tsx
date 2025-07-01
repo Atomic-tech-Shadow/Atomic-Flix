@@ -45,15 +45,9 @@ const AnimeSamaPage: React.FC = () => {
       const response = await apiRequest('/api/trending');
       
       if (response && response.success && response.results) {
-        // L'API renvoie les données dans response.results
-        const animesWithImages = response.results.map((anime: any) => ({
-          ...anime,
-          image: anime.image || `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`,
-          status: anime.status || 'Disponible',
-          type: anime.contentType || 'anime'
-        }));
-        setPopularAnimes(animesWithImages.slice(0, 12));
-        console.log('Animes populaires chargés:', animesWithImages.length);
+        // Utiliser uniquement les données de l'API sans fallback
+        setPopularAnimes(response.results.slice(0, 12));
+        console.log('Animes populaires chargés:', response.results.length);
       } else {
         console.warn('Réponse API trending échouée:', response);
         setPopularAnimes([]);
@@ -114,15 +108,9 @@ const AnimeSamaPage: React.FC = () => {
       if (response && response.success) {
         const results = response.results || [];
         if (Array.isArray(results)) {
-          // Filtrer seulement les animes (pas les mangas) et ajouter des propriétés manquantes
+          // Filtrer seulement les animes (pas les mangas) et utiliser uniquement les données API
           const animeOnly = results.filter((item: any) => item.type !== 'manga');
-          const animesWithImages = animeOnly.map((anime: any) => ({
-            ...anime,
-            image: anime.image || `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`,
-            status: anime.status || 'Disponible',
-            type: anime.type || 'Anime'
-          }));
-          setSearchResults(animesWithImages);
+          setSearchResults(animeOnly);
         } else {
           console.warn('Pas de résultats dans la réponse:', response);
           setSearchResults([]);

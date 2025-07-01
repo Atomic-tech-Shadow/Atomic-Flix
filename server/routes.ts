@@ -5,19 +5,19 @@ import { storage } from "./storage";
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes pour ATOMIC FLIX
   
-  // Route pour les animes populaires
-  app.get('/api/popular', async (req, res) => {
+  // Route pour les animes tendances (suppression de toute configuration locale)
+  app.get('/api/trending', async (req, res) => {
     try {
-      const response = await fetch('https://anime-sama-scraper.vercel.app/api/popular');
+      const response = await fetch('https://anime-sama-scraper.vercel.app/api/trending');
       const data = await response.json();
       res.json(data);
     } catch (error) {
-      console.error('Erreur API popular:', error);
-      res.status(500).json({ success: false, error: 'Erreur lors du chargement des animes populaires' });
+      console.error('Erreur API trending:', error);
+      res.status(500).json({ success: false, error: 'Service externe indisponible' });
     }
   });
 
-  // Route pour la recherche d'animes
+  // Route pour la recherche d'animes (uniquement API externe)
   app.get('/api/search', async (req, res) => {
     try {
       const { query } = req.query;
@@ -30,11 +30,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(data);
     } catch (error) {
       console.error('Erreur API search:', error);
-      res.status(500).json({ success: false, error: 'Erreur lors de la recherche' });
+      res.status(500).json({ success: false, error: 'Service externe indisponible' });
     }
   });
 
-  // Route pour les détails d'un anime
+  // Route pour les détails d'un anime (uniquement API externe)
   app.get('/api/anime/:id', async (req, res) => {
     try {
       const { id } = req.params;
@@ -43,34 +43,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(data);
     } catch (error) {
       console.error('Erreur API anime details:', error);
-      res.status(500).json({ success: false, error: 'Erreur lors du chargement des détails de l\'anime' });
+      res.status(500).json({ success: false, error: 'Service externe indisponible' });
     }
   });
 
-  // Route pour les épisodes d'une saison
-  app.get('/api/episodes', async (req, res) => {
+  // Route pour les épisodes d'une saison (uniquement API externe)
+  app.get('/api/episodes/:animeId', async (req, res) => {
     try {
-      const { animeId, season, language } = req.query;
+      const { animeId } = req.params;
+      const { season, language } = req.query;
       
-      if (!animeId || !season || !language) {
+      if (!season || !language) {
         return res.status(400).json({ 
           success: false, 
-          error: 'Paramètres animeId, season et language requis' 
+          error: 'Paramètres season et language requis' 
         });
       }
       
       const response = await fetch(
-        `https://anime-sama-scraper.vercel.app/api/episodes?animeId=${animeId}&season=${season}&language=${language}`
+        `https://anime-sama-scraper.vercel.app/api/episodes/${animeId}?season=${season}&language=${language}`
       );
       const data = await response.json();
       res.json(data);
     } catch (error) {
       console.error('Erreur API episodes:', error);
-      res.status(500).json({ success: false, error: 'Erreur lors du chargement des épisodes' });
+      res.status(500).json({ success: false, error: 'Service externe indisponible' });
     }
   });
 
-  // Route pour les sources d'embed d'un épisode
+  // Route pour les sources d'embed d'un épisode (uniquement API externe)
   app.get('/api/embed', async (req, res) => {
     try {
       const { url } = req.query;
@@ -86,7 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(data);
     } catch (error) {
       console.error('Erreur API embed:', error);
-      res.status(500).json({ success: false, error: 'Erreur lors du chargement des sources d\'embed' });
+      res.status(500).json({ success: false, error: 'Service externe indisponible' });
     }
   });
 
