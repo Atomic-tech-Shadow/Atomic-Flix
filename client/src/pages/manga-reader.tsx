@@ -190,28 +190,18 @@ const MangaReaderPage: React.FC = () => {
       setLoadingPages(true);
       console.log('Chargement des pages pour le chapitre:', chapter.number);
       
-      // Tentative de chargement des pages du chapitre
-      // L'API pour les pages n'est pas encore disponible
-      const response = await apiRequest(
-        `https://anime-sama-scraper.vercel.app/api/chapter/${id}/${chapter.number}?language=${chapter.language}`
-      );
-      
-      if (response && response.success && response.pages) {
-        const updatedChapter = { ...chapter, pages: response.pages };
-        setSelectedChapter(updatedChapter);
-        setCurrentPageIndex(0);
-      } else {
-        // Fallback: chapitre sans pages pour le moment
-        setSelectedChapter(chapter);
-        setCurrentPageIndex(0);
-        setError(null); // Pas d'erreur, juste pas de pages encore
-      }
-    } catch (error) {
-      console.error('Erreur chargement pages:', error);
-      // En cas d'erreur, on affiche quand même le chapitre sans message d'erreur
+      // Pour l'instant, l'API des pages n'est pas disponible
+      // On affiche directement le chapitre sans essayer de charger les pages
       setSelectedChapter(chapter);
       setCurrentPageIndex(0);
-      setError(null); // On ne veut pas afficher d'erreur, juste l'interface informative
+      setError(null);
+      
+    } catch (error) {
+      console.error('Erreur chargement pages:', error);
+      // En cas d'erreur, on affiche quand même le chapitre
+      setSelectedChapter(chapter);
+      setCurrentPageIndex(0);
+      setError(null);
     } finally {
       setLoadingPages(false);
     }
@@ -341,7 +331,7 @@ const MangaReaderPage: React.FC = () => {
               </Link>
               
               <div>
-                <h1 className="text-lg font-bold truncate max-w-[200px]">{mangaData.title}</h1>
+                <h1 className="text-lg font-bold truncate max-w-[200px]">{mangaData?.title || 'Manga'}</h1>
                 {selectedChapter && (
                   <p className="text-sm text-gray-400">
                     Chapitre {selectedChapter.number} - Page {currentPageIndex + 1}/{selectedChapter.pages?.length || 0}
