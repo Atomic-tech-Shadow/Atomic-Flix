@@ -492,38 +492,11 @@ const AnimePlayerPage: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header avec navigation et titre */}
-      <div className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
-        <div className="p-4">
-          <BreadcrumbNav 
-            items={[
-              { label: 'ATOMIC FLIX', href: '/anime-sama' },
-              { label: animeData.title, href: `/anime/${animeData.id}` },
-              { label: `${selectedSeason?.name || 'Saison 1'} - ${selectedLanguage}` }
-            ]}
-          />
-          <div className="flex items-center justify-between mt-3">
-            <Link href={`/anime/${id}`}>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 atomic-hover-scale"
-              >
-                <ArrowLeft size={20} />
-              </motion.button>
-            </Link>
-            <h1 className="text-lg font-semibold truncate atomic-gradient-text">{animeData.title}</h1>
-            <div className="w-10"></div> {/* Spacer pour équilibrer */}
-          </div>
-        </div>
-      </div>
-
-      <div className="p-4 space-y-6">
-        {/* Bannière avec titre de la saison */}
-        <div className="relative rounded-lg overflow-hidden">
+      <div className="-mx-4 -my-6">
+        {/* Bannière avec titre de la saison - Pleine largeur */}
+        <div className="relative overflow-hidden">
           <div 
-            className="h-32 bg-cover bg-center"
+            className="h-48 sm:h-56 md:h-64 bg-cover bg-center"
             style={{
               backgroundImage: `url(${animeData.image})`,
             }}
@@ -534,6 +507,8 @@ const AnimePlayerPage: React.FC = () => {
             <h3 className="text-gray-300 text-lg uppercase">{selectedSeason?.name}</h3>
           </div>
         </div>
+
+      <div className="p-4 space-y-6">
 
         {/* Sélecteur de langue - Style anime-sama */}
         {selectedSeason && selectedSeason.languages.length > 1 && (
