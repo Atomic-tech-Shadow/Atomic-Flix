@@ -521,8 +521,8 @@ const AnimePlayerPage: React.FC = () => {
                 onClick={() => changeLanguage(lang as 'VF' | 'VOSTFR')}
                 className={`relative px-4 py-2 rounded-md font-bold text-sm border-2 transition-all overflow-hidden ${
                   selectedLanguage === lang
-                    ? 'border-white text-white shadow-lg'
-                    : 'border-gray-500 text-gray-300 hover:border-gray-300'
+                    ? 'border-white text-white shadow-lg opacity-100'
+                    : 'border-gray-500 text-gray-300 hover:border-gray-300 opacity-50 hover:opacity-75'
                 }`}
               >
                 {/* Drapeau de fond */}
