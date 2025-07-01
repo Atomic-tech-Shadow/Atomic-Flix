@@ -4,6 +4,7 @@ import { Link, useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import MainLayout from '@/components/layout/main-layout';
 import { SectionLoading } from '@/components/ui/loading-spinner';
+import { animeAPI } from '@/lib/api';
 
 interface SearchResult {
   id: string;
@@ -55,7 +56,7 @@ const AnimeSamaPage: React.FC = () => {
   // Charger tout le contenu populaire depuis l'API
   const loadPopularAnimes = async () => {
     try {
-      const response = await apiRequest('/api/trending');
+      const response = await animeAPI.getTrending();
       
       if (response && response.success && response.results) {
         // Afficher tous les types de contenu de l'API : animes, mangas, films
@@ -116,7 +117,7 @@ const AnimeSamaPage: React.FC = () => {
     setError(null);
     
     try {
-      const response = await apiRequest(`/api/search?query=${encodeURIComponent(query)}`);
+      const response = await animeAPI.search(query);
       
       if (response && response.success) {
         const results = response.results || [];

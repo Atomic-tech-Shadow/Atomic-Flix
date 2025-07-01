@@ -7,6 +7,7 @@ import MainLayout from '@/components/layout/main-layout';
 import { SectionLoading, PageLoading } from '@/components/ui/loading-spinner';
 import { FloatingBackButton } from '@/components/navigation/floating-back-button';
 import { BreadcrumbNav } from '@/components/navigation/breadcrumb-nav';
+import { animeAPI } from '@/lib/api';
 
 interface Episode {
   id: string;
@@ -116,9 +117,9 @@ const AnimePage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // Essayer uniquement l'endpoint direct des détails anime
+        // Appeler directement l'API externe
         console.log('Chargement des détails pour:', id);
-        const apiResponse = await apiRequest(`/api/anime/${id}`, 20000);
+        const apiResponse = await animeAPI.getDetails(id);
         
         if (!apiResponse || !apiResponse.success) {
           const errorMsg = apiResponse?.error || apiResponse?.message || 'Anime non trouvé dans la base de données';
