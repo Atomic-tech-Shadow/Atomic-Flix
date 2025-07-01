@@ -188,12 +188,13 @@ const AnimePlayerPage: React.FC = () => {
 
 
   // Fonction pour charger les épisodes via API externe uniquement
-  const loadSeasonEpisodesDirectly = async (animeDataObj: any, season: Season, autoLoadEpisode = false) => {
+  const loadSeasonEpisodesDirectly = async (animeDataObj: any, season: Season, autoLoadEpisode = false, customLanguage?: string) => {
     try {
       setEpisodeLoading(true);
-      const languageCode = selectedLanguage.toLowerCase();
+      const languageToUse = customLanguage || selectedLanguage;
+      const languageCode = languageToUse.toLowerCase();
       
-      console.log('Chargement épisodes pour:', animeDataObj.id, 'saison:', season.value, 'langue:', selectedLanguage);
+      console.log('Chargement épisodes pour:', animeDataObj.id, 'saison:', season.value, 'langue:', languageToUse);
       
       // Utiliser uniquement l'API externe
       const data = await apiRequest(`/api/episodes/${animeDataObj.id}?season=${season.value}&language=${languageCode}`);
@@ -217,7 +218,7 @@ const AnimePlayerPage: React.FC = () => {
             title: episodeTitle,
             episodeNumber: episodeNumber,
             url: episodeUrl,
-            language: data.language ? data.language.toUpperCase() : selectedLanguage.toUpperCase(),
+            language: data.language ? data.language.toUpperCase() : languageToUse.toUpperCase(),
             available: ep.available !== false, // Default à true si non spécifié
             streamingSources: ep.streamingSources || []
           };
@@ -454,9 +455,9 @@ const AnimePlayerPage: React.FC = () => {
   // Changer de langue
   const changeLanguage = (newLanguage: 'VF' | 'VOSTFR') => {
     setSelectedLanguage(newLanguage);
-    if (selectedSeason) {
-      // ✅ Recharger les épisodes avec la nouvelle langue
-      loadSeasonEpisodes(selectedSeason);
+    if (selectedSeason && animeData) {
+      // Recharger les épisodes avec la nouvelle langue
+      loadSeasonEpisodesDirectly(animeData, selectedSeason, true, newLanguage);
     }
   };
 
