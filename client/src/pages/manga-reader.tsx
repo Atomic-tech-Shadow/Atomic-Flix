@@ -204,14 +204,14 @@ const MangaReaderPage: React.FC = () => {
         // Fallback: chapitre sans pages pour le moment
         setSelectedChapter(chapter);
         setCurrentPageIndex(0);
-        setError('Pages du chapitre non disponibles pour le moment');
+        setError(null); // Pas d'erreur, juste pas de pages encore
       }
     } catch (error) {
       console.error('Erreur chargement pages:', error);
-      // En cas d'erreur, on affiche quand même le chapitre
+      // En cas d'erreur, on affiche quand même le chapitre sans message d'erreur
       setSelectedChapter(chapter);
       setCurrentPageIndex(0);
-      setError('Erreur lors du chargement des pages du chapitre');
+      setError(null); // On ne veut pas afficher d'erreur, juste l'interface informative
     } finally {
       setLoadingPages(false);
     }
@@ -306,7 +306,7 @@ const MangaReaderPage: React.FC = () => {
     );
   }
 
-  if (error || !mangaData) {
+  if (!mangaData && !loading) {
     return (
       <MainLayout>
         <div className="min-h-screen bg-black flex items-center justify-center">
