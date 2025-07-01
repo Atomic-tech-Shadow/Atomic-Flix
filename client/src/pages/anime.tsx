@@ -4,8 +4,6 @@ import { ChevronLeft, ChevronRight, ChevronDown, Play, AlertCircle, ArrowLeft, D
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'wouter';
 import MainLayout from '@/components/layout/main-layout';
-import { FloatingBackButton } from '@/components/navigation/floating-back-button';
-import { BreadcrumbNav } from '@/components/navigation/breadcrumb-nav';
 
 interface Episode {
   id: string;
@@ -198,18 +196,7 @@ const AnimePage: React.FC = () => {
 
   return (
     <MainLayout>
-      <FloatingBackButton 
-        onClick={() => navigate('/')} 
-        show={true}
-      />
-      
       <div className="space-y-6">
-        <BreadcrumbNav 
-          items={[
-            { label: "Animes", href: "/anime-sama" },
-            { label: animeData.title }
-          ]} 
-        />
 
       {/* Banner de l'anime */}
       <div className="relative">
