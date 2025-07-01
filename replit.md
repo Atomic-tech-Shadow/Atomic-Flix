@@ -114,6 +114,7 @@ ATOMIC FLIX is a modern anime streaming platform built with React, TypeScript, a
 - July 01, 2025. Manga reader implementation: Completely redesigned manga-reader.tsx to use anime-sama-scraper.vercel.app API. Added support for manga/scan detection, chapter loading, and proper navigation. Interface shows available chapters with fallback message for pages pending API development. Integrated with anime.tsx navigation for seamless manga access.
 - July 01, 2025. Logo integration: Successfully integrated user's custom ATOMIC FLIX logo (neon cyan/purple design) into navbar. Logo features futuristic neon styling with space background that perfectly matches the app's dark theme. Removed home page per user request - app now redirects directly to anime search page for better user experience.
 - July 01, 2025. Vercel deployment configuration: Configured complete Vercel deployment setup with serverless functions, proper build configuration, environment variables setup, and deployment documentation. Created api/index.ts for serverless backend, vercel.json for deployment config, and comprehensive README.md with deployment instructions.
+- July 01, 2025. Database integration and Vercel optimization: Integrated user's Neon PostgreSQL database directly into the application with connection string in .env and vercel.json. Fixed Vercel runtime configuration error by updating to @vercel/node@3.0.0 and simplified build command to use only vite build for faster deployment.
 
 ## User Preferences
 
