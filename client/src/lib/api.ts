@@ -1,10 +1,7 @@
-// Configuration API pour ATOMIC FLIX - API externe uniquement
+// Configuration API pour ATOMIC FLIX - API externe directe
 export const API_CONFIG = {
   // API externe pour les données anime/manga
   EXTERNAL_API: 'https://anime-sama-scraper.vercel.app/api',
-  
-  // Configuration locale pour Vercel
-  LOCAL_API: '/api',
   
   // Timeout par défaut
   TIMEOUT: 15000,
@@ -14,9 +11,9 @@ export const API_CONFIG = {
   RETRY_DELAY: 1000
 };
 
-// Fonction utilitaire pour les requêtes API
+// Fonction utilitaire pour les requêtes API directes
 export const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-  const { MAX_RETRIES, RETRY_DELAY, TIMEOUT, LOCAL_API } = API_CONFIG;
+  const { MAX_RETRIES, RETRY_DELAY, TIMEOUT, EXTERNAL_API } = API_CONFIG;
   let attempt = 0;
   
   while (attempt < MAX_RETRIES) {
@@ -24,8 +21,8 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
       
-      // Utiliser l'API locale pour Vercel qui fait proxy vers l'API externe
-      const url = `${LOCAL_API}${endpoint}`;
+      // Utiliser directement l'API externe
+      const url = `${EXTERNAL_API}${endpoint}`;
       
       const response = await fetch(url, {
         method: 'GET',

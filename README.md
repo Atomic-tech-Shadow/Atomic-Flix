@@ -45,8 +45,8 @@ npm run check
 - **Wouter** pour le routing
 
 ### Backend
-- **API Serverless** (Vercel Functions)
-- **Proxy vers API externe** (anime-sama-scraper.vercel.app)
+- **API externe directe** (anime-sama-scraper.vercel.app)
+- **Pas de serveur backend requis** (frontend-only)
 - **Pas de base de données locale** (données externes uniquement)
 
 ### Structure du projet
@@ -56,8 +56,7 @@ npm run check
 │   │   ├── components/   # Composants UI
 │   │   ├── pages/        # Pages de l'application
 │   │   └── lib/          # Utilitaires et configuration API
-├── api/                  # Fonctions serverless Vercel
-│   └── index.js          # Proxy vers API externe
+# Plus de backend requis - frontend direct vers API externe
 ├── shared/               # Types TypeScript partagés
 └── vercel.json           # Configuration Vercel
 ```
@@ -87,17 +86,17 @@ Aucune base de données locale ou données de démonstration.
 
 ## 🔒 Sécurité
 
-- Séparation client/serveur stricte
+- Frontend-only sécurisé
 - Pas de données sensibles stockées localement
-- Proxy API pour éviter les problèmes CORS
-- Configuration Vercel sécurisée
+- Appels API directs vers service externe sécurisé
+- Configuration Vercel optimisée
 
 ## 📝 Déploiement réussi
 
-✅ Build optimisé pour Vercel  
-✅ Configuration serverless  
-✅ API externe uniquement  
+✅ Build optimisé pour Vercel (frontend-only)  
+✅ API externe directe (plus de serverless)  
 ✅ Pas de base de données requise  
+✅ Configuration simplifiée  
 ✅ Interface responsive complète  
 
 **URL de démonstration :** Disponible après déploiement Vercel
