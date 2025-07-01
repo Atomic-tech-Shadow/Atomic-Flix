@@ -211,7 +211,7 @@ const AnimeSamaPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
             >
               {searchResults.map((anime, index) => (
                 <motion.div
@@ -226,7 +226,7 @@ const AnimeSamaPage: React.FC = () => {
                   <img
                     src={anime.image}
                     alt={anime.title}
-                    className="w-full aspect-[3/4] object-cover group-hover:opacity-90 transition-opacity"
+                    className="w-full h-48 sm:h-56 md:h-64 object-cover group-hover:opacity-90 transition-opacity"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = 'https://via.placeholder.com/300x400/1a1a1a/ffffff?text=Image+Non+Disponible';
@@ -285,7 +285,7 @@ const AnimeSamaPage: React.FC = () => {
                     Actualiser
                   </button>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                   {popularAnimes.map((anime, index) => (
                     <motion.div
                       key={`popular-${anime.id}-${index}`}
@@ -299,7 +299,7 @@ const AnimeSamaPage: React.FC = () => {
                         <img
                           src={anime.image}
                           alt={anime.title}
-                          className="w-full aspect-[3/4] object-cover group-hover:opacity-90 transition-opacity"
+                          className="w-full h-48 sm:h-56 md:h-64 object-cover group-hover:opacity-90 transition-opacity"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.src = 'https://via.placeholder.com/300x400/1a1a1a/ffffff?text=Image+Non+Disponible';
