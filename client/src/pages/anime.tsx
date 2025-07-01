@@ -208,7 +208,7 @@ const AnimePage: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div>
         {/* Bouton de retour flottant */}
         <FloatingBackButton 
           onClick={() => navigate('/anime-sama')}
@@ -216,7 +216,7 @@ const AnimePage: React.FC = () => {
         />
 
       {/* Banner de l'anime */}
-      <div className="relative atomic-fade-in rounded-xl overflow-hidden">
+      <div className="relative atomic-fade-in overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent z-10" />
         <img 
           src={animeData.image} 
@@ -255,7 +255,7 @@ const AnimePage: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
+      <div className="p-4 pt-0 space-y-6">
         {/* Message d'erreur/info avec possibilité de réessayer */}
         {error && (
           <div className="bg-red-600/20 border border-red-600/30 rounded-lg p-4">
