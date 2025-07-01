@@ -541,7 +541,9 @@ const AnimePlayerPage: React.FC = () => {
                 )}
                 
                 {/* Texte de la langue */}
-                <span className="relative z-10 text-white font-bold drop-shadow-lg">
+                <span className="relative z-10 text-white font-bold text-shadow-strong" style={{
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)'
+                }}>
                   {lang === 'VOSTFR' ? 'VO' : lang}
                 </span>
               </motion.button>
