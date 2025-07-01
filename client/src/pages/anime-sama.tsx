@@ -267,7 +267,7 @@ const AnimeSamaPage: React.FC = () => {
             {popularAnimes.length > 0 && (
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-white text-lg font-bold">🔥 Animes Populaires</h2>
+                  <h2 className="text-white text-lg font-bold">🔥🎌Animes📈Populaires🎌🔥</h2>
                   <button 
                     onClick={() => loadPopularAnimes()}
                     className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors"
