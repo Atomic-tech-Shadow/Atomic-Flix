@@ -108,7 +108,7 @@ const AnimePlayerPage: React.FC = () => {
   // Fonction pour charger les détails d'un anime via l'API externe
   const getAnimeDetails = async (animeId: string) => {
     try {
-      const response = await apiRequest(`https://anime-sama-scraper.vercel.app/anime/${animeId}`);
+      const response = await apiRequest(`https://anime-sama-scraper.vercel.app/api/anime/${animeId}`);
       
       if (!response || !response.success) {
         console.error('Erreur API anime details:', response);
@@ -127,7 +127,7 @@ const AnimePlayerPage: React.FC = () => {
   // Fonction pour charger les saisons d'un anime selon la documentation API
   const getAnimeSeasons = async (animeId: string) => {
     try {
-      const response = await apiRequest(`https://anime-sama-scraper.vercel.app/seasons/${animeId}`);
+      const response = await apiRequest(`https://anime-sama-scraper.vercel.app/api/seasons/${animeId}`);
       return response;
     } catch (error) {
       console.error('Erreur chargement saisons:', error);
@@ -200,7 +200,7 @@ const AnimePlayerPage: React.FC = () => {
       console.log('Chargement épisodes pour:', animeDataObj.id, 'saison:', season.value, 'langue:', languageToUse);
       
       // Utiliser uniquement l'API externe
-      const data = await apiRequest(`https://anime-sama-scraper.vercel.app/episodes/${animeDataObj.id}?season=${season.value}&language=${languageCode}`);
+      const data = await apiRequest(`https://anime-sama-scraper.vercel.app/api/episodes/${animeDataObj.id}?season=${season.value}&language=${languageCode}`);
       console.log('Épisodes reçus de l\'API:', data);
       
       if (!data || !data.success) {
@@ -404,7 +404,7 @@ const AnimePlayerPage: React.FC = () => {
       console.log('Récupération sources streaming pour épisode:', episode.episodeNumber);
       
       // Utiliser uniquement l'API embed externe selon la documentation
-      const response = await fetch(`https://anime-sama-scraper.vercel.app/embed?url=${encodeURIComponent(episode.url)}`);
+      const response = await fetch(`https://anime-sama-scraper.vercel.app/api/embed?url=${encodeURIComponent(episode.url)}`);
       
       if (!response.ok) {
         console.error(`Erreur API embed: ${response.status}`);
