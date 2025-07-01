@@ -174,7 +174,7 @@ const AnimeSamaPage: React.FC = () => {
       <div className="min-h-screen text-white atomic-fade-in" style={{ backgroundColor: 'var(--atomic-dark)' }}>
 
       {/* Page principale */}
-      <div className="p-4">
+      <div className="p-2">
         {/* Barre de recherche locale */}
         {searchQuery && (
           <div className="mb-6 atomic-slide-in">
@@ -211,7 +211,7 @@ const AnimeSamaPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"
             >
               {searchResults.map((anime, index) => (
                 <motion.div
@@ -220,7 +220,7 @@ const AnimeSamaPage: React.FC = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
                   onClick={() => loadAnimeDetails(anime.id, anime.type)}
-                  className="cursor-pointer group overflow-hidden atomic-hover-scale h-80 sm:h-96 rounded-lg relative"
+                  className="cursor-pointer group overflow-hidden atomic-hover-scale h-56 sm:h-64 md:h-72 rounded-lg relative"
                 >
                   <img
                     src={anime.image}
@@ -285,7 +285,7 @@ const AnimeSamaPage: React.FC = () => {
                     Actualiser
                   </button>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                   {popularAnimes.map((anime, index) => (
                     <motion.div
                       key={`popular-${anime.id}-${index}`}
@@ -293,7 +293,7 @@ const AnimeSamaPage: React.FC = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.1, duration: 0.3 }}
                       onClick={() => loadAnimeDetails(anime.id, anime.type)}
-                      className="cursor-pointer group overflow-hidden atomic-hover-scale h-80 sm:h-96 rounded-lg relative"
+                      className="cursor-pointer group overflow-hidden atomic-hover-scale h-56 sm:h-64 md:h-72 rounded-lg relative"
                     >
                       <img
                         src={anime.image}
