@@ -9,12 +9,12 @@
    - Connectez-vous avec votre compte GitHub
    - Cliquez sur "New Project" et sélectionnez votre dépôt
 
-2. **Configuration des variables d'environnement**
-   Sur Vercel, ajoutez ces variables dans Settings > Environment Variables :
-   - `DATABASE_URL` : `postgresql://Shadow_owner:npg_PTOGd5J9ZluF@ep-tight-rice-a8sv8oq9-pooler.eastus2.azure.neon.tech/Shadow?sslmode=require&channel_binding=require`
-   - `NODE_ENV` : `production`
+2. **Redéploiement nécessaire**
+   Le site est en ligne mais les assets ne se chargent pas correctement.
+   Après avoir commité les corrections de configuration, redéployez sur Vercel.
    
-   Note: L'URL de base de données est déjà configurée dans vercel.json
+   La configuration corrigée utilise `rewrites` au lieu de `routes` pour permettre
+   le chargement correct des fichiers CSS et JavaScript.
 
 3. **Déploiement automatique**
    - Vercel déploiera automatiquement à chaque push sur la branche main
