@@ -209,11 +209,7 @@ const AnimePage: React.FC = () => {
   return (
     <MainLayout>
       <div className="-mx-4 -my-6">
-        {/* Bouton de retour flottant */}
-        <FloatingBackButton 
-          onClick={() => navigate('/anime-sama')}
-          show={true}
-        />
+
 
         {/* Banner de l'anime */}
         <div className="relative atomic-fade-in overflow-hidden">
