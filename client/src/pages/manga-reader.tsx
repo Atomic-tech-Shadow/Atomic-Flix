@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { ChevronLeft, ChevronRight, ArrowLeft, ZoomIn, ZoomOut, RotateCw, BookOpen, List } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, ZoomIn, ZoomOut, RotateCw, BookOpen, List, Book } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'wouter';
 import MainLayout from '@/components/layout/main-layout';
@@ -8,21 +8,34 @@ import MainLayout from '@/components/layout/main-layout';
 interface MangaChapter {
   id: string;
   title: string;
-  chapterNumber: number;
+  number: number;
   url: string;
   pages: string[];
   available: boolean;
+  language: string;
+}
+
+interface MangaSeason {
+  number: number;
+  name: string;
+  value: string;
+  type: string;
+  languages: string[];
+  available: boolean;
+  contentType: string;
+  url: string;
+  fullUrl: string;
 }
 
 interface MangaData {
   id: string;
   title: string;
-  description: string;
+  synopsis: string;
   image: string;
   genres: string[];
   status: string;
-  author: string;
-  chapters: MangaChapter[];
+  year: string;
+  seasons: MangaSeason[];
   url: string;
 }
 
@@ -33,12 +46,19 @@ const MangaReaderPage: React.FC = () => {
   // Récupérer les paramètres de l'URL
   const urlParams = new URLSearchParams(window.location.search);
   const targetChapter = urlParams.get('chapter');
+  const targetSeason = urlParams.get('season') || 'scan';
+  const targetLanguage = urlParams.get('language') || 'VF';
   
   // États pour les données
   const [mangaData, setMangaData] = useState<MangaData | null>(null);
+  const [mangaSeasons, setMangaSeasons] = useState<MangaSeason[]>([]);
+  const [selectedSeason, setSelectedSeason] = useState<MangaSeason | null>(null);
+  const [chapters, setChapters] = useState<MangaChapter[]>([]);
   const [selectedChapter, setSelectedChapter] = useState<MangaChapter | null>(null);
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const [loadingChapters, setLoadingChapters] = useState(false);
+  const [loadingPages, setLoadingPages] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showChapterList, setShowChapterList] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -65,34 +85,41 @@ const MangaReaderPage: React.FC = () => {
     }
   };
 
-  // Charger les détails du manga
+  // Charger les détails du manga et ses saisons
   useEffect(() => {
     if (!id) return;
     
     const loadMangaData = async () => {
       try {
         setLoading(true);
+        console.log('Chargement des données manga pour:', id);
         
-        const response = await apiRequest(`/api/anime/${id}`);
+        // Charger d'abord les informations générales
+        const animeResponse = await apiRequest(`https://anime-sama-scraper.vercel.app/api/anime/${id}`);
         
-        if (response && response.success && response.data) {
-          setMangaData(response.data);
+        if (animeResponse && animeResponse.success && animeResponse.data) {
+          setMangaData(animeResponse.data);
           
-          // Sélectionner le chapitre demandé ou le premier disponible
-          if (response.data.chapters && response.data.chapters.length > 0) {
-            let chapterToSelect = response.data.chapters[0];
+          // Charger les saisons pour trouver les scans
+          const seasonsResponse = await apiRequest(`https://anime-sama-scraper.vercel.app/api/seasons/${id}`);
+          
+          if (seasonsResponse && seasonsResponse.success && seasonsResponse.seasons) {
+            // Filtrer uniquement les scans (manga)
+            const scans = seasonsResponse.seasons.filter((season: any) => season.contentType === 'manga');
+            console.log('Scans trouvés:', scans);
             
-            if (targetChapter) {
-              const requestedChapter = response.data.chapters.find(
-                (c: any) => c.chapterNumber === parseInt(targetChapter)
-              );
-              if (requestedChapter) {
-                chapterToSelect = requestedChapter;
-              }
+            setMangaSeasons(scans);
+            
+            if (scans.length > 0) {
+              // Sélectionner la saison demandée ou la première disponible
+              let seasonToSelect = scans.find((s: any) => s.value === targetSeason) || scans[0];
+              setSelectedSeason(seasonToSelect);
+              
+              // Charger les chapitres de cette saison
+              await loadSeasonChapters(seasonToSelect, targetLanguage);
+            } else {
+              setError('Aucun scan disponible pour cet anime');
             }
-            
-            setSelectedChapter(chapterToSelect);
-            await loadChapterPages(chapterToSelect);
           }
         }
       } catch (err) {
@@ -106,25 +133,87 @@ const MangaReaderPage: React.FC = () => {
     loadMangaData();
   }, [id]);
 
+  // Charger les chapitres d'une saison/scan
+  const loadSeasonChapters = async (season: MangaSeason, language: string = 'VF') => {
+    try {
+      setLoadingChapters(true);
+      console.log('Chargement des chapitres pour:', season.value, 'langue:', language);
+      
+      const response = await apiRequest(
+        `https://anime-sama-scraper.vercel.app/api/episodes/${id}?season=${season.value}&language=${language}`
+      );
+      
+      if (response && response.success && response.episodes) {
+        const chapterList = response.episodes.map((ep: any) => ({
+          id: ep.id,
+          title: ep.title,
+          number: ep.number,
+          url: ep.url,
+          pages: [],
+          available: ep.available,
+          language: language
+        }));
+        
+        console.log('Chapitres chargés:', chapterList);
+        setChapters(chapterList);
+        
+        if (chapterList.length > 0) {
+          // Sélectionner le chapitre demandé ou le premier disponible
+          let chapterToSelect = chapterList[0];
+          
+          if (targetChapter) {
+            const requestedChapter = chapterList.find(
+              (c: any) => c.number === parseInt(targetChapter)
+            );
+            if (requestedChapter) {
+              chapterToSelect = requestedChapter;
+            }
+          }
+          
+          setSelectedChapter(chapterToSelect);
+          await loadChapterPages(chapterToSelect);
+        }
+      } else {
+        setError('Aucun chapitre trouvé pour ce scan');
+      }
+    } catch (error) {
+      console.error('Erreur chargement chapitres:', error);
+      setError('Erreur lors du chargement des chapitres');
+    } finally {
+      setLoadingChapters(false);
+    }
+  };
+
   // Charger les pages d'un chapitre
   const loadChapterPages = async (chapter: MangaChapter) => {
     try {
-      setLoading(true);
+      setLoadingPages(true);
+      console.log('Chargement des pages pour le chapitre:', chapter.number);
       
-      const response = await apiRequest(`/api/manga/chapter/${chapter.id}`);
+      // Tentative de chargement des pages du chapitre
+      // L'API pour les pages n'est pas encore disponible
+      const response = await apiRequest(
+        `https://anime-sama-scraper.vercel.app/api/chapter/${id}/${chapter.number}?language=${chapter.language}`
+      );
       
       if (response && response.success && response.pages) {
         const updatedChapter = { ...chapter, pages: response.pages };
         setSelectedChapter(updatedChapter);
         setCurrentPageIndex(0);
       } else {
-        setError('Erreur lors du chargement des pages du chapitre');
+        // Fallback: chapitre sans pages pour le moment
+        setSelectedChapter(chapter);
+        setCurrentPageIndex(0);
+        setError('Pages du chapitre non disponibles pour le moment');
       }
     } catch (error) {
       console.error('Erreur chargement pages:', error);
+      // En cas d'erreur, on affiche quand même le chapitre
+      setSelectedChapter(chapter);
+      setCurrentPageIndex(0);
       setError('Erreur lors du chargement des pages du chapitre');
     } finally {
-      setLoading(false);
+      setLoadingPages(false);
     }
   };
 
@@ -147,22 +236,22 @@ const MangaReaderPage: React.FC = () => {
 
   // Navigation entre les chapitres
   const nextChapter = () => {
-    if (!mangaData || !selectedChapter) return;
+    if (!chapters || !selectedChapter) return;
     
-    const currentIndex = mangaData.chapters.findIndex(c => c.id === selectedChapter.id);
-    if (currentIndex < mangaData.chapters.length - 1) {
-      const nextChap = mangaData.chapters[currentIndex + 1];
+    const currentIndex = chapters.findIndex(c => c.id === selectedChapter.id);
+    if (currentIndex < chapters.length - 1) {
+      const nextChap = chapters[currentIndex + 1];
       setSelectedChapter(nextChap);
       loadChapterPages(nextChap);
     }
   };
 
   const prevChapter = () => {
-    if (!mangaData || !selectedChapter) return;
+    if (!chapters || !selectedChapter) return;
     
-    const currentIndex = mangaData.chapters.findIndex(c => c.id === selectedChapter.id);
+    const currentIndex = chapters.findIndex(c => c.id === selectedChapter.id);
     if (currentIndex > 0) {
-      const prevChap = mangaData.chapters[currentIndex - 1];
+      const prevChap = chapters[currentIndex - 1];
       setSelectedChapter(prevChap);
       loadChapterPages(prevChap);
     }
@@ -255,7 +344,7 @@ const MangaReaderPage: React.FC = () => {
                 <h1 className="text-lg font-bold truncate max-w-[200px]">{mangaData.title}</h1>
                 {selectedChapter && (
                   <p className="text-sm text-gray-400">
-                    Chapitre {selectedChapter.chapterNumber} - Page {currentPageIndex + 1}/{selectedChapter.pages?.length || 0}
+                    Chapitre {selectedChapter.number} - Page {currentPageIndex + 1}/{selectedChapter.pages?.length || 0}
                   </p>
                 )}
               </div>
@@ -312,7 +401,7 @@ const MangaReaderPage: React.FC = () => {
                 </button>
               </div>
               <div className="p-2">
-                {mangaData.chapters.map((chapter) => (
+                {chapters.map((chapter) => (
                   <button
                     key={chapter.id}
                     onClick={() => {
@@ -326,7 +415,7 @@ const MangaReaderPage: React.FC = () => {
                         : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
                     }`}
                   >
-                    <div className="font-medium">Chapitre {chapter.chapterNumber}</div>
+                    <div className="font-medium">Chapitre {chapter.number}</div>
                     <div className="text-sm opacity-70">{chapter.title}</div>
                   </button>
                 ))}
@@ -337,7 +426,14 @@ const MangaReaderPage: React.FC = () => {
 
         {/* Zone de lecture principale */}
         <div className="pt-20 pb-4">
-          {selectedChapter && selectedChapter.pages?.length > 0 ? (
+          {loadingPages ? (
+            <div className="flex items-center justify-center h-96">
+              <div className="text-center">
+                <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-white">Chargement des pages...</p>
+              </div>
+            </div>
+          ) : selectedChapter && selectedChapter.pages?.length > 0 ? (
             <div className="flex justify-center items-center min-h-[calc(100vh-6rem)]">
               <div 
                 className="relative max-w-full overflow-auto"
@@ -356,9 +452,43 @@ const MangaReaderPage: React.FC = () => {
                 />
               </div>
             </div>
+          ) : selectedChapter ? (
+            <div className="flex flex-col items-center justify-center h-96 text-center px-4">
+              <Book size={64} className="text-gray-600 mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">{selectedChapter.title}</h3>
+              <p className="text-gray-400 mb-4">Chapitre {selectedChapter.number}</p>
+              <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-4 max-w-md">
+                <p className="text-yellow-400 text-sm">
+                  Les pages de ce chapitre seront bientôt disponibles. 
+                  L'API des images de manga est en cours de développement.
+                </p>
+              </div>
+              {selectedChapter.url && (
+                <a 
+                  href={selectedChapter.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Lire sur anime-sama.fr
+                </a>
+              )}
+            </div>
+          ) : chapters.length > 0 ? (
+            <div className="flex flex-col items-center justify-center h-96 text-center px-4">
+              <List size={64} className="text-gray-600 mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">Sélectionnez un chapitre</h3>
+              <p className="text-gray-400 mb-4">{chapters.length} chapitres disponibles</p>
+              <button
+                onClick={() => setShowChapterList(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
+              >
+                Voir la liste des chapitres
+              </button>
+            </div>
           ) : (
             <div className="flex items-center justify-center h-96">
-              <p className="text-gray-400">Aucune page disponible pour ce chapitre</p>
+              <p className="text-gray-400">Aucun chapitre disponible</p>
             </div>
           )}
         </div>
