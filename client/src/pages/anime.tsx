@@ -71,6 +71,7 @@ const AnimePage: React.FC = () => {
   const [animeData, setAnimeData] = useState<AnimeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAllSeasons, setShowAllSeasons] = useState(false);
 
   // Configuration API externe
   const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
@@ -288,8 +289,18 @@ const AnimePage: React.FC = () => {
           <h3 className="atomic-gradient-text text-xl font-bold mb-6 flex items-center gap-2">
             🎬 Saisons et Films
           </h3>
-          <div className="grid grid-cols-2 gap-4">
-            {animeData.seasons.map((season, index) => {
+          
+          {/* Nombre total de saisons */}
+          <div className="mb-4 text-center">
+            <div className="inline-block bg-cyan-500/20 border border-cyan-500/30 rounded-full px-4 py-2">
+              <span className="text-cyan-300 text-sm font-medium">
+                {animeData.seasons.length} saisons disponibles
+              </span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {animeData.seasons.slice(0, showAllSeasons ? animeData.seasons.length : 8).map((season, index) => {
               // Détecter si c'est un manga/scan
               const isManga = season.name.toLowerCase().includes('scan') || 
                              season.name.toLowerCase().includes('manga') ||
@@ -308,7 +319,7 @@ const AnimePage: React.FC = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => goToPlayer(season)}
-                  className={`relative overflow-hidden rounded-2xl h-28 group transition-all duration-300 border-2 ${borderColor} atomic-hover-glow backdrop-blur-sm bg-gray-900/30`}
+                  className={`relative overflow-hidden rounded-xl h-32 sm:h-28 group transition-all duration-300 border-2 ${borderColor} atomic-hover-glow backdrop-blur-sm bg-gray-900/30 shadow-lg`}
                 >
                   {/* Image de fond */}
                   <div 
@@ -342,6 +353,21 @@ const AnimePage: React.FC = () => {
               );
             })}
           </div>
+          
+          {/* Bouton Voir plus/moins */}
+          {animeData.seasons.length > 8 && (
+            <div className="text-center mt-6">
+              <button
+                onClick={() => setShowAllSeasons(!showAllSeasons)}
+                className="px-6 py-3 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-300 hover:bg-cyan-500/30 hover:border-cyan-400/50 transition-all duration-300 atomic-hover-scale"
+              >
+                {showAllSeasons ? 
+                  `Voir moins` : 
+                  `Voir toutes les ${animeData.seasons.length} saisons`
+                }
+              </button>
+            </div>
+          )}
         </div>
       </div>
       </div>
