@@ -199,23 +199,23 @@ const AnimePage: React.FC = () => {
       <div className="space-y-6">
 
       {/* Banner de l'anime */}
-      <div className="relative">
+      <div className="relative atomic-fade-in rounded-xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent z-10" />
         <img 
           src={animeData.image} 
           alt={animeData.title}
-          className="w-full h-48 sm:h-64 object-cover"
+          className="w-full h-48 sm:h-64 object-cover transition-transform duration-700 hover:scale-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = 'https://via.placeholder.com/800x400/1a1a1a/ffffff?text=Image+Non+Disponible';
           }}
         />
-        <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-          <h2 className="text-xl sm:text-2xl font-bold">{animeData.title}</h2>
+        <div className="absolute bottom-0 left-0 right-0 p-6 z-20 atomic-slide-in">
+          <h2 className="text-xl sm:text-2xl font-bold atomic-gradient-text mb-2">{animeData.title}</h2>
           <p className="text-gray-300 text-sm mt-1 leading-relaxed">{animeData.synopsis}</p>
-          <div className="flex flex-wrap gap-2 mt-2">
+          <div className="flex flex-wrap gap-2 mt-3">
             {animeData.genres.map((genre, index) => (
-              <span key={index} className="px-2 py-1 bg-gray-800/80 rounded text-xs">
+              <span key={index} className="px-3 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-xs text-cyan-300 backdrop-blur-sm transition-all duration-300 hover:bg-cyan-500/30">
                 {genre}
               </span>
             ))}
@@ -241,22 +241,26 @@ const AnimePage: React.FC = () => {
         )}
 
         {/* Informations de l'anime */}
-        <div className="bg-gray-800/50 rounded-lg p-4">
+        <div className="atomic-card atomic-slide-in">
           <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-gray-400">Statut:</span>
-              <span className="ml-2 text-white">{animeData.status}</span>
+            <div className="flex items-center space-x-3">
+              <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
+              <span className="text-gray-400 uppercase tracking-wide">Statut:</span>
+              <span className="text-white font-medium">{animeData.status}</span>
             </div>
-            <div>
-              <span className="text-gray-400">Année:</span>
-              <span className="ml-2 text-white">{animeData.year}</span>
+            <div className="flex items-center space-x-3">
+              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+              <span className="text-gray-400 uppercase tracking-wide">Année:</span>
+              <span className="text-white font-medium">{animeData.year}</span>
             </div>
           </div>
         </div>
 
         {/* Sélection des saisons */}
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Saisons et Films</h3>
+        <div className="atomic-fade-in">
+          <h3 className="atomic-gradient-text text-xl font-bold mb-6 flex items-center gap-2">
+            🎬 Saisons et Films
+          </h3>
           <div className="grid grid-cols-2 gap-4">
             {animeData.seasons.map((season, index) => {
               // Détecter si c'est un manga/scan
@@ -266,15 +270,18 @@ const AnimePage: React.FC = () => {
                              season.name.toLowerCase().includes('chapitre');
               
               // Couleur de bordure selon le type
-              const borderColor = isManga ? 'border-orange-400 hover:border-orange-300' : 'border-blue-400 hover:border-blue-300';
+              const borderColor = isManga ? 'border-orange-400 hover:border-orange-300 hover:shadow-orange-500/25' : 'border-cyan-400 hover:border-cyan-300 hover:shadow-cyan-500/25';
               
               return (
                 <motion.button
                   key={`season-${index}-${season.name}`}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => goToPlayer(season)}
-                  className={`relative overflow-hidden rounded-2xl h-24 group transition-all duration-300 border-4 ${borderColor} hover:shadow-lg`}
+                  className={`relative overflow-hidden rounded-2xl h-28 group transition-all duration-300 border-2 ${borderColor} atomic-hover-glow backdrop-blur-sm bg-gray-900/30`}
                 >
                   {/* Image de fond */}
                   <div 
@@ -287,11 +294,21 @@ const AnimePage: React.FC = () => {
                   <div className="absolute inset-0 bg-black/60" />
                   
                   {/* Contenu centré */}
-                  <div className="absolute inset-0 flex items-center justify-center p-3">
+                  <div className="absolute inset-0 flex items-center justify-center p-4">
                     <div className="text-center">
-                      <div className="text-white font-bold text-sm sm:text-base leading-tight drop-shadow-lg shadow-black/50">
+                      <div className="text-white font-bold text-sm sm:text-base leading-tight drop-shadow-lg group-hover:scale-105 transition-transform duration-300">
                         {season.name}
                       </div>
+                      {isManga && (
+                        <div className="mt-1 text-orange-300 text-xs font-medium">
+                          📖 MANGA
+                        </div>
+                      )}
+                      {!isManga && (
+                        <div className="mt-1 text-cyan-300 text-xs font-medium">
+                          🎥 ANIME
+                        </div>
+                      )}
                     </div>
                   </div>
                 </motion.button>

@@ -38,7 +38,7 @@ export function Navbar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
               <Film className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold atomic-gradient-text">
               ATOMIC FLIX
             </span>
           </Link>
@@ -88,6 +88,7 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="icon"
+              className="atomic-hover-scale hover:text-cyan-400 transition-all duration-300"
               onClick={() => setIsSearchOpen(!isSearchOpen)}
             >
               <Search className="h-5 w-5" />
@@ -97,6 +98,7 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="icon"
+              className="atomic-hover-scale hover:text-cyan-400 transition-all duration-300"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

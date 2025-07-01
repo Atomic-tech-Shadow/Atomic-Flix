@@ -166,26 +166,26 @@ const AnimeSamaPage: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="min-h-screen text-white" style={{ backgroundColor: '#0a0a0a' }}>
+      <div className="min-h-screen text-white atomic-fade-in" style={{ backgroundColor: 'var(--atomic-dark)' }}>
 
       {/* Page principale */}
       <div className="p-4">
         {/* Barre de recherche locale */}
         {searchQuery && (
-          <div className="mb-6">
-            <div className="flex items-center gap-3 p-4 rounded-lg border border-gray-700" style={{ backgroundColor: '#1a1a1a' }}>
-              <Search size={20} className="text-gray-400" />
+          <div className="mb-6 atomic-slide-in">
+            <div className="atomic-glass flex items-center gap-3 p-4">
+              <Search size={20} className="text-cyan-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Rechercher des animes..."
-                className="flex-1 bg-transparent text-white placeholder-gray-400 border-none outline-none"
+                className="flex-1 bg-transparent text-white placeholder-gray-400 border-none outline-none atomic-input"
                 autoFocus
               />
               <button
                 onClick={() => setSearchQuery('')}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-400 hover:text-cyan-400 transition-all duration-300 hover:scale-110"
               >
                 ✕
               </button>
@@ -195,13 +195,13 @@ const AnimeSamaPage: React.FC = () => {
 
         {/* Résultats de recherche */}
         {searchResults.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 atomic-fade-in">
             {searchResults.map((anime, index) => (
               <div
                 key={`search-${anime.id}-${index}`}
                 onClick={() => loadAnimeDetails(anime.id, anime.type)}
-                className="rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform group"
-                style={{ backgroundColor: '#1a1a1a' }}
+                className="atomic-card cursor-pointer group overflow-hidden"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="relative">
                   <img
@@ -215,11 +215,11 @@ const AnimeSamaPage: React.FC = () => {
                     }}
                   />
                   {/* Badge type de contenu */}
-                  <div className={`absolute top-2 left-2 text-white text-xs px-2 py-1 rounded-full font-semibold ${
-                    anime.type === 'manga' ? 'bg-orange-500' :
-                    anime.type === 'film' ? 'bg-purple-500' :
-                    anime.type === 'movie' ? 'bg-purple-500' :
-                    'bg-blue-500'
+                  <div className={`absolute top-2 left-2 text-white text-xs px-3 py-1 rounded-full font-bold backdrop-blur-sm border transition-all duration-300 ${
+                    anime.type === 'manga' ? 'bg-orange-500/80 border-orange-400 hover:bg-orange-500' :
+                    anime.type === 'film' ? 'bg-purple-500/80 border-purple-400 hover:bg-purple-500' :
+                    anime.type === 'movie' ? 'bg-purple-500/80 border-purple-400 hover:bg-purple-500' :
+                    'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500'
                   }`}>
                     {anime.type === 'manga' ? 'MANGA' :
                      anime.type === 'film' || anime.type === 'movie' ? 'FILM' :
@@ -232,11 +232,11 @@ const AnimeSamaPage: React.FC = () => {
                     </div>
                   )}
                 </div>
-                <div className="p-3">
-                  <h3 className="text-white font-medium text-sm line-clamp-2 group-hover:text-cyan-400 transition-colors">{anime.title}</h3>
-                  <div className="flex justify-between items-center mt-1">
-                    <p className="text-gray-400 text-xs">{anime.status}</p>
-                    <p className="text-gray-500 text-xs">{anime.type || 'anime'}</p>
+                <div className="p-4">
+                  <h3 className="text-white font-medium text-sm line-clamp-2 group-hover:text-cyan-400 transition-all duration-300">{anime.title}</h3>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-gray-400 text-xs uppercase tracking-wide">{anime.status}</p>
+                    <p className="text-cyan-400/80 text-xs font-medium">{anime.type || 'anime'}</p>
                   </div>
                 </div>
               </div>
@@ -248,12 +248,14 @@ const AnimeSamaPage: React.FC = () => {
           <div>
             {/* Section Animes Populaires */}
             {popularAnimes.length > 0 && (
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-white text-lg font-bold">🔥 Contenu Populaire 📈</h2>
+              <div className="mb-8 atomic-fade-in">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="atomic-gradient-text text-xl font-bold flex items-center gap-2">
+                    🔥 Contenu Populaire 📈
+                  </h2>
                   <button 
                     onClick={() => loadPopularAnimes()}
-                    className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors"
+                    className="text-cyan-400 text-sm hover:text-cyan-300 transition-all duration-300 px-3 py-1 rounded border border-cyan-500/30 hover:border-cyan-400/50 hover:bg-cyan-500/10"
                   >
                     Actualiser
                   </button>
