@@ -126,82 +126,41 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
-  // Fonction pour générer les épisodes d'une saison basée sur les données disponibles
-  const generateSeasonEpisodes = (animeId: string, season: Season, language = 'VOSTFR') => {
+  // Fonction pour générer des épisodes par défaut avec un système de fallback universel
+  const generateFallbackEpisodes = (animeId: string, season: Season, language = 'VOSTFR') => {
     try {
-      // Données spécifiques par anime et saison pour générer les épisodes
-      const episodeData: Record<string, Record<string, { count: number; startEp?: number }>> = {
-        'one-piece': {
-          'saison1': { count: 61, startEp: 1 },
-          'saison2': { count: 77, startEp: 62 },
-          'saison3': { count: 52, startEp: 139 },
-          'saison4': { count: 118, startEp: 191 },
-          'saison5': { count: 48, startEp: 309 },
-          'saison6': { count: 91, startEp: 357 },
-          'saison7': { count: 118, startEp: 448 },
-          'saison8': { count: 118, startEp: 566 },
-          'saison9': { count: 99, startEp: 684 },
-          'saison10': { count: 195, startEp: 783 },
-          'saison11': { count: 122, startEp: 1086 }, // Egghead Arc
-        }
-      };
-
       const langCode = language.toLowerCase();
-      const data = episodeData[animeId]?.[season.value];
       
-      if (!data) {
-        // Fallback: générer 12 épisodes par défaut
-        const episodes = Array.from({ length: 12 }, (_, i) => ({
-          id: `${animeId}-${season.value}-ep${i + 1}-${langCode}`,
-          title: `Épisode ${i + 1}`,
-          episodeNumber: i + 1,
+      // Système de fallback universel basé sur le nombre d'épisodes indiqué dans la saison
+      const episodeCount = season.episodeCount || 12; // Default à 12 épisodes si non spécifié
+      
+      const episodes = Array.from({ length: episodeCount }, (_, i) => ({
+        id: `${animeId}-${season.value}-ep${i + 1}-${langCode}`,
+        title: `Épisode ${i + 1}`,
+        episodeNumber: i + 1,
+        url: `https://anime-sama.fr/catalogue/${animeId}/${season.value}/${langCode}`,
+        language: language,
+        available: true,
+        streamingSources: [{
           url: `https://anime-sama.fr/catalogue/${animeId}/${season.value}/${langCode}`,
+          server: 'Anime-Sama',
+          quality: 'HD',
           language: language,
-          available: true,
-          streamingSources: [{
-            url: `https://anime-sama.fr/catalogue/${animeId}/${season.value}/${langCode}`,
-            server: 'Anime-Sama',
-            quality: 'HD',
-            language: language,
-            type: 'streaming',
-            serverIndex: 0
-          }]
-        }));
-        
-        return {
-          success: true,
-          episodes: episodes
-        };
-      }
-
-      // Générer les épisodes avec la numérotation correcte
-      const episodes = Array.from({ length: data.count }, (_, i) => {
-        const episodeNumber = (data.startEp || 1) + i;
-        return {
-          id: `${animeId}-${season.value}-ep${episodeNumber}-${langCode}`,
-          title: `Épisode ${episodeNumber}`,
-          episodeNumber: episodeNumber,
-          url: `https://anime-sama.fr/catalogue/${animeId}/${season.value}/${langCode}`,
-          language: language,
-          available: true,
-          streamingSources: [{
-            url: `https://anime-sama.fr/catalogue/${animeId}/${season.value}/${langCode}`,
-            server: 'Anime-Sama',
-            quality: 'HD',
-            language: language,
-            type: 'streaming',
-            serverIndex: 0
-          }]
-        };
-      });
-
+          type: 'streaming',
+          serverIndex: 0
+        }]
+      }));
+      
       return {
         success: true,
         episodes: episodes
       };
     } catch (error) {
-      console.error('Erreur génération épisodes:', error);
-      return null;
+      console.error('Erreur génération épisodes fallback:', error);
+      return {
+        success: false,
+        episodes: []
+      };
     }
   };
 
@@ -274,126 +233,128 @@ const AnimePlayerPage: React.FC = () => {
     loadAnimeData();
   }, [id]);
 
-  // Fonction pour charger les épisodes avec données anime déjà disponibles
+
+
+  // Fonction pour charger les épisodes avec données anime déjà disponibles et système de fallback
   const loadSeasonEpisodesDirectly = async (animeDataObj: any, season: Season, autoLoadEpisode = false) => {
     try {
       setEpisodeLoading(true);
       const languageCode = selectedLanguage.toLowerCase() === 'vf' ? 'vf' : 'vostfr';
       
       console.log('Chargement épisodes pour:', animeDataObj.id, 'saison:', season.value, 'langue:', selectedLanguage);
-      const data = await apiRequest(`/api/episodes/${animeDataObj.id}?season=${season.value}&language=${selectedLanguage}`);
-      console.log('Épisodes reçus de l\'API:', data);
       
-      if (!data || !data.success) {
-        console.error('Erreur API épisodes:', data);
-        throw new Error('Erreur lors du chargement des épisodes');
+      let formattedEpisodes: Episode[] = [];
+      
+      try {
+        // Tentative de chargement via l'API
+        const data = await apiRequest(`/api/episodes/${animeDataObj.id}?season=${season.value}&language=${selectedLanguage}`);
+        console.log('Épisodes reçus de l\'API:', data);
+        
+        if (data && data.success && data.episodes && Array.isArray(data.episodes) && data.episodes.length > 0) {
+          // Adapter les données de l'API au format attendu
+          formattedEpisodes = data.episodes.map((ep: any, index: number) => ({
+            id: `${animeDataObj.id}-${season.value}-ep${ep.episodeNumber || (index + 1)}-${languageCode}`,
+            title: ep.title || `Épisode ${ep.episodeNumber || (index + 1)}`,
+            episodeNumber: ep.episodeNumber || (index + 1),
+            url: ep.url || `https://anime-sama.fr/catalogue/${animeDataObj.id}/${season.value}/${languageCode}`,
+            language: selectedLanguage,
+            available: true,
+            streamingSources: ep.streamingSources || [{
+              url: ep.url || `https://anime-sama.fr/catalogue/${animeDataObj.id}/${season.value}/${languageCode}`,
+              server: 'Anime-Sama',
+              quality: 'HD',
+              language: selectedLanguage,
+              type: 'streaming',
+              serverIndex: 0
+            }]
+          }));
+          console.log('Épisodes formatés depuis API:', formattedEpisodes.length);
+        } else {
+          throw new Error('API ne retourne pas d\'épisodes valides');
+        }
+      } catch (apiError) {
+        console.warn('Échec API, utilisation du fallback:', apiError);
+        // Fallback universel si l'API échoue
+        const fallbackResult = generateFallbackEpisodes(animeDataObj.id, season, selectedLanguage);
+        if (fallbackResult.success) {
+          formattedEpisodes = fallbackResult.episodes;
+          console.log('Épisodes générés via fallback:', formattedEpisodes.length);
+        }
       }
       
-      if (data.success && data.episodes && Array.isArray(data.episodes)) {
-        // Adapter les données de l'API au format attendu
-        const formattedEpisodes = data.episodes.map((ep: any, index: number) => ({
-          id: `${animeDataObj.id}-${season.value}-ep${ep.episodeNumber || (index + 1)}-${languageCode}`,
-          title: ep.title || `Épisode ${ep.episodeNumber || (index + 1)}`,
-          episodeNumber: ep.episodeNumber || (index + 1),
-          url: ep.url || `https://anime-sama.fr/catalogue/${animeDataObj.id}/${season.value}/${languageCode}`,
-          language: selectedLanguage,
-          available: true,
-          streamingSources: ep.streamingSources || []
-        }));
-        
-        console.log('Épisodes formatés:', formattedEpisodes.length);
+      if (formattedEpisodes.length > 0) {
         setEpisodes(formattedEpisodes);
         
         // Sélectionner l'épisode spécifié ou le premier
-        if (formattedEpisodes.length > 0) {
-          let episodeToSelect = formattedEpisodes[0];
-          
-          if (targetEpisode) {
-            const requestedEpisode = formattedEpisodes.find(
-              (ep: any) => ep.episodeNumber === parseInt(targetEpisode)
-            );
-            if (requestedEpisode) {
-              episodeToSelect = requestedEpisode;
-            }
+        let episodeToSelect = formattedEpisodes[0];
+        
+        if (targetEpisode) {
+          const requestedEpisode = formattedEpisodes.find(
+            (ep: any) => ep.episodeNumber === parseInt(targetEpisode)
+          );
+          if (requestedEpisode) {
+            episodeToSelect = requestedEpisode;
           }
-          
-          console.log('Épisode sélectionné:', episodeToSelect.title);
-          setSelectedEpisode(episodeToSelect);
-          
-          // Auto-charger l'épisode avec URLs directes
-          if (autoLoadEpisode) {
-            console.log('Auto-chargement URLs directes pour:', episodeToSelect.title);
+        }
+        
+        console.log('Épisode sélectionné:', episodeToSelect.title);
+        setSelectedEpisode(episodeToSelect);
+        
+        // Auto-charger l'épisode avec système de fallback pour les sources
+        if (autoLoadEpisode) {
+          try {
+            // Tentative de récupération des URLs directes via l'API embed
+            const response = await fetch(`/api/embed?url=${encodeURIComponent(episodeToSelect.url)}`);
             
-            try {
-              // Appel au nouvel endpoint /api/embed qui retourne du JSON
-              const response = await fetch(`/api/embed?url=${encodeURIComponent(episodeToSelect.url)}`);
+            if (response.ok) {
+              const embedData = await response.json();
               
-              if (response.ok) {
-                const embedData = await response.json();
-                console.log('URLs directes auto-chargées:', embedData);
-                
-                if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-                  // Utiliser les URLs directes extraites par l'API
-                  setEpisodeDetails({
-                    id: episodeToSelect.id,
-                    title: episodeToSelect.title,
-                    animeTitle: animeDataObj.title,
-                    episodeNumber: episodeToSelect.episodeNumber,
-                    sources: embedData.sources,
-                    availableServers: embedData.sources.map((s: any) => s.server),
-                    url: episodeToSelect.url
-                  });
-                  console.log('Détails épisode chargés avec URLs directes:', embedData.sources.length, 'sources');
-                } else {
-                  // Fallback vers les sources originales
-                  if (episodeToSelect.streamingSources && episodeToSelect.streamingSources.length > 0) {
-                    setEpisodeDetails({
-                      id: episodeToSelect.id,
-                      title: episodeToSelect.title,
-                      animeTitle: animeDataObj.title,
-                      episodeNumber: episodeToSelect.episodeNumber,
-                      sources: episodeToSelect.streamingSources,
-                      availableServers: episodeToSelect.streamingSources.map((s: any) => s.server),
-                      url: episodeToSelect.url
-                    });
-                    console.log('Détails épisode chargés (fallback):', episodeToSelect.title);
-                  }
-                }
-              } else {
-                // Fallback en cas d'erreur API
-                if (episodeToSelect.streamingSources && episodeToSelect.streamingSources.length > 0) {
-                  setEpisodeDetails({
-                    id: episodeToSelect.id,
-                    title: episodeToSelect.title,
-                    animeTitle: animeDataObj.title,
-                    episodeNumber: episodeToSelect.episodeNumber,
-                    sources: episodeToSelect.streamingSources,
-                    availableServers: episodeToSelect.streamingSources.map((s: any) => s.server),
-                    url: episodeToSelect.url
-                  });
-                  console.log('Détails épisode chargés (fallback API):', episodeToSelect.title);
-                }
-              }
-            } catch (err) {
-              console.error('Erreur auto-chargement URLs directes:', err);
-              // Fallback vers les sources originales
-              if (episodeToSelect.streamingSources && episodeToSelect.streamingSources.length > 0) {
+              if (embedData.success && embedData.sources && embedData.sources.length > 0) {
+                // Utiliser les URLs directes extraites par l'API
                 setEpisodeDetails({
                   id: episodeToSelect.id,
                   title: episodeToSelect.title,
                   animeTitle: animeDataObj.title,
                   episodeNumber: episodeToSelect.episodeNumber,
-                  sources: episodeToSelect.streamingSources,
-                  availableServers: episodeToSelect.streamingSources.map((s: any) => s.server),
+                  sources: embedData.sources,
+                  availableServers: embedData.sources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                console.log('Détails épisode chargés (fallback erreur):', episodeToSelect.title);
+                console.log('Épisode chargé avec URLs directes:', embedData.sources.length, 'sources');
+              } else {
+                throw new Error('Pas de sources dans la réponse embed');
               }
+            } else {
+              throw new Error('Erreur API embed');
             }
+          } catch (embedError) {
+            console.warn('Échec API embed, utilisation du fallback:', embedError);
+            // Fallback vers les sources de l'épisode ou source générique
+            const sources = episodeToSelect.streamingSources && episodeToSelect.streamingSources.length > 0 
+              ? episodeToSelect.streamingSources 
+              : [{
+                  url: episodeToSelect.url,
+                  server: 'Anime-Sama',
+                  quality: 'HD',
+                  language: episodeToSelect.language,
+                  type: 'streaming',
+                  serverIndex: 0
+                }];
+            
+            setEpisodeDetails({
+              id: episodeToSelect.id,
+              title: episodeToSelect.title,
+              animeTitle: animeDataObj.title,
+              episodeNumber: episodeToSelect.episodeNumber,
+              sources: sources,
+              availableServers: sources.map((s: any) => s.server),
+              url: episodeToSelect.url
+            });
+            console.log('Épisode chargé avec fallback');
           }
         }
       } else {
-        setError('Aucun épisode trouvé pour cette saison');
+        setError('Aucun épisode disponible pour cette saison');
       }
     } catch (err) {
       console.error('Erreur chargement épisodes direct:', err);
@@ -403,7 +364,9 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
-  // ✅ CORRECTION: Génération des épisodes depuis les données de saison
+
+
+  // Fonction de chargement des épisodes avec système de fallback universel
   const loadSeasonEpisodes = async (season: Season, autoLoadEpisode = false) => {
     if (!animeData) {
       console.log('Pas de données anime disponibles pour charger les épisodes');
@@ -414,66 +377,116 @@ const AnimePlayerPage: React.FC = () => {
       setEpisodeLoading(true);
       const languageCode = selectedLanguage.toLowerCase() === 'vf' ? 'vf' : 'vostfr';
       
-      // ✅ NOUVEAU : Utiliser l'API qui fonctionne maintenant
-      console.log('Chargement épisodes pour:', animeData.id, 'saison:', season.value, 'langue:', selectedLanguage);
-      const data = await apiRequest(`/api/episodes/${animeData.id}?season=${season.value}&language=${selectedLanguage}`);
-      console.log('Épisodes reçus de l\'API:', data);
+      let formattedEpisodes: Episode[] = [];
       
-      if (!data || !data.success) {
-        console.error('Erreur API épisodes:', data);
-        throw new Error('Erreur lors du chargement des épisodes');
+      try {
+        // Tentative de chargement via l'API
+        console.log('Chargement épisodes pour:', animeData.id, 'saison:', season.value, 'langue:', selectedLanguage);
+        const data = await apiRequest(`/api/episodes/${animeData.id}?season=${season.value}&language=${selectedLanguage}`);
+        console.log('Épisodes reçus de l\'API:', data);
+        
+        if (data && data.success && data.episodes && Array.isArray(data.episodes) && data.episodes.length > 0) {
+          // Adapter les données de l'API au format attendu
+          formattedEpisodes = data.episodes.map((ep: any, index: number) => ({
+            id: `${animeData.id}-${season.value}-ep${ep.episodeNumber || (index + 1)}-${languageCode}`,
+            title: ep.title || `Épisode ${ep.episodeNumber || (index + 1)}`,
+            episodeNumber: ep.episodeNumber || (index + 1),
+            url: ep.url || `https://anime-sama.fr/catalogue/${animeData.id}/${season.value}/${languageCode}`,
+            language: selectedLanguage,
+            available: true,
+            streamingSources: ep.streamingSources || [{
+              url: ep.url || `https://anime-sama.fr/catalogue/${animeData.id}/${season.value}/${languageCode}`,
+              server: 'Anime-Sama',
+              quality: 'HD',
+              language: selectedLanguage,
+              type: 'streaming',
+              serverIndex: 0
+            }]
+          }));
+          console.log('Épisodes formatés depuis API:', formattedEpisodes.length);
+        } else {
+          throw new Error('API ne retourne pas d\'épisodes valides');
+        }
+      } catch (apiError) {
+        console.warn('Échec API, utilisation du fallback universel:', apiError);
+        // Fallback universel si l'API échoue
+        const fallbackResult = generateFallbackEpisodes(animeData.id, season, selectedLanguage);
+        if (fallbackResult.success) {
+          formattedEpisodes = fallbackResult.episodes;
+          console.log('Épisodes générés via fallback universel:', formattedEpisodes.length);
+        }
       }
       
-      if (data.success && data.episodes && Array.isArray(data.episodes)) {
-        // Adapter les données de l'API au format attendu
-        const formattedEpisodes = data.episodes.map((ep: any, index: number) => ({
-          id: `${animeData.id}-${season.value}-ep${ep.episodeNumber || (index + 1)}-${languageCode}`,
-          title: ep.title || `Épisode ${ep.episodeNumber || (index + 1)}`,
-          episodeNumber: ep.episodeNumber || (index + 1),
-          url: ep.url || `https://anime-sama.fr/catalogue/${animeData.id}/${season.value}/${languageCode}`,
-          language: selectedLanguage,
-          available: true,
-          streamingSources: ep.streamingSources || [{
-            url: ep.url || `https://anime-sama.fr/catalogue/${animeData.id}/${season.value}/${languageCode}`,
-            server: 'Anime-Sama',
-            quality: 'HD',
-            language: selectedLanguage,
-            type: 'streaming',
-            serverIndex: 0
-          }]
-        }));
-        
+      if (formattedEpisodes.length > 0) {
         setEpisodes(formattedEpisodes);
         
         // Sélectionner l'épisode spécifié ou le premier
-        if (formattedEpisodes.length > 0) {
-          let episodeToSelect = formattedEpisodes[0];
-          
-          if (targetEpisode) {
-            const requestedEpisode = formattedEpisodes.find(
-              (ep: any) => ep.episodeNumber === parseInt(targetEpisode)
-            );
-            if (requestedEpisode) {
-              episodeToSelect = requestedEpisode;
-            }
+        let episodeToSelect = formattedEpisodes[0];
+        
+        if (targetEpisode) {
+          const requestedEpisode = formattedEpisodes.find(
+            (ep: any) => ep.episodeNumber === parseInt(targetEpisode)
+          );
+          if (requestedEpisode) {
+            episodeToSelect = requestedEpisode;
           }
-          
-          setSelectedEpisode(episodeToSelect);
-          // Auto-charger l'épisode avec ses sources
-          if (autoLoadEpisode && episodeToSelect.streamingSources.length > 0) {
+        }
+        
+        setSelectedEpisode(episodeToSelect);
+        
+        // Auto-charger l'épisode avec système de fallback pour les sources
+        if (autoLoadEpisode) {
+          try {
+            const response = await fetch(`/api/embed?url=${encodeURIComponent(episodeToSelect.url)}`);
+            
+            if (response.ok) {
+              const embedData = await response.json();
+              
+              if (embedData.success && embedData.sources && embedData.sources.length > 0) {
+                setEpisodeDetails({
+                  id: episodeToSelect.id,
+                  title: episodeToSelect.title,
+                  animeTitle: animeData.title,
+                  episodeNumber: episodeToSelect.episodeNumber,
+                  sources: embedData.sources,
+                  availableServers: embedData.sources.map((s: any) => s.server),
+                  url: episodeToSelect.url
+                });
+                console.log('Épisode chargé avec URLs directes');
+              } else {
+                throw new Error('Pas de sources dans la réponse embed');
+              }
+            } else {
+              throw new Error('Erreur API embed');
+            }
+          } catch (embedError) {
+            console.warn('Échec API embed, utilisation du fallback sources:', embedError);
+            // Fallback vers les sources de l'épisode ou source générique
+            const sources = episodeToSelect.streamingSources && episodeToSelect.streamingSources.length > 0 
+              ? episodeToSelect.streamingSources 
+              : [{
+                  url: episodeToSelect.url,
+                  server: 'Anime-Sama',
+                  quality: 'HD',
+                  language: episodeToSelect.language,
+                  type: 'streaming',
+                  serverIndex: 0
+                }];
+            
             setEpisodeDetails({
               id: episodeToSelect.id,
               title: episodeToSelect.title,
               animeTitle: animeData.title,
               episodeNumber: episodeToSelect.episodeNumber,
-              sources: episodeToSelect.streamingSources,
-              availableServers: episodeToSelect.streamingSources.map((s: any) => s.server),
+              sources: sources,
+              availableServers: sources.map((s: any) => s.server),
               url: episodeToSelect.url
             });
+            console.log('Épisode chargé avec sources fallback');
           }
         }
       } else {
-        setError('Aucun épisode trouvé pour cette saison');
+        setError('Aucun épisode disponible pour cette saison');
       }
     } catch (err) {
       console.error('Erreur chargement épisodes:', err);
