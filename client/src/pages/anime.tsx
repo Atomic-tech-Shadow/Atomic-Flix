@@ -127,7 +127,7 @@ const AnimePage: React.FC = () => {
         
         // Charger les saisons (incluant les scans)
         console.log('Chargement des saisons pour:', id);
-        const seasonsResponse = await apiRequest(`/api/seasons/${id}`, 20000);
+        const seasonsResponse = await apiRequest(`https://anime-sama-scraper.vercel.app/api/seasons/${id}`, 20000);
         
         let allSeasons = animeResponse.data.seasons || [];
         
