@@ -1,6 +1,7 @@
 {
   "name": "ATOMIC FLIX - Streaming d'Anime",
   "short_name": "ATOMIC FLIX",
+  "id": "com.atomicflix.app",
   "description": "Plateforme de streaming d'anime moderne avec interface sombre et lecteur intégré",
   "start_url": "/",
   "display": "standalone",
@@ -36,6 +37,25 @@
     }
   ],
   "categories": ["entertainment", "video"],
+  "screenshots": [
+    {
+      "src": "/assets/atomic-logo.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Interface principale ATOMIC FLIX"
+    },
+    {
+      "src": "/assets/atomic-logo.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Version mobile ATOMIC FLIX"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "shortcuts": [
     {
       "name": "Rechercher des animes",
