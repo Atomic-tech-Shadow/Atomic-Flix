@@ -673,7 +673,7 @@ const AnimePlayerPage: React.FC = () => {
         {selectedEpisode && (
           <div className="text-center text-gray-300 text-sm italic">
             ⚛️I AM ATOMIC⚛️<br />
-            <span className="font-bold">Changez de lecteur.</span>
+            <span className="font-bold">Trop de pub🙄? Changez de lecteur.</span>
           </div>
         )}
 
