@@ -10,6 +10,9 @@ export default defineConfig({
       "@shared": path.resolve(__dirname, "../shared"),
     },
   },
+  build: {
+    outDir: "dist",
+  },
   server: {
     host: "0.0.0.0",
     port: 5000,

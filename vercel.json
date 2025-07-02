@@ -1,3 +1,10 @@
 {
-  "buildCommand": "vite build"
+  "buildCommand": "vite build",
+  "outputDirectory": "client/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
