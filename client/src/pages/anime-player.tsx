@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'wouter';
-import { ChevronLeft, ChevronRight, ChevronDown, Download, Shield } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useLocation } from 'wouter';
+import { ChevronLeft, ChevronRight, ChevronDown, Play, ArrowLeft, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'wouter';
 import MainLayout from '@/components/layout/main-layout';
-import { SectionLoading } from '@/components/ui/loading-spinner';
+import { SectionLoading, PageLoading } from '@/components/ui/loading-spinner';
+import { FloatingBackButton } from '@/components/navigation/floating-back-button';
+import { BreadcrumbNav } from '@/components/navigation/breadcrumb-nav';
 
 interface Episode {
   id: string;
@@ -80,40 +83,6 @@ const AnimePlayerPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [episodeLoading, setEpisodeLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [adBlockEnabled, setAdBlockEnabled] = useState(true);
-  const [popupBlocked, setPopupBlocked] = useState(0);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  // Protection anti-publicités
-  useEffect(() => {
-    if (adBlockEnabled) {
-      // Bloquer les popups automatiques
-      const originalOpen = window.open;
-      window.open = function(...args) {
-        setPopupBlocked(prev => prev + 1);
-        console.log('🛡️ Popup bloqué par ATOMIC FLIX');
-        return null;
-      };
-
-      // Intercepter les changements de localisation
-      const originalAssign = location.assign;
-      location.assign = function(url) {
-        const urlString = typeof url === 'string' ? url : url.toString();
-        if (urlString.includes('atomic-flix') || urlString.includes('localhost')) {
-          originalAssign.call(location, url);
-        } else {
-          console.log('🛡️ Redirection bloquée par ATOMIC FLIX:', urlString);
-          setPopupBlocked(prev => prev + 1);
-        }
-      };
-
-      // Nettoyer à la désactivation
-      return () => {
-        window.open = originalOpen;
-        location.assign = originalAssign;
-      };
-    }
-  }, [adBlockEnabled]);
 
   // Fonction pour les requêtes API externes uniquement
   const apiRequest = async (endpoint: string) => {
@@ -643,20 +612,15 @@ const AnimePlayerPage: React.FC = () => {
           >
             <div className="aspect-video relative">
               <iframe
-                ref={iframeRef}
                 key={`player-${selectedPlayer}-${selectedEpisode?.id}`}
                 src={episodeDetails.sources[selectedPlayer]?.url}
                 className="w-full h-full"
                 allowFullScreen
                 frameBorder="0"
                 title={`${episodeDetails?.title} - ${episodeDetails.sources[selectedPlayer]?.server}`}
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
-                referrerPolicy="no-referrer"
-                style={{ 
-                  border: 'none',
-                  background: 'black'
-                }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-top-navigation"
+                referrerPolicy="no-referrer-when-downgrade"
               />
               
               {/* Overlay avec informations de l'épisode */}
@@ -705,40 +669,11 @@ const AnimePlayerPage: React.FC = () => {
           </div>
         )}
 
-        {/* Protection anti-publicités */}
+        {/* Message d'erreur de pub */}
         {selectedEpisode && (
-          <div className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 rounded-lg p-4 border border-cyan-500/30">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 text-cyan-400">
-                <Shield size={20} />
-                <span className="font-bold">Protection ATOMIC FLIX</span>
-              </div>
-              <button
-                onClick={() => setAdBlockEnabled(!adBlockEnabled)}
-                className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${
-                  adBlockEnabled 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-red-600 text-white'
-                }`}
-              >
-                {adBlockEnabled ? 'ACTIVÉ' : 'DÉSACTIVÉ'}
-              </button>
-            </div>
-            <div className="text-gray-300 text-sm">
-              <span className="font-bold">Publicités bloquées :</span> {popupBlocked}
-              <br />
-              <span className="text-xs italic">
-                {adBlockEnabled 
-                  ? "Protection active contre les popups et redirections publicitaires" 
-                  : "Protection désactivée - Popups autorisés"
-                }
-              </span>
-            </div>
-            {!adBlockEnabled && (
-              <div className="text-yellow-400 text-xs mt-2 italic">
-                ⚠️ Changez de lecteur si des publicités apparaissent
-              </div>
-            )}
+          <div className="text-center text-gray-300 text-sm italic">
+            ⚛️I AM ATOMIC⚛️<br />
+            <span className="font-bold">Changez de lecteur.</span>
           </div>
         )}
 
