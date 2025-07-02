@@ -12,6 +12,20 @@ export default defineConfig({
   },
   build: {
     outDir: "dist",
+    minify: "esbuild",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          lucide: ['lucide-react'],
+          radix: [
+            '@radix-ui/react-slot',
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu'
+          ]
+        }
+      }
+    }
   },
   server: {
     host: "0.0.0.0",
