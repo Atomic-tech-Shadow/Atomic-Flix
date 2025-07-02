@@ -680,6 +680,9 @@ const AnimePlayerPage: React.FC = () => {
           </motion.div>
         )}
 
+        {/* Espace après le lecteur */}
+        <div className="h-6"></div>
+
         <AnimatePresence>
           {episodeLoading && (
             <motion.div
