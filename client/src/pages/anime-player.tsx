@@ -633,55 +633,49 @@ const AnimePlayerPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            
-            {/* Navigation et message en bas de la carte du lecteur */}
-            <div className="p-4 bg-gray-900 space-y-4">
-              {/* Navigation entre épisodes - Style anime-sama */}
-              {selectedEpisode && (
-                <div className="flex justify-center items-center gap-4">
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => navigateEpisode('prev')}
-                    disabled={!selectedEpisode || episodes.findIndex(ep => ep.id === selectedEpisode.id) === 0}
-                    className="p-3 bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <ChevronLeft size={24} className="text-white" />
-                  </motion.button>
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
-                  >
-                    <Download size={24} className="text-white" />
-                  </motion.button>
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => navigateEpisode('next')}
-                    disabled={!selectedEpisode || episodes.findIndex(ep => ep.id === selectedEpisode.id) === episodes.length - 1}
-                    className="p-3 bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <ChevronRight size={24} className="text-white" />
-                  </motion.button>
-                </div>
-              )}
-
-              {/* Message d'erreur de pub */}
-              {selectedEpisode && (
-                <div className="text-center text-gray-300 text-sm italic">
-                  ⚛️I AM ATOMIC⚛️<br />
-                  <span className="font-bold">Changez de lecteur.</span>
-                </div>
-              )}
-            </div>
           </motion.div>
         )}
 
-        {/* Espace après le lecteur */}
-        <div className="h-6"></div>
+        {/* Navigation entre épisodes - Style anime-sama */}
+        {selectedEpisode && (
+          <div className="flex justify-center items-center gap-4">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => navigateEpisode('prev')}
+              disabled={!selectedEpisode || episodes.findIndex(ep => ep.id === selectedEpisode.id) === 0}
+              className="p-3 bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={24} className="text-white" />
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              <Download size={24} className="text-white" />
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => navigateEpisode('next')}
+              disabled={!selectedEpisode || episodes.findIndex(ep => ep.id === selectedEpisode.id) === episodes.length - 1}
+              className="p-3 bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight size={24} className="text-white" />
+            </motion.button>
+          </div>
+        )}
+
+        {/* Message d'erreur de pub */}
+        {selectedEpisode && (
+          <div className="text-center text-gray-300 text-sm italic">
+            ⚛️I AM ATOMIC⚛️<br />
+            <span className="font-bold">Changez de lecteur.</span>
+          </div>
+        )}
 
         <AnimatePresence>
           {episodeLoading && (
