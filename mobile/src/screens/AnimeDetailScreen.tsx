@@ -22,7 +22,7 @@ type AnimeDetailScreenRouteProp = RouteProp<RootStackParamList, 'AnimeDetail'>;
 
 const { width } = Dimensions.get('window');
 
-// Adaptation directe du code anime.tsx
+// Direct adaptation of anime.tsx
 const AnimeDetailScreen: React.FC = () => {
   const navigation = useNavigation<AnimeDetailScreenNavigationProp>();
   const route = useRoute<AnimeDetailScreenRouteProp>();
