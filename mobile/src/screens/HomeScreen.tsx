@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,53 +12,170 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import { animeAPI } from '../services/api';
 import { SearchResult } from '../types';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
 const { width } = Dimensions.get('window');
-const cardWidth = (width - 48) / 2; // 2 colonnes avec marges
+const cardWidth = (width - 48) / 2;
 
+// Adaptation directe du code anime-sama.tsx
 const HomeScreen: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [popularAnimes, setPopularAnimes] = useState<SearchResult[]>([]);
 
-  const { data: searchResults, isLoading, error } = useQuery({
-    queryKey: ['search', searchTerm],
-    queryFn: () => animeAPI.search(searchTerm),
-    enabled: searchTerm.length > 2,
-    retry: 2,
-  });
+  // Configuration API externe identique au site web
+  const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
 
-  const handleSearch = () => {
-    if (searchQuery.trim().length > 2) {
-      setSearchTerm(searchQuery.trim());
-    } else {
-      Alert.alert('Recherche', 'Veuillez saisir au moins 3 caractères');
+  // Fonction utilitaire pour les requêtes API (identique au site web)
+  const apiRequest = async (endpoint: string, options = {}) => {
+    const maxRetries = 2;
+    let attempt = 0;
+    
+    while (attempt < maxRetries) {
+      try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+          method: 'GET',
+          ...options
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        return await response.json();
+      } catch (error) {
+        attempt++;
+        console.log(`Tentative ${attempt}/${maxRetries} échouée:`, error);
+        
+        if (attempt >= maxRetries) {
+          console.error('Erreur API après', maxRetries, 'tentatives:', error);
+          throw error;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      }
     }
   };
 
-  const handleAnimePress = (anime: SearchResult) => {
-    navigation.navigate('AnimeDetail', {
-      animeUrl: anime.url,
-      animeTitle: anime.title,
-    });
+  // animeAPI identique au site web
+  const animeAPI = {
+    search: async (query: string) => {
+      return await apiRequest(`/api/search?query=${encodeURIComponent(query)}`);
+    },
+    getTrending: async () => {
+      return await apiRequest('/api/trending');
+    }
   };
 
+  // Charger les animes populaires (identique au site web)
+  const loadPopularAnimes = async () => {
+    try {
+      const response = await animeAPI.getTrending();
+      
+      if (response && response.success && response.results) {
+        setPopularAnimes(response.results.slice(0, 24));
+        console.log('Contenu populaire chargé:', response.results.length, 'éléments');
+      } else {
+        console.warn('Réponse API trending échouée:', response);
+        setPopularAnimes([]);
+      }
+    } catch (error) {
+      console.error('Erreur chargement trending:', error);
+      setPopularAnimes([]);
+    }
+  };
+
+  // Recherche d'animes (identique au site web)
+  const searchAnimes = async (query: string) => {
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await animeAPI.search(query);
+      
+      if (response && response.success) {
+        const results = response.results || [];
+        if (Array.isArray(results)) {
+          setSearchResults(results);
+        } else {
+          console.warn('Pas de résultats dans la réponse:', response);
+          setSearchResults([]);
+        }
+      } else {
+        throw new Error('Réponse API invalide');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur de recherche';
+      console.error('Erreur recherche:', errorMessage);
+      
+      if (errorMessage.includes('504') || errorMessage.includes('timeout')) {
+        setError('Le serveur anime-sama-scraper.vercel.app ne répond pas actuellement. Veuillez réessayer plus tard.');
+      } else if (errorMessage.includes('500')) {
+        setError('Erreur temporaire du serveur. Veuillez réessayer dans quelques instants.');
+      } else {
+        setError('Impossible de rechercher les animes. Vérifiez votre connexion internet.');
+      }
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Navigation vers détails (adaptation mobile)
+  const loadAnimeDetails = async (anime: SearchResult) => {
+    // Détecter si c'est un manga pour rediriger vers le lecteur approprié
+    if (anime.type === 'manga') {
+      navigation.navigate('MangaReader', {
+        mangaUrl: anime.url,
+        mangaTitle: anime.title,
+      });
+    } else {
+      navigation.navigate('AnimeDetail', {
+        animeUrl: anime.url,
+        animeTitle: anime.title,
+      });
+    }
+  };
+
+  // Charger l'historique au démarrage et les animes populaires
+  useEffect(() => {
+    loadPopularAnimes();
+  }, []);
+
+  // Gérer la recherche en temps réel (identique au site web)
+  useEffect(() => {
+    if (searchQuery) {
+      const timeoutId = setTimeout(() => {
+        searchAnimes(searchQuery);
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
+
+  // Adapter le renderAnimeCard du site web (identical styling)
   const renderAnimeCard = (anime: SearchResult) => (
     <TouchableOpacity
       key={anime.id}
       style={{
         width: cardWidth,
-        marginBottom: 20,
+        marginBottom: 16,
         backgroundColor: '#1e293b',
         borderRadius: 12,
         overflow: 'hidden',
@@ -68,7 +185,7 @@ const HomeScreen: React.FC = () => {
         shadowRadius: 8,
         elevation: 8,
       }}
-      onPress={() => handleAnimePress(anime)}
+      onPress={() => loadAnimeDetails(anime)}
       activeOpacity={0.8}
     >
       <View style={{ position: 'relative' }}>
@@ -76,11 +193,30 @@ const HomeScreen: React.FC = () => {
           source={{ uri: anime.image }}
           style={{
             width: '100%',
-            height: 220,
+            height: 240, // Hauteur identique au site web
             backgroundColor: '#334155',
           }}
           resizeMode="cover"
         />
+        
+        {/* Badge type identique au site web */}
+        <View
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            backgroundColor: anime.type && anime.type.toLowerCase().includes('manga') ? '#d946ef' : '#0ea5e9',
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+            borderRadius: 6,
+          }}
+        >
+          <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
+            {anime.type || 'ANIME'}
+          </Text>
+        </View>
+
+        {/* Gradient identique au site web */}
         <LinearGradient
           colors={['transparent', 'rgba(0,0,0,0.8)']}
           style={{
@@ -91,21 +227,6 @@ const HomeScreen: React.FC = () => {
             height: 60,
           }}
         />
-        <View
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            backgroundColor: anime.type === 'ANIME' ? '#0ea5e9' : '#d946ef',
-            paddingHorizontal: 8,
-            paddingVertical: 4,
-            borderRadius: 6,
-          }}
-        >
-          <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>
-            {anime.type}
-          </Text>
-        </View>
       </View>
       
       <View style={{ padding: 12 }}>
@@ -126,7 +247,7 @@ const HomeScreen: React.FC = () => {
             fontSize: 12,
           }}
         >
-          {anime.status}
+          {anime.status || 'Disponible'}
         </Text>
       </View>
     </TouchableOpacity>
@@ -134,114 +255,79 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#0f172a' }}>
-      <StatusBar style="light" />
+      <StatusBar style="light" backgroundColor="#0f172a" />
       
-      {/* Header avec logo et recherche */}
-      <LinearGradient
-        colors={['#0f172a', '#1e293b']}
-        style={{
-          paddingTop: 20,
-          paddingHorizontal: 20,
-          paddingBottom: 20,
-        }}
-      >
-        {/* Logo ATOMIC FLIX */}
-        <View style={{ alignItems: 'center', marginBottom: 20 }}>
-          <LinearGradient
-            colors={['#0ea5e9', '#d946ef']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{
-              paddingHorizontal: 20,
-              paddingVertical: 10,
-              borderRadius: 25,
-            }}
-          >
-            <Text
-              style={{
-                color: 'white',
-                fontSize: 24,
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}
-            >
-              ATOMIC FLIX
-            </Text>
-          </LinearGradient>
-        </View>
-
-        {/* Barre de recherche */}
-        <View
-          style={{
-            flexDirection: 'row',
-            backgroundColor: '#334155',
-            borderRadius: 25,
-            paddingHorizontal: 15,
-            paddingVertical: 5,
-            alignItems: 'center',
-          }}
-        >
-          <TextInput
-            style={{
-              flex: 1,
-              color: '#f8fafc',
-              fontSize: 16,
-              paddingVertical: 10,
-            }}
-            placeholder="Rechercher un anime ou manga..."
-            placeholderTextColor="#94a3b8"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            onSubmitEditing={handleSearch}
-            returnKeyType="search"
-          />
-          <TouchableOpacity
-            onPress={handleSearch}
-            style={{
-              backgroundColor: '#0ea5e9',
-              borderRadius: 20,
-              padding: 10,
-              marginLeft: 10,
-            }}
-          >
-            <Icon name="search" size={20} color="white" />
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
-
-      {/* Contenu principal */}
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{
-          padding: 20,
-        }}
+        contentContainerStyle={{ paddingVertical: 8, paddingHorizontal: 8 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* État de chargement */}
-        {isLoading && (
-          <View style={{ alignItems: 'center', marginTop: 50 }}>
-            <ActivityIndicator size="large" color="#0ea5e9" />
-            <Text style={{ color: '#94a3b8', marginTop: 10 }}>
+        {/* Barre de recherche conditionnelle (identique au site web) */}
+        {searchQuery && (
+          <View style={{ marginBottom: 24, paddingHorizontal: 8 }}>
+            <View style={{
+              backgroundColor: 'rgba(51, 65, 85, 0.8)',
+              borderRadius: 12,
+              padding: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 12,
+            }}>
+              <Icon name="search" size={20} color="#22d3ee" />
+              <TextInput
+                style={{
+                  flex: 1,
+                  color: '#f8fafc',
+                  fontSize: 16,
+                  borderWidth: 0,
+                  outline: 'none',
+                }}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="Rechercher des animes..."
+                placeholderTextColor="#9ca3af"
+                autoFocus
+              />
+              <TouchableOpacity
+                onPress={() => setSearchQuery('')}
+                style={{ padding: 4 }}
+              >
+                <Text style={{ color: '#9ca3af', fontSize: 18 }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        {/* Affichage des états (identique au site web) */}
+        {loading && (
+          <View style={{ padding: 32, alignItems: 'center' }}>
+            <ActivityIndicator size="large" color="#22d3ee" />
+            <Text style={{ color: '#9ca3af', marginTop: 12, fontSize: 14 }}>
               Recherche en cours...
             </Text>
           </View>
         )}
 
-        {/* Erreur */}
-        {error && !isLoading && (
-          <View style={{ alignItems: 'center', marginTop: 50 }}>
-            <Icon name="alert-circle" size={48} color="#ef4444" />
-            <Text style={{ color: '#ef4444', marginTop: 10, textAlign: 'center' }}>
-              Erreur lors de la recherche
+        {error && !loading && (
+          <View style={{ 
+            backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+            borderRadius: 12, 
+            padding: 16, 
+            margin: 8,
+            alignItems: 'center'
+          }}>
+            <Icon name="alert-circle" size={32} color="#ef4444" />
+            <Text style={{ color: '#ef4444', textAlign: 'center', marginTop: 8 }}>
+              {error}
             </Text>
             <TouchableOpacity
-              onPress={handleSearch}
+              onPress={() => searchAnimes(searchQuery)}
               style={{
-                backgroundColor: '#0ea5e9',
-                paddingHorizontal: 20,
-                paddingVertical: 10,
+                backgroundColor: '#22d3ee',
+                paddingHorizontal: 16,
+                paddingVertical: 8,
                 borderRadius: 20,
-                marginTop: 10,
+                marginTop: 12,
               }}
             >
               <Text style={{ color: 'white', fontWeight: 'bold' }}>
@@ -251,56 +337,95 @@ const HomeScreen: React.FC = () => {
           </View>
         )}
 
-        {/* Résultats de recherche */}
-        {searchResults?.success && searchResults.data && (
+        {/* Résultats de recherche (logique identique au site web) */}
+        {searchResults.length > 0 && (
           <>
-            <Text
-              style={{
-                color: '#f8fafc',
-                fontSize: 18,
-                fontWeight: 'bold',
-                marginBottom: 20,
-              }}
-            >
-              Résultats pour "{searchTerm}" ({searchResults.data.length})
+            <Text style={{
+              color: '#f8fafc',
+              fontSize: 20,
+              fontWeight: 'bold',
+              marginBottom: 16,
+              paddingHorizontal: 8,
+            }}>
+              Résultats pour "{searchQuery}" ({searchResults.length})
             </Text>
             
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                justifyContent: 'space-between',
-              }}
-            >
-              {searchResults.data.map(renderAnimeCard)}
+            <View style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              paddingHorizontal: 8,
+            }}>
+              {searchResults.map(renderAnimeCard)}
             </View>
           </>
         )}
 
-        {/* Message d'accueil */}
-        {!searchTerm && !isLoading && (
-          <View style={{ alignItems: 'center', marginTop: 50 }}>
-            <Icon name="tv" size={64} color="#0ea5e9" />
-            <Text
+        {/* Contenu populaire (identique au site web) */}
+        {!searchQuery && !loading && popularAnimes.length > 0 && (
+          <>
+            <Text style={{
+              color: '#f8fafc',
+              fontSize: 20,
+              fontWeight: 'bold',
+              marginBottom: 16,
+              paddingHorizontal: 8,
+            }}>
+              Contenu populaire
+            </Text>
+            
+            <View style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              paddingHorizontal: 8,
+            }}>
+              {popularAnimes.map(renderAnimeCard)}
+            </View>
+          </>
+        )}
+
+        {/* Message d'accueil (identique au site web) */}
+        {!searchQuery && !loading && popularAnimes.length === 0 && (
+          <View style={{ alignItems: 'center', marginTop: 80, paddingHorizontal: 20 }}>
+            <LinearGradient
+              colors={['#0ea5e9', '#d946ef']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
               style={{
-                color: '#f8fafc',
-                fontSize: 20,
-                fontWeight: 'bold',
-                marginTop: 20,
-                textAlign: 'center',
+                paddingHorizontal: 24,
+                paddingVertical: 12,
+                borderRadius: 25,
+                marginBottom: 20,
               }}
             >
+              <Text style={{
+                color: 'white',
+                fontSize: 24,
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>
+                ATOMIC FLIX
+              </Text>
+            </LinearGradient>
+            
+            <Icon name="tv" size={64} color="#22d3ee" />
+            <Text style={{
+              color: '#f8fafc',
+              fontSize: 20,
+              fontWeight: 'bold',
+              marginTop: 20,
+              textAlign: 'center',
+            }}>
               Bienvenue sur ATOMIC FLIX
             </Text>
-            <Text
-              style={{
-                color: '#94a3b8',
-                fontSize: 16,
-                marginTop: 10,
-                textAlign: 'center',
-                paddingHorizontal: 20,
-              }}
-            >
+            <Text style={{
+              color: '#9ca3af',
+              fontSize: 16,
+              marginTop: 10,
+              textAlign: 'center',
+              lineHeight: 24,
+            }}>
               Découvrez des milliers d'animes et mangas en streaming gratuit
             </Text>
           </View>

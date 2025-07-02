@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,13 +10,11 @@ import {
   Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import { animeAPI } from '../services/api';
-import { Season } from '../types';
+import { Season, AnimeData } from '../types';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type AnimeDetailScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AnimeDetail'>;
@@ -24,18 +22,90 @@ type AnimeDetailScreenRouteProp = RouteProp<RootStackParamList, 'AnimeDetail'>;
 
 const { width } = Dimensions.get('window');
 
+// Adaptation directe du code anime.tsx
 const AnimeDetailScreen: React.FC = () => {
   const navigation = useNavigation<AnimeDetailScreenNavigationProp>();
   const route = useRoute<AnimeDetailScreenRouteProp>();
   const { animeUrl, animeTitle } = route.params;
 
-  const [selectedLanguage, setSelectedLanguage] = useState('VF');
+  const [animeData, setAnimeData] = useState<AnimeData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const { data: animeData, isLoading, error } = useQuery({
-    queryKey: ['anime', animeUrl],
-    queryFn: () => animeAPI.getAnimeData(animeUrl),
-    retry: 2,
-  });
+  // Configuration API externe (identique au site web)
+  const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
+
+  // Fonction pour les requêtes API avec timeout (identique au site web)
+  const apiRequest = async (endpoint: string, timeoutMs = 20000) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    
+    try {
+      console.log('Requête API:', endpoint);
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Données reçues:', data);
+      return data;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Timeout: La requête a pris trop de temps');
+      }
+      throw error;
+    }
+  };
+
+  // Charger les données d'anime (identique au site web)
+  const loadAnimeData = async () => {
+    if (!animeUrl) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await apiRequest(`/api/anime?url=${encodeURIComponent(animeUrl)}`);
+      
+      if (response && response.success && response.data) {
+        console.log('Données anime reçues:', response.data);
+        setAnimeData(response.data);
+      } else {
+        throw new Error('Données anime invalides');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+      console.error('Erreur chargement anime:', errorMessage);
+      
+      if (errorMessage.includes('Timeout')) {
+        setError('Le chargement prend trop de temps. Vérifiez votre connexion internet.');
+      } else if (errorMessage.includes('404')) {
+        setError('Cet anime n\'existe pas ou n\'est plus disponible.');
+      } else if (errorMessage.includes('500')) {
+        setError('Erreur temporaire du serveur. Veuillez réessayer plus tard.');
+      } else {
+        setError('Impossible de charger les détails de l\'anime. Veuillez réessayer.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Charger les données au montage du composant
+  useEffect(() => {
+    loadAnimeData();
+  }, [animeUrl]);
 
   const handleSeasonPress = (season: Season) => {
     if (season.available) {
