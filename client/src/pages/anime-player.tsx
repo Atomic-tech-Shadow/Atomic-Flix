@@ -248,7 +248,7 @@ const AnimePlayerPage: React.FC = () => {
         // Auto-charger l'épisode avec l'API embed
         if (autoLoadEpisode) {
           try {
-            const response = await fetch(`/api/embed?url=${encodeURIComponent(episodeToSelect.url)}`);
+            const response = await fetch(`https://anime-sama-scraper.vercel.app/api/embed?url=${encodeURIComponent(episodeToSelect.url)}`);
             
             if (response.ok) {
               const embedData = await response.json();
@@ -305,7 +305,7 @@ const AnimePlayerPage: React.FC = () => {
       console.log('Chargement épisodes pour:', animeData.id, 'saison:', season.value, 'langue:', selectedLanguage);
       
       // Utiliser uniquement l'API selon la documentation
-      const data = await apiRequest(`/api/episodes/${animeData.id}?season=${season.value}&language=${languageCode}`);
+      const data = await apiRequest(`https://anime-sama-scraper.vercel.app/api/episodes/${animeData.id}?season=${season.value}&language=${languageCode}`);
       console.log('Épisodes reçus de l\'API:', data);
       
       if (!data || !data.success) {
@@ -352,7 +352,7 @@ const AnimePlayerPage: React.FC = () => {
         // Auto-charger l'épisode avec l'API embed uniquement
         if (autoLoadEpisode) {
           try {
-            const response = await fetch(`/api/embed?url=${encodeURIComponent(episodeToSelect.url)}`);
+            const response = await fetch(`https://anime-sama-scraper.vercel.app/api/embed?url=${encodeURIComponent(episodeToSelect.url)}`);
             
             if (response.ok) {
               const embedData = await response.json();
@@ -644,7 +644,7 @@ const AnimePlayerPage: React.FC = () => {
           </div>
         )}
 
-        {/* Lecteur vidéo - URLs directes via nouvel endpoint /api/embed JSON */}
+        {/* Lecteur vidéo - URLs directes via API externe embed */}
         {episodeDetails && episodeDetails.sources.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
