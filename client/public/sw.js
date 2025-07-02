@@ -1,7 +1,7 @@
 const CACHE_NAME = 'atomic-flix-v1';
 const urlsToCache = [
   '/',
-  '/assets/atomic-flix-logo.png',
+  '/assets/atomic-logo.png',
   '/manifest.json'
 ];
 
