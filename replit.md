@@ -30,9 +30,15 @@ ATOMIC FLIX is a modern anime streaming platform built with React, TypeScript, a
 │   │   ├── pages/        # Route components
 │   │   ├── lib/          # Utility functions and configurations
 │   │   └── hooks/        # Custom React hooks
-├── server/               # Backend Express application
+├── mobile/               # React Native Expo mobile application
+│   ├── src/
+│   │   ├── navigation/   # Navigation configuration
+│   │   ├── screens/      # Mobile screens (HomeScreen, AnimeDetailScreen, etc.)
+│   │   ├── services/     # API services identical to web version
+│   │   ├── types/        # TypeScript interfaces
+│   │   └── utils/        # Utility functions and configurations
 ├── shared/               # Shared types and schemas
-└── migrations/           # Database migration files
+└── migrations/           # Database migration files (legacy)
 ```
 
 ## Key Components
@@ -121,6 +127,7 @@ ATOMIC FLIX is a modern anime streaming platform built with React, TypeScript, a
 - July 01, 2025. Vercel deployment optimization: Fixed Node.js version conflict by simplifying to frontend-only deployment. Removed serverless functions and configured direct API calls to anime-sama-scraper.vercel.app. Updated vercel.json to simple build configuration. Application now fully optimized for Vercel deployment without Node.js version requirements or serverless complexity.
 - July 02, 2025. Complete migration to frontend-only architecture: Successfully migrated from Replit Agent to standard Replit environment with 100% frontend architecture. Removed all backend dependencies (Express, tsx, esbuild), deleted server directory, and configured Vite for direct development. Application now runs purely client-side using only external API (anime-sama-scraper.vercel.app). Created dedicated client configuration with tsconfig.json and vite.config.ts for proper module resolution. Architecture now optimized for security with complete client/server separation.
 - July 02, 2025. Fixed Vercel deployment routing issues: Resolved 404 errors for dynamic routes on Vercel deployment by configuring proper rewrites in vercel.json, setting correct output directory, and adding _redirects file. Fixed CSS compilation errors by removing problematic @apply directives. Application now fully functional on both Replit and Vercel environments.
+- July 02, 2025. Mobile application development: Created complete React Native Expo mobile application in /mobile directory that reproduces 100% of web functionality. Implemented HomeScreen with search, AnimeDetailScreen with season selection, AnimePlayerScreen with video streaming, and MangaReaderScreen with page navigation. Added identical API integration, same design system (cyan/purple gradients, dark theme), React Navigation for native navigation, TanStack Query for state management, and comprehensive TypeScript architecture. Mobile app ready for Android APK build with exact same user experience as web version.
 
 ## User Preferences
 
