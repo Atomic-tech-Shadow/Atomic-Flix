@@ -257,6 +257,111 @@ const HomeScreen: React.FC = () => {
     <View style={{ flex: 1, backgroundColor: '#0f172a' }}>
       <StatusBar style="light" backgroundColor="#0f172a" />
       
+      {/* Header avec navbar identique au site web */}
+      <View style={{
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+        borderBottomWidth: 1,
+        borderBottomColor: '#1e293b',
+      }}>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: 16,
+          height: 64,
+        }}>
+          {/* Logo ATOMIC FLIX (identique au navbar.tsx) */}
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+          }}>
+            <View style={{
+              width: 40,
+              height: 40,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <LinearGradient
+                colors={['#22d3ee', '#a855f7']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text style={{
+                  color: 'white',
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                }}>A</Text>
+              </LinearGradient>
+            </View>
+            
+            <Text style={{
+              fontSize: 20,
+              fontWeight: 'bold',
+              color: '#f8fafc',
+            }}>
+              ATOMIC FLIX
+            </Text>
+          </View>
+
+          {/* Bouton recherche (identique au navbar.tsx) */}
+          <TouchableOpacity
+            onPress={() => setSearchQuery(searchQuery ? '' : 'search')}
+            style={{
+              width: 40,
+              height: 40,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 20,
+            }}
+          >
+            <Icon 
+              name="search" 
+              size={20} 
+              color="#22d3ee" 
+            />
+          </TouchableOpacity>
+        </View>
+        
+        {/* Barre de recherche permanente (adaptation de anime-sama.tsx) */}
+        <View style={{
+          paddingHorizontal: 16,
+          paddingBottom: 16,
+        }}>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: '#1e293b',
+            borderRadius: 25,
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            gap: 12,
+          }}>
+            <Icon name="search" size={20} color="#22d3ee" />
+            <TextInput
+              style={{
+                flex: 1,
+                color: '#f8fafc',
+                fontSize: 16,
+                borderWidth: 0,
+              }}
+              placeholder="Rechercher des animes..."
+              placeholderTextColor="#94a3b8"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              returnKeyType="search"
+            />
+          </View>
+        </View>
+      </View>
+      
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingVertical: 8, paddingHorizontal: 8 }}

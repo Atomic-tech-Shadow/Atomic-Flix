@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
-  Alert,
   Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { StatusBar } from 'expo-status-bar';
 
 import { Season, AnimeData } from '../types';
 import type { RootStackParamList } from '../navigation/AppNavigator';
