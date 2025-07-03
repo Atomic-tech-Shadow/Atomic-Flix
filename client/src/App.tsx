@@ -25,11 +25,13 @@ function Router() {
 }
 
 function App() {
-  const [showStartup, setShowStartup] = useState(true);
+  const [showStartup, setShowStartup] = useState(false); // Temporairement désactivé pour test
 
   const handleStartupComplete = () => {
     setShowStartup(false);
   };
+
+  console.log('App rendering, showStartup:', showStartup);
 
   return (
     <QueryClientProvider client={queryClient}>
