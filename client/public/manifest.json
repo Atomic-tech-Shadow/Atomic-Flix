@@ -89,6 +89,27 @@
       "url": "url"
     }
   },
+  "handle_links": "preferred",
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "widgets": [
+    {
+      "name": "Recherche rapide",
+      "description": "Rechercher des animes rapidement",
+      "tag": "search-widget",
+      "ms_ac_template": "generic",
+      "data": "search-widget-data",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/assets/atomic-logo.png",
+          "sizes": "256x256",
+          "label": "Widget de recherche ATOMIC FLIX"
+        }
+      ]
+    }
+  ],
   "shortcuts": [
     {
       "name": "Rechercher des animes",
