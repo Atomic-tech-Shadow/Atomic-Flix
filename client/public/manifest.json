@@ -10,6 +10,10 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "fr",
+  "dir": "ltr",
+  "iarc_rating_id": "e84b072d-71de-4aac-9b1c-b8f2a43b5d05",
+  "prefer_related_applications": false,
+  "related_applications": [],
   "icons": [
     {
       "src": "/assets/atomic-logo.png",
