@@ -189,6 +189,19 @@
     animation: atomic-pulse 2s ease-in-out infinite;
   }
 
+  @keyframes fade-out {
+    from { 
+      opacity: 1; 
+    }
+    to { 
+      opacity: 0; 
+    }
+  }
+
+  .animate-fade-out {
+    animation: fade-out 0.5s ease-out forwards;
+  }
+
   /* Page transition animations */
   .page-enter {
     opacity: 0;
