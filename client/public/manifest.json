@@ -9,6 +9,11 @@
   "theme_color": "#00d4ff",
   "orientation": "portrait-primary",
   "scope": "/",
+  "scope_extensions": [
+    {
+      "origin": "https://atomic-flix.vercel.app"
+    }
+  ],
   "lang": "fr",
   "dir": "ltr",
   "iarc_rating_id": "e84b072d-71de-4aac-9b1c-b8f2a43b5d05",
@@ -59,6 +64,30 @@
   ],
   "launch_handler": {
     "client_mode": "navigate-existing"
+  },
+  "display_override": ["window-controls-overlay", "standalone"],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "video/*": [".mp4", ".mkv", ".avi"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+atomicflix",
+      "url": "/?protocol=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
   },
   "shortcuts": [
     {
