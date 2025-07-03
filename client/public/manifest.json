@@ -18,7 +18,13 @@
   "dir": "ltr",
   "iarc_rating_id": "e84b072d-71de-4aac-9b1c-b8f2a43b5d05",
   "prefer_related_applications": false,
-  "related_applications": [],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.atomicflix.app",
+      "id": "com.atomicflix.app"
+    }
+  ],
   "icons": [
     {
       "src": "/assets/atomic-logo.png",
