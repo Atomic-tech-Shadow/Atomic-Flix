@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Script principal pour générer l'APK Android TWA d'ATOMIC FLIX
+echo "🚀 Génération de l'APK Android TWA pour ATOMIC FLIX"
+echo "================================================="
+
+cd android-twa
+
+# Exécuter le script de configuration
+echo "📦 Configuration du projet TWA..."
+node build-apk-simple.js
+
+echo ""
+echo "✅ Configuration terminée!"
+echo ""
+echo "📋 Étapes suivantes pour créer votre APK:"
+echo ""
+echo "1. 🌐 Aller sur PWABuilder:"
+echo "   https://www.pwabuilder.com/"
+echo ""
+echo "2. 📝 Entrer l'URL de votre PWA:"
+echo "   https://atomic-flix.vercel.app"
+echo ""
+echo "3. 📱 Sélectionner 'Package For Stores' → 'Android'"
+echo ""
+echo "4. ⚙️ Utiliser ces paramètres exacts:"
+echo "   • Package ID: app.vercel.atomic_flix.twa"
+echo "   • App Name: ATOMIC FLIX"
+echo "   • Short Name: ATF"
+echo "   • Theme Color: #8F00FF"
+echo "   • Background Color: #0F111A"
+echo "   • Display Mode: standalone"
+echo "   • Start URL: /"
+echo ""
+echo "5. 📥 Télécharger l'APK généré"
+echo ""
+echo "6. 🔑 Obtenir l'empreinte SHA256 (fournie avec l'APK)"
+echo ""
+echo "7. 🔧 Configurer assetlinks.json:"
+echo "   node deploy-assetlinks.js \"VOTRE_EMPREINTE_SHA256\""
+echo ""
+echo "8. 🚀 Déployer sur Vercel:"
+echo "   git add client/public/.well-known/assetlinks.json"
+echo "   git commit -m \"Add assetlinks.json for TWA\""
+echo "   git push"
+echo ""
+echo "9. 📱 Installer et tester l'APK sur Android"
+echo ""
+echo "📖 Guide complet disponible dans: android-twa/GUIDE_COMPLET.md"
+echo ""
+echo "🎯 Résultat: Application Android native sans barre d'URL!"

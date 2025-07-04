@@ -10,6 +10,7 @@
     "check": "tsc"
   },
   "dependencies": {
+    "@bubblewrap/cli": "^1.23.0",
     "@expo/cli": "^0.24.17",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
