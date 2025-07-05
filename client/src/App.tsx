@@ -8,6 +8,7 @@ import AnimeSamaPage from "@/pages/anime-sama";
 import AnimePage from "@/pages/anime";
 import AnimePlayerPage from "@/pages/anime-player";
 import MangaReaderPage from "@/pages/manga-reader";
+import AboutPage from "@/pages/about";
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/anime/:id" component={AnimePage} />
       <Route path="/anime/:id/player" component={AnimePlayerPage} />
       <Route path="/manga/:id/reader" component={MangaReaderPage} />
+      <Route path="/about" component={AboutPage} />
       <Route component={NotFound} />
     </Switch>
   );
