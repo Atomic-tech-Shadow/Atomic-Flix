@@ -465,36 +465,50 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
+  // Fonction pour convertir l'URL selon la qualité choisie
+  const convertVideoUrl = (originalUrl: string, quality: 'faible' | 'moyenne' | 'HD'): string => {
+    // Définir les paramètres de qualité
+    const qualityParams = {
+      'faible': { resolution: '480p', bitrate: '500k' },
+      'moyenne': { resolution: '720p', bitrate: '1500k' },
+      'HD': { resolution: '1080p', bitrate: '3000k' }
+    };
+    
+    const params = qualityParams[quality];
+    
+    // Si l'URL contient déjà des paramètres, ajouter les nôtres
+    const separator = originalUrl.includes('?') ? '&' : '?';
+    
+    // Construire l'URL avec les paramètres de qualité
+    const convertedUrl = `${originalUrl}${separator}quality=${params.resolution}&bitrate=${params.bitrate}&format=mp4`;
+    
+    return convertedUrl;
+  };
+
   // Fonction pour télécharger la vidéo avec qualité choisie
   const downloadVideo = async (quality: 'faible' | 'moyenne' | 'HD') => {
     if (!episodeDetails || !episodeDetails.sources.length) return;
 
     try {
-      // Trouver la source avec la qualité demandée ou prendre la première disponible
-      let selectedSource = episodeDetails.sources[selectedPlayer];
+      // Prendre la source actuellement sélectionnée
+      const selectedSource = episodeDetails.sources[selectedPlayer];
       
-      // Essayer de trouver une source avec la qualité spécifique
-      const qualityMap = {
-        'faible': ['360p', '480p', 'LOW', 'SD'],
-        'moyenne': ['720p', 'MD', 'MEDIUM', 'HD'],
-        'HD': ['1080p', 'FULLHD', 'FHD', 'HIGH', 'HD']
+      // Convertir l'URL selon la qualité choisie
+      const convertedUrl = convertVideoUrl(selectedSource.url, quality);
+      
+      // Définir les labels de qualité pour le nom de fichier
+      const qualityLabels = {
+        'faible': '480p',
+        'moyenne': '720p', 
+        'HD': '1080p'
       };
-      
-      const preferredQualities = qualityMap[quality];
-      const matchingSource = episodeDetails.sources.find(source => 
-        preferredQualities.some(q => source.quality.toUpperCase().includes(q))
-      );
-      
-      if (matchingSource) {
-        selectedSource = matchingSource;
-      }
 
-      // Créer le nom du fichier
-      const fileName = `${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber} (${selectedSource.quality}).mp4`;
+      // Créer le nom du fichier avec la qualité convertie
+      const fileName = `${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber} (${qualityLabels[quality]}).mp4`;
       
-      // Créer un lien de téléchargement
+      // Créer un lien de téléchargement avec l'URL convertie
       const link = document.createElement('a');
-      link.href = selectedSource.url;
+      link.href = convertedUrl;
       link.download = fileName;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
@@ -508,7 +522,7 @@ const AnimePlayerPage: React.FC = () => {
       setShowDownloadMenu(false);
       
       // Afficher un message de confirmation
-      console.log(`Téléchargement initié: ${fileName}`);
+      console.log(`Téléchargement initié: ${fileName} avec URL convertie pour ${quality} qualité`);
       
     } catch (error) {
       console.error('Erreur lors du téléchargement:', error);
