@@ -42,9 +42,24 @@ export default function About() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-gray-300">
-                ATOMIC FLIX est une plateforme de streaming d'anime moderne développée avec les dernières technologies web. 
+                ATOMIC FLIX est une application de streaming d'anime créée par <span className="font-semibold text-cyan-400">Cid AKUE</span>. 
                 Elle offre une expérience utilisateur fluide et intuitive pour découvrir et regarder vos anime préférés.
               </p>
+              
+              <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 space-y-2">
+                <h4 className="font-semibold text-yellow-400">Avertissement Important</h4>
+                <p className="text-gray-300 text-sm">
+                  ATOMIC FLIX n'héberge aucune vidéo sur son serveur. Contactez directement la plateforme d'hébergement vidéo 
+                  pour toute réclamation de droit relative aux contenus en question.
+                </p>
+              </div>
+              
+              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 space-y-2">
+                <h4 className="font-semibold text-green-400">Confidentialité</h4>
+                <p className="text-gray-300 text-sm">
+                  Cette application ne collecte aucune donnée personnelle. Votre vie privée est respectée.
+                </p>
+              </div>
               
               <div className="space-y-2">
                 <h4 className="font-semibold text-purple-400">Fonctionnalités principales :</h4>
@@ -75,7 +90,7 @@ export default function About() {
                 Contact
               </CardTitle>
               <CardDescription className="text-gray-300">
-                Contactez le développeur
+                Contactez Cid AKUE - Développeur
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -133,10 +148,10 @@ export default function About() {
         {/* Footer */}
         <div className="text-center py-8 atomic-fade-in">
           <p className="text-gray-400">
-            Développé avec ❤️ pour les fans d'anime
+            Développé avec ❤️ par Cid AKUE pour les fans d'anime
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            © 2025 ATOMIC FLIX. Tous droits réservés.
+            © 2025 ATOMIC FLIX - Cid AKUE. Tous droits réservés.
           </p>
         </div>
       </div>
