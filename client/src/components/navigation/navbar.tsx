@@ -37,9 +37,9 @@ export function Navbar() {
           <Link href="/" className="flex items-center space-x-3">
             <div className="flex h-10 w-10 items-center justify-center">
               <img 
-                src="/assets/atomic-logo.png" 
+                src="/assets/atomic-logo-new.png" 
                 alt="ATOMIC FLIX Logo" 
-                className="h-8 w-8 object-contain"
+                className="h-10 w-10 object-contain rounded-lg"
               />
             </div>
             <span className="hidden sm:block text-xl font-bold atomic-gradient-text">
