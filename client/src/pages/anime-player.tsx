@@ -465,68 +465,8 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
-  // Fonction pour obtenir l'URL de streaming directe via l'API
-  const getDirectStreamingUrl = async (episodeDetails: EpisodeDetails, quality: 'faible' | 'moyenne' | 'HD'): Promise<string> => {
-    try {
-      // Utiliser l'API anime-sama-scraper pour obtenir des sources directes
-      const embedUrl = episodeDetails.sources[selectedPlayer]?.url;
-      if (!embedUrl) {
-        throw new Error('Aucune source sélectionnée');
-      }
-      
-      console.log('Récupération source directe pour:', embedUrl);
-      
-      // Appeler l'API pour extraire les sources de streaming
-      const response = await fetch(`https://anime-sama-scraper.vercel.app/api/stream?url=${encodeURIComponent(embedUrl)}`);
-      
-      if (response.ok) {
-        const streamData = await response.json();
-        console.log('Sources de streaming reçues:', streamData);
-        
-        if (streamData.success && streamData.streams && streamData.streams.length > 0) {
-          // Rechercher la qualité demandée
-          const qualityMap = {
-            'faible': ['360p', '480p', 'low'],
-            'moyenne': ['720p', 'medium'],
-            'HD': ['1080p', '1440p', '4k', 'high', 'hd']
-          };
-          
-          const preferredQualities = qualityMap[quality];
-          
-          // Chercher une source avec la qualité demandée
-          for (const preferredQuality of preferredQualities) {
-            const stream = streamData.streams.find((s: any) => 
-              s.quality?.toLowerCase().includes(preferredQuality.toLowerCase()) ||
-              s.resolution?.toLowerCase().includes(preferredQuality.toLowerCase())
-            );
-            
-            if (stream && stream.url) {
-              console.log(`Source ${quality} trouvée:`, stream.url);
-              return stream.url;
-            }
-          }
-          
-          // Si aucune qualité spécifique trouvée, prendre la première
-          const firstStream = streamData.streams[0];
-          if (firstStream && firstStream.url) {
-            console.log('Utilisation de la première source disponible:', firstStream.url);
-            return firstStream.url;
-          }
-        }
-      }
-      
-      // Fallback : essayer d'extraire depuis l'embed
-      console.log('Tentative d\'extraction depuis embed...');
-      return embedUrl;
-      
-    } catch (error) {
-      console.error('Erreur récupération source directe:', error);
-      throw error;
-    }
-  };
-
-  // Fonction pour télécharger la vidéo avec qualité via l'API
-  const downloadVideoWithApi = async (quality: 'faible' | 'moyenne' | 'HD') => {
+  // Fonction pour ouvrir la page de téléchargement du serveur
+  const openDownloadPage = async (quality: 'faible' | 'moyenne' | 'HD') => {
     if (!episodeDetails || !episodeDetails.sources.length) {
       console.error('Aucun épisode ou source disponible');
       return;
@@ -534,53 +474,66 @@ const AnimePlayerPage: React.FC = () => {
 
     try {
       setShowDownloadMenu(false);
-      console.log(`Début du téléchargement ${quality} pour:`, episodeDetails.title);
       
-      // Obtenir l'URL de streaming directe via l'API
-      const streamingUrl = await getDirectStreamingUrl(episodeDetails, quality);
+      // Obtenir l'URL d'embed actuelle
+      const embedUrl = episodeDetails.sources[selectedPlayer]?.url;
+      const serverName = episodeDetails.sources[selectedPlayer]?.server;
       
-      if (!streamingUrl) {
-        throw new Error('Impossible d\'obtenir l\'URL de streaming');
+      if (!embedUrl) {
+        throw new Error('Aucune source sélectionnée');
       }
       
-      // Définir les labels de qualité pour le nom de fichier
-      const qualityLabels = {
-        'faible': '360p',
-        'moyenne': '720p', 
-        'HD': '1080p'
-      };
-
-      // Créer le nom du fichier
-      const fileName = `${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber} (${qualityLabels[quality]}).mp4`;
+      console.log(`Ouverture page de téléchargement ${quality} pour serveur:`, serverName);
+      console.log('URL embed:', embedUrl);
       
-      console.log('URL de streaming obtenue:', streamingUrl);
-      console.log('Nom du fichier:', fileName);
+      // Ouvrir dans un nouvel onglet avec instructions
+      const newWindow = window.open(embedUrl, '_blank');
       
-      // Télécharger directement l'URL de streaming
-      const link = document.createElement('a');
-      link.href = streamingUrl;
-      link.download = fileName;
-      link.target = '_blank';
-      link.style.display = 'none';
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      console.log(`Téléchargement lancé: ${fileName}`);
+      if (newWindow) {
+        // Afficher un message d'instruction à l'utilisateur
+        const qualityLabels = {
+          'faible': '360p',
+          'moyenne': '720p', 
+          'HD': '1080p'
+        };
+        
+        const instructions = `
+          Page de téléchargement ouverte pour ${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber}
+          
+          Serveur: ${serverName}
+          Qualité demandée: ${qualityLabels[quality]}
+          
+          Instructions:
+          1. Attendez que la vidéo se charge sur la page
+          2. Faites clic droit sur la vidéo
+          3. Sélectionnez "Enregistrer la vidéo sous..." ou "Télécharger la vidéo"
+          4. Choisissez l'emplacement de sauvegarde
+          
+          Note: Certains serveurs peuvent nécessiter de cliquer sur un bouton de téléchargement spécifique.
+        `;
+        
+        // Afficher les instructions dans une popup
+        setTimeout(() => {
+          alert(instructions);
+        }, 1000);
+        
+        console.log(`Page de téléchargement ouverte pour: ${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber}`);
+      } else {
+        throw new Error('Impossible d\'ouvrir la page de téléchargement (popup bloquée?)');
+      }
       
     } catch (error) {
-      console.error('Erreur téléchargement:', error);
+      console.error('Erreur ouverture page téléchargement:', error);
       setShowDownloadMenu(false);
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-      alert(`Erreur lors du téléchargement: ${errorMessage}`);
+      alert(`Erreur: ${errorMessage}`);
     }
   };
 
   // Fonction pour télécharger la vidéo avec qualité choisie
   const downloadVideo = async (quality: 'faible' | 'moyenne' | 'HD') => {
-    // Utiliser la nouvelle méthode avec l'API
-    await downloadVideoWithApi(quality);
+    // Ouvrir la page du serveur avec instructions de téléchargement
+    await openDownloadPage(quality);
   };
 
   if (loading) {
