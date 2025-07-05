@@ -518,6 +518,12 @@ const AnimePlayerPage: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       
+      // Méthode alternative si le téléchargement direct ne fonctionne pas
+      setTimeout(() => {
+        // Ouvrir dans un nouvel onglet pour téléchargement manuel
+        window.open(convertedUrl, '_blank');
+      }, 100);
+      
       // Fermer le menu de téléchargement
       setShowDownloadMenu(false);
       
