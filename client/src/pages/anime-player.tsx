@@ -512,50 +512,74 @@ const AnimePlayerPage: React.FC = () => {
       // Afficher un message de chargement
       console.log(`Début du téléchargement: ${fileName}`);
       
-      // Récupérer la vidéo via fetch et la télécharger
-      const response = await fetch(convertedUrl, {
-        mode: 'cors',
-        credentials: 'omit'
-      });
+      // Fonction pour télécharger avec progress tracking
+      const downloadWithProgress = async (url: string, filename: string) => {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'video/mp4,video/*,*/*',
+            'Cache-Control': 'no-cache'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Erreur de téléchargement: ${response.status}`);
+        }
+        
+        const reader = response.body?.getReader();
+        const contentLength = response.headers.get('content-length');
+        const total = parseInt(contentLength || '0', 10);
+        
+        let received = 0;
+        const chunks: Uint8Array[] = [];
+        
+        if (reader) {
+          while (true) {
+            const { done, value } = await reader.read();
+            
+            if (done) break;
+            
+            chunks.push(value);
+            received += value.length;
+            
+            // Log du progrès
+            if (total > 0) {
+              const progress = Math.round((received / total) * 100);
+              console.log(`Téléchargement: ${progress}%`);
+            }
+          }
+        }
+        
+        // Créer le blob final
+        const blob = new Blob(chunks, { type: 'video/mp4' });
+        
+        // Créer et déclencher le téléchargement
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = filename;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Nettoyer
+        setTimeout(() => {
+          window.URL.revokeObjectURL(blobUrl);
+        }, 1000);
+        
+        return blob;
+      };
       
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
-      }
-      
-      // Convertir la réponse en blob
-      const blob = await response.blob();
-      
-      // Créer un lien de téléchargement avec le blob
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fileName;
-      link.style.display = 'none';
-      
-      // Ajouter le lien au DOM, le cliquer, puis le supprimer
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Nettoyer l'URL blob après utilisation
-      setTimeout(() => {
-        window.URL.revokeObjectURL(url);
-      }, 100);
-      
+      // Lancer le téléchargement
+      await downloadWithProgress(convertedUrl, fileName);
       console.log(`Téléchargement terminé: ${fileName}`);
       
     } catch (error) {
       console.error('Erreur lors du téléchargement:', error);
-      
-      // Fallback: ouvrir l'URL dans un nouvel onglet
-      const selectedSource = episodeDetails.sources[selectedPlayer];
-      const convertedUrl = convertVideoUrl(selectedSource.url, quality);
-      window.open(convertedUrl, '_blank');
-      
-      // Fermer le menu
       setShowDownloadMenu(false);
-      
-      alert('Téléchargement automatique impossible. La vidéo s\'ouvrira dans un nouvel onglet - utilisez clic droit > Enregistrer sous pour télécharger.');
+      alert('Erreur lors du téléchargement. Vérifiez votre connexion et réessayez.');
     }
   };
 
