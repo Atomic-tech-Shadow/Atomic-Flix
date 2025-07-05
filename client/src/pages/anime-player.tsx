@@ -469,7 +469,7 @@ const AnimePlayerPage: React.FC = () => {
   const convertVideoUrl = (originalUrl: string, quality: 'faible' | 'moyenne' | 'HD'): string => {
     // Définir les paramètres de qualité
     const qualityParams = {
-      'faible': { resolution: '480p', bitrate: '500k' },
+      'faible': { resolution: '360p', bitrate: '400k' },
       'moyenne': { resolution: '720p', bitrate: '1500k' },
       'HD': { resolution: '1080p', bitrate: '3000k' }
     };
@@ -498,7 +498,7 @@ const AnimePlayerPage: React.FC = () => {
       
       // Définir les labels de qualité pour le nom de fichier
       const qualityLabels = {
-        'faible': '480p',
+        'faible': '360p',
         'moyenne': '720p', 
         'HD': '1080p'
       };
@@ -744,7 +744,7 @@ const AnimePlayerPage: React.FC = () => {
                         className="w-full text-left px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors flex items-center gap-2"
                       >
                         <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                        <span>Qualité Faible (360p-480p)</span>
+                        <span>Qualité Faible (360p)</span>
                       </motion.button>
                       <motion.button
                         whileHover={{ backgroundColor: '#374151' }}
