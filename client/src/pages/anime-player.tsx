@@ -465,8 +465,8 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
-  // Fonction pour ouvrir la page de téléchargement du serveur
-  const openDownloadPage = async (quality: 'faible' | 'moyenne' | 'HD') => {
+  // Système de téléchargement avancé avec capture vidéo
+  const downloadVideoCapture = async (quality: 'faible' | 'moyenne' | 'HD') => {
     if (!episodeDetails || !episodeDetails.sources.length) {
       console.error('Aucun épisode ou source disponible');
       return;
@@ -475,7 +475,6 @@ const AnimePlayerPage: React.FC = () => {
     try {
       setShowDownloadMenu(false);
       
-      // Obtenir l'URL d'embed actuelle
       const embedUrl = episodeDetails.sources[selectedPlayer]?.url;
       const serverName = episodeDetails.sources[selectedPlayer]?.server;
       
@@ -483,47 +482,230 @@ const AnimePlayerPage: React.FC = () => {
         throw new Error('Aucune source sélectionnée');
       }
       
-      console.log(`Ouverture page de téléchargement ${quality} pour serveur:`, serverName);
-      console.log('URL embed:', embedUrl);
+      console.log(`Démarrage capture ${quality} pour:`, serverName);
       
-      // Ouvrir dans un nouvel onglet avec instructions
-      const newWindow = window.open(embedUrl, '_blank');
+      // Créer une popup de capture vidéo
+      const captureWindow = window.open('', '_blank', 'width=800,height=600');
       
-      if (newWindow) {
-        // Afficher un message d'instruction à l'utilisateur
-        const qualityLabels = {
-          'faible': '360p',
-          'moyenne': '720p', 
-          'HD': '1080p'
-        };
-        
-        const instructions = `
-          Page de téléchargement ouverte pour ${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber}
-          
-          Serveur: ${serverName}
-          Qualité demandée: ${qualityLabels[quality]}
-          
-          Instructions:
-          1. Attendez que la vidéo se charge sur la page
-          2. Faites clic droit sur la vidéo
-          3. Sélectionnez "Enregistrer la vidéo sous..." ou "Télécharger la vidéo"
-          4. Choisissez l'emplacement de sauvegarde
-          
-          Note: Certains serveurs peuvent nécessiter de cliquer sur un bouton de téléchargement spécifique.
-        `;
-        
-        // Afficher les instructions dans une popup
-        setTimeout(() => {
-          alert(instructions);
-        }, 1000);
-        
-        console.log(`Page de téléchargement ouverte pour: ${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber}`);
-      } else {
-        throw new Error('Impossible d\'ouvrir la page de téléchargement (popup bloquée?)');
+      if (!captureWindow) {
+        throw new Error('Popup bloquée - activez les popups pour le téléchargement');
       }
       
+      // Qualités et résolutions
+      const qualitySettings = {
+        'faible': { width: 640, height: 360, bitrate: 400000 },
+        'moyenne': { width: 1280, height: 720, bitrate: 1500000 },
+        'HD': { width: 1920, height: 1080, bitrate: 3000000 }
+      };
+      
+      const settings = qualitySettings[quality];
+      const fileName = `${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber} (${settings.height}p).mp4`;
+      
+      // Interface de capture dans la popup
+      captureWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>ATOMIC FLIX - Téléchargeur</title>
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+              color: white; 
+              margin: 0; 
+              padding: 20px;
+            }
+            .container { max-width: 100%; margin: 0 auto; }
+            .header { text-align: center; margin-bottom: 20px; }
+            .logo { color: #00ffff; font-size: 24px; font-weight: bold; }
+            iframe { width: 100%; height: 400px; border: 2px solid #00ffff; border-radius: 8px; }
+            .controls { 
+              margin-top: 20px; 
+              display: flex; 
+              gap: 10px; 
+              justify-content: center; 
+              flex-wrap: wrap;
+            }
+            button { 
+              background: linear-gradient(45deg, #00ffff, #ff00ff);
+              border: none; 
+              padding: 12px 24px; 
+              color: white; 
+              border-radius: 8px; 
+              cursor: pointer; 
+              font-weight: bold;
+              transition: transform 0.2s;
+            }
+            button:hover { transform: scale(1.05); }
+            button:disabled { opacity: 0.5; cursor: not-allowed; }
+            .status { 
+              text-align: center; 
+              margin-top: 20px; 
+              padding: 10px;
+              background: rgba(0,255,255,0.1);
+              border-radius: 8px;
+            }
+            .progress { 
+              width: 100%; 
+              height: 20px; 
+              background: #333; 
+              border-radius: 10px; 
+              margin: 10px 0;
+              overflow: hidden;
+            }
+            .progress-bar { 
+              height: 100%; 
+              background: linear-gradient(45deg, #00ffff, #ff00ff);
+              width: 0%; 
+              transition: width 0.3s;
+            }
+            .info {
+              background: rgba(255,255,255,0.1);
+              padding: 15px;
+              border-radius: 8px;
+              margin-bottom: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo">⚛️ ATOMIC FLIX DOWNLOADER</div>
+            </div>
+            
+            <div class="info">
+              <strong>📹 ${episodeDetails.animeTitle}</strong><br>
+              🎬 Épisode ${episodeDetails.episodeNumber}<br>
+              🖥️ Serveur: ${serverName}<br>
+              📊 Qualité: ${settings.height}p<br>
+              📁 Nom: ${fileName}
+            </div>
+            
+            <iframe id="videoFrame" src="${embedUrl}" allowfullscreen></iframe>
+            
+            <div class="controls">
+              <button onclick="startCapture()">🎥 Démarrer Capture</button>
+              <button onclick="stopCapture()" disabled id="stopBtn">⏹️ Arrêter</button>
+              <button onclick="downloadVideo()" disabled id="downloadBtn">💾 Télécharger</button>
+              <button onclick="window.close()">❌ Fermer</button>
+            </div>
+            
+            <div class="status" id="status">
+              ℹ️ Attendez que la vidéo se charge, puis cliquez sur "Démarrer Capture"
+            </div>
+            
+            <div class="progress">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+          </div>
+          
+          <script>
+            let mediaRecorder;
+            let recordedChunks = [];
+            let isRecording = false;
+            
+            async function startCapture() {
+              try {
+                document.getElementById('status').innerHTML = '🔄 Démarrage de la capture...';
+                
+                // Capturer l'écran
+                const stream = await navigator.mediaDevices.getDisplayMedia({
+                  video: {
+                    width: ${settings.width},
+                    height: ${settings.height},
+                    frameRate: 30
+                  },
+                  audio: true
+                });
+                
+                // Configurer MediaRecorder
+                mediaRecorder = new MediaRecorder(stream, {
+                  mimeType: 'video/webm;codecs=vp9',
+                  videoBitsPerSecond: ${settings.bitrate}
+                });
+                
+                recordedChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                  if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                  }
+                };
+                
+                mediaRecorder.onstop = () => {
+                  document.getElementById('status').innerHTML = '✅ Capture terminée - Prêt à télécharger';
+                  document.getElementById('downloadBtn').disabled = false;
+                  document.getElementById('stopBtn').disabled = true;
+                  isRecording = false;
+                };
+                
+                // Démarrer l'enregistrement
+                mediaRecorder.start(1000); // Chunk toutes les secondes
+                isRecording = true;
+                
+                document.getElementById('status').innerHTML = '🔴 Capture en cours - Lisez la vidéo dans l\\'iframe';
+                document.getElementById('stopBtn').disabled = false;
+                
+                // Simuler une barre de progression
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                  if (!isRecording) {
+                    clearInterval(progressInterval);
+                    return;
+                  }
+                  progress += 1;
+                  document.getElementById('progressBar').style.width = (progress % 100) + '%';
+                }, 1000);
+                
+              } catch (error) {
+                console.error('Erreur capture:', error);
+                document.getElementById('status').innerHTML = '❌ Erreur: ' + error.message;
+              }
+            }
+            
+            function stopCapture() {
+              if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+              }
+            }
+            
+            function downloadVideo() {
+              if (recordedChunks.length === 0) {
+                alert('Aucune vidéo capturée');
+                return;
+              }
+              
+              // Créer le blob vidéo
+              const blob = new Blob(recordedChunks, { type: 'video/webm' });
+              
+              // Créer le lien de téléchargement
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = '${fileName.replace('.mp4', '.webm')}';
+              a.click();
+              
+              URL.revokeObjectURL(url);
+              
+              document.getElementById('status').innerHTML = '💾 Téléchargement démarré !';
+            }
+            
+            // Message d'instructions
+            setTimeout(() => {
+              if (!isRecording) {
+                document.getElementById('status').innerHTML = '📝 Instructions: 1) Cliquez "Démarrer Capture" 2) Sélectionnez cette fenêtre pour la capture 3) Lisez la vidéo 4) Cliquez "Arrêter" puis "Télécharger"';
+              }
+            }, 3000);
+          </script>
+        </body>
+        </html>
+      `);
+      
+      console.log('Interface de capture créée pour:', fileName);
+      
     } catch (error) {
-      console.error('Erreur ouverture page téléchargement:', error);
+      console.error('Erreur création capture:', error);
       setShowDownloadMenu(false);
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       alert(`Erreur: ${errorMessage}`);
@@ -532,8 +714,8 @@ const AnimePlayerPage: React.FC = () => {
 
   // Fonction pour télécharger la vidéo avec qualité choisie
   const downloadVideo = async (quality: 'faible' | 'moyenne' | 'HD') => {
-    // Ouvrir la page du serveur avec instructions de téléchargement
-    await openDownloadPage(quality);
+    // Lancer le système de capture vidéo
+    await downloadVideoCapture(quality);
   };
 
   if (loading) {
