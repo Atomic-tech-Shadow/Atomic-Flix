@@ -465,8 +465,8 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
-  // Système de téléchargement moderne avec outils externes
-  const showDownloadOptions = async (quality: 'faible' | 'moyenne' | 'HD') => {
+  // Système de téléchargement automatique
+  const downloadVideoAutomatic = async (quality: 'faible' | 'moyenne' | 'HD') => {
     if (!episodeDetails || !episodeDetails.sources.length) {
       console.error('Aucun épisode ou source disponible');
       return;
@@ -488,228 +488,159 @@ const AnimePlayerPage: React.FC = () => {
         'HD': '1080p'
       };
       
-      const fileName = `${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber} (${qualityLabels[quality]})`;
+      const fileName = `${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber} (${qualityLabels[quality]}).mp4`;
       
-      // Ouvrir une popup avec les options de téléchargement modernes
-      const downloadWindow = window.open('', '_blank', 'width=900,height=700');
+      console.log(`Démarrage téléchargement automatique ${quality} pour:`, fileName);
       
-      if (!downloadWindow) {
-        throw new Error('Popup bloquée - activez les popups pour le téléchargement');
+      // Méthode 1: Essayer de télécharger directement via service worker
+      if ('serviceWorker' in navigator && 'MessageChannel' in window) {
+        try {
+          const messageChannel = new MessageChannel();
+          const swRegistration = await navigator.serviceWorker.ready;
+          
+          if (swRegistration.active) {
+            // Envoyer la demande de téléchargement au service worker
+            swRegistration.active.postMessage({
+              type: 'DOWNLOAD_VIDEO',
+              url: embedUrl,
+              fileName: fileName,
+              quality: quality
+            }, [messageChannel.port2]);
+            
+            // Écouter la réponse
+            messageChannel.port1.onmessage = (event) => {
+              if (event.data.success) {
+                console.log('Téléchargement démarré via service worker');
+                return;
+              } else {
+                console.log('Service worker échec, tentative méthode 2');
+                downloadWithFetch();
+              }
+            };
+            
+            // Timeout après 3 secondes
+            setTimeout(() => {
+              console.log('Service worker timeout, tentative méthode 2');
+              downloadWithFetch();
+            }, 3000);
+            
+            return;
+          }
+        } catch (swError) {
+          console.log('Service worker non disponible, tentative méthode 2');
+        }
       }
       
-      downloadWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>ATOMIC FLIX - Options de téléchargement</title>
-          <style>
-            body { 
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-              background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-              color: white; 
-              margin: 0; 
-              padding: 20px;
-              line-height: 1.6;
-            }
-            .container { max-width: 800px; margin: 0 auto; }
-            .header { text-align: center; margin-bottom: 30px; }
-            .logo { color: #00ffff; font-size: 28px; font-weight: bold; margin-bottom: 10px; }
-            .subtitle { color: #888; font-size: 14px; }
-            .info-card {
-              background: rgba(0,255,255,0.1);
-              border: 1px solid #00ffff;
-              border-radius: 12px;
-              padding: 20px;
-              margin-bottom: 30px;
-            }
-            .method {
-              background: rgba(255,255,255,0.05);
-              border-radius: 12px;
-              padding: 20px;
-              margin-bottom: 20px;
-              border-left: 4px solid #00ffff;
-            }
-            .method h3 { 
-              color: #00ffff; 
-              margin-top: 0; 
-              display: flex; 
-              align-items: center; 
-              gap: 10px;
-            }
-            .code {
-              background: #1a1a1a;
-              border: 1px solid #333;
-              border-radius: 8px;
-              padding: 15px;
-              font-family: 'Monaco', 'Consolas', monospace;
-              font-size: 13px;
-              margin: 10px 0;
-              overflow-x: auto;
-              position: relative;
-            }
-            .copy-btn {
-              position: absolute;
-              top: 10px;
-              right: 10px;
-              background: #00ffff;
-              color: black;
-              border: none;
-              padding: 5px 10px;
-              border-radius: 4px;
-              cursor: pointer;
-              font-size: 11px;
-              font-weight: bold;
-            }
-            .copy-btn:hover { background: #66ffff; }
-            .extension-link {
-              display: inline-block;
-              background: linear-gradient(45deg, #00ffff, #ff00ff);
-              color: white;
-              text-decoration: none;
-              padding: 10px 20px;
-              border-radius: 8px;
-              margin: 5px;
-              font-weight: bold;
-              transition: transform 0.2s;
-            }
-            .extension-link:hover { transform: scale(1.05); }
-            .warning {
-              background: rgba(255,165,0,0.1);
-              border: 1px solid #ff8c00;
-              border-radius: 8px;
-              padding: 15px;
-              margin: 20px 0;
-            }
-            .url-display {
-              background: #2a2a2a;
-              border: 1px solid #555;
-              border-radius: 8px;
-              padding: 10px;
-              font-family: monospace;
-              font-size: 12px;
-              word-break: break-all;
-              margin: 10px 0;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <div class="logo">⚛️ ATOMIC FLIX</div>
-              <div class="subtitle">Options de téléchargement modernes</div>
-            </div>
-            
-            <div class="info-card">
-              <strong>📹 ${episodeDetails.animeTitle}</strong><br>
-              🎬 Épisode ${episodeDetails.episodeNumber}<br>
-              🖥️ Serveur: ${serverName}<br>
-              📊 Qualité demandée: ${qualityLabels[quality]}<br>
-              📁 Nom suggéré: ${fileName}
-            </div>
-
-            <div class="method">
-              <h3>🔗 Méthode 1: Extensions de navigateur (Recommandée)</h3>
-              <p>Installez une extension de téléchargement vidéo et visitez directement la page:</p>
-              <div class="url-display">${embedUrl}</div>
-              <div style="text-align: center; margin: 15px 0;">
-                <a href="https://chrome.google.com/webstore/detail/video-downloader-plus/njgehamdpphlbekcjofnhfjeamkoljpd" target="_blank" class="extension-link">Video Downloader Plus</a>
-                <a href="https://chrome.google.com/webstore/detail/video-downloadhelper/lmjnegcaeklhafolokijcfjliaokphfk" target="_blank" class="extension-link">Video DownloadHelper</a>
-                <a href="https://chrome.google.com/webstore/detail/flash-video-downloader/aiimdkdngfcipjohbjenkahhlhccpdbc" target="_blank" class="extension-link">Flash Video Downloader</a>
-              </div>
-              <button onclick="window.open('${embedUrl}', '_blank')" style="background: #00ffff; color: black; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">
-                🎬 Ouvrir la page vidéo
-              </button>
-            </div>
-
-            <div class="method">
-              <h3>⚡ Méthode 2: yt-dlp (Avancée)</h3>
-              <p>Outil en ligne de commande le plus puissant pour télécharger des vidéos:</p>
-              <div class="code">
-                <button class="copy-btn" onclick="copyToClipboard('ytdlp-cmd')">Copier</button>
-                <div id="ytdlp-cmd">yt-dlp "${embedUrl}" -o "${fileName}.%(ext)s" --format "best[height<=${qualityLabels[quality].replace('p', '')}]"</div>
-              </div>
-              <p><strong>Installation:</strong></p>
-              <div class="code">
-                <button class="copy-btn" onclick="copyToClipboard('install-cmd')">Copier</button>
-                <div id="install-cmd"># Windows (avec chocolatey)
-choco install yt-dlp
-
-# macOS (avec brew)
-brew install yt-dlp
-
-# Linux (avec pip)
-pip install yt-dlp</div>
-              </div>
-              <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" class="extension-link">📥 Télécharger yt-dlp</a>
-            </div>
-
-            <div class="method">
-              <h3>🌐 Méthode 3: Sites de téléchargement en ligne</h3>
-              <p>Collez l'URL dans ces services en ligne:</p>
-              <div style="text-align: center; margin: 15px 0;">
-                <a href="https://savefrom.net/" target="_blank" class="extension-link">SaveFrom.net</a>
-                <a href="https://9xbuddy.com/" target="_blank" class="extension-link">9xBuddy</a>
-                <a href="https://keepvid.pro/" target="_blank" class="extension-link">KeepVid</a>
-              </div>
-              <div class="warning">
-                ⚠️ Attention: Vérifiez que ces sites sont sûrs et évitez les publicités douteuses
-              </div>
-            </div>
-
-            <div class="method">
-              <h3>🛠️ Méthode 4: JDownloader 2</h3>
-              <p>Logiciel de téléchargement automatique:</p>
-              <div class="code">
-                <button class="copy-btn" onclick="copyToClipboard('jd-url')">Copier URL</button>
-                <div id="jd-url">${embedUrl}</div>
-              </div>
-              <p>1. Copiez l'URL ci-dessus<br>
-              2. JDownloader la détectera automatiquement<br>
-              3. Choisissez la qualité et téléchargez</p>
-              <a href="https://jdownloader.org/download/index" target="_blank" class="extension-link">📥 Télécharger JDownloader 2</a>
-            </div>
-
-            <div style="text-align: center; margin-top: 30px;">
-              <button onclick="window.close()" style="background: #666; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;">
-                ❌ Fermer
-              </button>
-            </div>
-          </div>
+      // Méthode 2: Téléchargement direct avec fetch et blob
+      async function downloadWithFetch() {
+        try {
+          console.log('Tentative de téléchargement direct...');
           
-          <script>
-            function copyToClipboard(elementId) {
-              const element = document.getElementById(elementId);
-              const text = element.textContent;
-              navigator.clipboard.writeText(text).then(() => {
-                const btn = element.parentElement.querySelector('.copy-btn');
-                const originalText = btn.textContent;
-                btn.textContent = '✅ Copié';
-                btn.style.background = '#00ff00';
-                setTimeout(() => {
-                  btn.textContent = originalText;
-                  btn.style.background = '#00ffff';
-                }, 2000);
-              });
+          // Créer un iframe caché pour charger la page embed
+          const iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = embedUrl;
+          document.body.appendChild(iframe);
+          
+          // Attendre que l'iframe se charge
+          await new Promise((resolve) => {
+            iframe.onload = resolve;
+            setTimeout(resolve, 5000); // Timeout après 5 secondes
+          });
+          
+          try {
+            // Essayer d'extraire l'URL de la vidéo depuis l'iframe
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+            if (iframeDoc) {
+              const videoElements = iframeDoc.querySelectorAll('video source, video');
+              let videoUrl = null;
+              
+              for (const element of videoElements) {
+                const src = element.getAttribute('src') || element.getAttribute('data-src');
+                if (src && (src.includes('.mp4') || src.includes('.m3u8') || src.includes('video'))) {
+                  videoUrl = src.startsWith('http') ? src : new URL(src, embedUrl).href;
+                  break;
+                }
+              }
+              
+              if (videoUrl) {
+                console.log('URL vidéo trouvée:', videoUrl);
+                
+                // Télécharger la vidéo
+                const response = await fetch(videoUrl, {
+                  mode: 'cors',
+                  headers: {
+                    'Referer': embedUrl,
+                    'Origin': new URL(embedUrl).origin
+                  }
+                });
+                
+                if (response.ok) {
+                  const blob = await response.blob();
+                  const downloadUrl = URL.createObjectURL(blob);
+                  
+                  const link = document.createElement('a');
+                  link.href = downloadUrl;
+                  link.download = fileName;
+                  link.style.display = 'none';
+                  
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  
+                  URL.revokeObjectURL(downloadUrl);
+                  document.body.removeChild(iframe);
+                  
+                  console.log('Téléchargement automatique réussi!');
+                  return;
+                }
+              }
             }
-          </script>
-        </body>
-        </html>
-      `);
+          } catch (extractError) {
+            console.log('Extraction échouée:', extractError);
+          }
+          
+          // Nettoyer l'iframe
+          document.body.removeChild(iframe);
+          
+          // Méthode 3: Fallback - Ouvrir la page avec instructions
+          console.log('Méthode automatique échouée, ouverture manuelle...');
+          
+          const newWindow = window.open(embedUrl, '_blank');
+          if (newWindow) {
+            setTimeout(() => {
+              alert(`Téléchargement automatique impossible pour ce serveur (${serverName}).\n\nLa page vidéo s'est ouverte dans un nouvel onglet.\n\nInstructions:\n1. Attendez que la vidéo se charge\n2. Clic droit sur la vidéo\n3. "Enregistrer la vidéo sous..."\n4. Nommez le fichier: ${fileName}`);
+            }, 1000);
+          }
+          
+        } catch (fetchError) {
+          console.error('Erreur téléchargement fetch:', fetchError);
+          
+          // Dernier recours: Copier l'URL dans le presse-papiers
+          try {
+            await navigator.clipboard.writeText(embedUrl);
+            alert(`Téléchargement automatique impossible.\n\nL'URL a été copiée dans votre presse-papiers:\n${embedUrl}\n\nCollez-la dans un téléchargeur vidéo comme yt-dlp ou une extension de navigateur.`);
+          } catch (clipboardError) {
+            alert(`Téléchargement automatique impossible pour ce serveur.\n\nVeuillez utiliser une extension de navigateur ou copier manuellement cette URL:\n${embedUrl}`);
+          }
+        }
+      }
       
-      console.log('Options de téléchargement modernes affichées pour:', fileName);
+      // Démarrer le téléchargement
+      downloadWithFetch();
       
     } catch (error) {
-      console.error('Erreur options téléchargement:', error);
+      console.error('Erreur téléchargement automatique:', error);
       setShowDownloadMenu(false);
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-      alert(`Erreur: ${errorMessage}`);
+      alert(`Erreur lors du téléchargement automatique: ${errorMessage}`);
     }
   };
 
   // Fonction pour télécharger la vidéo avec qualité choisie
   const downloadVideo = async (quality: 'faible' | 'moyenne' | 'HD') => {
-    // Afficher les options de téléchargement modernes
-    await showDownloadOptions(quality);
+    // Lancer le téléchargement automatique
+    await downloadVideoAutomatic(quality);
   };
 
   if (loading) {
