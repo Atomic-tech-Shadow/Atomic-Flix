@@ -465,8 +465,8 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
-  // Système de téléchargement avancé avec capture vidéo
-  const downloadVideoCapture = async (quality: 'faible' | 'moyenne' | 'HD') => {
+  // Système de téléchargement moderne avec outils externes
+  const showDownloadOptions = async (quality: 'faible' | 'moyenne' | 'HD') => {
     if (!episodeDetails || !episodeDetails.sources.length) {
       console.error('Aucun épisode ou source disponible');
       return;
@@ -482,230 +482,224 @@ const AnimePlayerPage: React.FC = () => {
         throw new Error('Aucune source sélectionnée');
       }
       
-      console.log(`Démarrage capture ${quality} pour:`, serverName);
+      const qualityLabels = {
+        'faible': '360p',
+        'moyenne': '720p', 
+        'HD': '1080p'
+      };
       
-      // Créer une popup de capture vidéo
-      const captureWindow = window.open('', '_blank', 'width=800,height=600');
+      const fileName = `${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber} (${qualityLabels[quality]})`;
       
-      if (!captureWindow) {
+      // Ouvrir une popup avec les options de téléchargement modernes
+      const downloadWindow = window.open('', '_blank', 'width=900,height=700');
+      
+      if (!downloadWindow) {
         throw new Error('Popup bloquée - activez les popups pour le téléchargement');
       }
       
-      // Qualités et résolutions
-      const qualitySettings = {
-        'faible': { width: 640, height: 360, bitrate: 400000 },
-        'moyenne': { width: 1280, height: 720, bitrate: 1500000 },
-        'HD': { width: 1920, height: 1080, bitrate: 3000000 }
-      };
-      
-      const settings = qualitySettings[quality];
-      const fileName = `${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber} (${settings.height}p).mp4`;
-      
-      // Interface de capture dans la popup
-      captureWindow.document.write(`
+      downloadWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
-          <title>ATOMIC FLIX - Téléchargeur</title>
+          <title>ATOMIC FLIX - Options de téléchargement</title>
           <style>
             body { 
-              font-family: Arial, sans-serif; 
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
               background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
               color: white; 
               margin: 0; 
               padding: 20px;
+              line-height: 1.6;
             }
-            .container { max-width: 100%; margin: 0 auto; }
-            .header { text-align: center; margin-bottom: 20px; }
-            .logo { color: #00ffff; font-size: 24px; font-weight: bold; }
-            iframe { width: 100%; height: 400px; border: 2px solid #00ffff; border-radius: 8px; }
-            .controls { 
-              margin-top: 20px; 
+            .container { max-width: 800px; margin: 0 auto; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .logo { color: #00ffff; font-size: 28px; font-weight: bold; margin-bottom: 10px; }
+            .subtitle { color: #888; font-size: 14px; }
+            .info-card {
+              background: rgba(0,255,255,0.1);
+              border: 1px solid #00ffff;
+              border-radius: 12px;
+              padding: 20px;
+              margin-bottom: 30px;
+            }
+            .method {
+              background: rgba(255,255,255,0.05);
+              border-radius: 12px;
+              padding: 20px;
+              margin-bottom: 20px;
+              border-left: 4px solid #00ffff;
+            }
+            .method h3 { 
+              color: #00ffff; 
+              margin-top: 0; 
               display: flex; 
-              gap: 10px; 
-              justify-content: center; 
-              flex-wrap: wrap;
+              align-items: center; 
+              gap: 10px;
             }
-            button { 
+            .code {
+              background: #1a1a1a;
+              border: 1px solid #333;
+              border-radius: 8px;
+              padding: 15px;
+              font-family: 'Monaco', 'Consolas', monospace;
+              font-size: 13px;
+              margin: 10px 0;
+              overflow-x: auto;
+              position: relative;
+            }
+            .copy-btn {
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              background: #00ffff;
+              color: black;
+              border: none;
+              padding: 5px 10px;
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 11px;
+              font-weight: bold;
+            }
+            .copy-btn:hover { background: #66ffff; }
+            .extension-link {
+              display: inline-block;
               background: linear-gradient(45deg, #00ffff, #ff00ff);
-              border: none; 
-              padding: 12px 24px; 
-              color: white; 
-              border-radius: 8px; 
-              cursor: pointer; 
+              color: white;
+              text-decoration: none;
+              padding: 10px 20px;
+              border-radius: 8px;
+              margin: 5px;
               font-weight: bold;
               transition: transform 0.2s;
             }
-            button:hover { transform: scale(1.05); }
-            button:disabled { opacity: 0.5; cursor: not-allowed; }
-            .status { 
-              text-align: center; 
-              margin-top: 20px; 
-              padding: 10px;
-              background: rgba(0,255,255,0.1);
+            .extension-link:hover { transform: scale(1.05); }
+            .warning {
+              background: rgba(255,165,0,0.1);
+              border: 1px solid #ff8c00;
               border-radius: 8px;
-            }
-            .progress { 
-              width: 100%; 
-              height: 20px; 
-              background: #333; 
-              border-radius: 10px; 
-              margin: 10px 0;
-              overflow: hidden;
-            }
-            .progress-bar { 
-              height: 100%; 
-              background: linear-gradient(45deg, #00ffff, #ff00ff);
-              width: 0%; 
-              transition: width 0.3s;
-            }
-            .info {
-              background: rgba(255,255,255,0.1);
               padding: 15px;
+              margin: 20px 0;
+            }
+            .url-display {
+              background: #2a2a2a;
+              border: 1px solid #555;
               border-radius: 8px;
-              margin-bottom: 20px;
+              padding: 10px;
+              font-family: monospace;
+              font-size: 12px;
+              word-break: break-all;
+              margin: 10px 0;
             }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <div class="logo">⚛️ ATOMIC FLIX DOWNLOADER</div>
+              <div class="logo">⚛️ ATOMIC FLIX</div>
+              <div class="subtitle">Options de téléchargement modernes</div>
             </div>
             
-            <div class="info">
+            <div class="info-card">
               <strong>📹 ${episodeDetails.animeTitle}</strong><br>
               🎬 Épisode ${episodeDetails.episodeNumber}<br>
               🖥️ Serveur: ${serverName}<br>
-              📊 Qualité: ${settings.height}p<br>
-              📁 Nom: ${fileName}
+              📊 Qualité demandée: ${qualityLabels[quality]}<br>
+              📁 Nom suggéré: ${fileName}
             </div>
-            
-            <iframe id="videoFrame" src="${embedUrl}" allowfullscreen></iframe>
-            
-            <div class="controls">
-              <button onclick="startCapture()">🎥 Démarrer Capture</button>
-              <button onclick="stopCapture()" disabled id="stopBtn">⏹️ Arrêter</button>
-              <button onclick="downloadVideo()" disabled id="downloadBtn">💾 Télécharger</button>
-              <button onclick="window.close()">❌ Fermer</button>
+
+            <div class="method">
+              <h3>🔗 Méthode 1: Extensions de navigateur (Recommandée)</h3>
+              <p>Installez une extension de téléchargement vidéo et visitez directement la page:</p>
+              <div class="url-display">${embedUrl}</div>
+              <div style="text-align: center; margin: 15px 0;">
+                <a href="https://chrome.google.com/webstore/detail/video-downloader-plus/njgehamdpphlbekcjofnhfjeamkoljpd" target="_blank" class="extension-link">Video Downloader Plus</a>
+                <a href="https://chrome.google.com/webstore/detail/video-downloadhelper/lmjnegcaeklhafolokijcfjliaokphfk" target="_blank" class="extension-link">Video DownloadHelper</a>
+                <a href="https://chrome.google.com/webstore/detail/flash-video-downloader/aiimdkdngfcipjohbjenkahhlhccpdbc" target="_blank" class="extension-link">Flash Video Downloader</a>
+              </div>
+              <button onclick="window.open('${embedUrl}', '_blank')" style="background: #00ffff; color: black; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">
+                🎬 Ouvrir la page vidéo
+              </button>
             </div>
-            
-            <div class="status" id="status">
-              ℹ️ Attendez que la vidéo se charge, puis cliquez sur "Démarrer Capture"
+
+            <div class="method">
+              <h3>⚡ Méthode 2: yt-dlp (Avancée)</h3>
+              <p>Outil en ligne de commande le plus puissant pour télécharger des vidéos:</p>
+              <div class="code">
+                <button class="copy-btn" onclick="copyToClipboard('ytdlp-cmd')">Copier</button>
+                <div id="ytdlp-cmd">yt-dlp "${embedUrl}" -o "${fileName}.%(ext)s" --format "best[height<=${qualityLabels[quality].replace('p', '')}]"</div>
+              </div>
+              <p><strong>Installation:</strong></p>
+              <div class="code">
+                <button class="copy-btn" onclick="copyToClipboard('install-cmd')">Copier</button>
+                <div id="install-cmd"># Windows (avec chocolatey)
+choco install yt-dlp
+
+# macOS (avec brew)
+brew install yt-dlp
+
+# Linux (avec pip)
+pip install yt-dlp</div>
+              </div>
+              <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" class="extension-link">📥 Télécharger yt-dlp</a>
             </div>
-            
-            <div class="progress">
-              <div class="progress-bar" id="progressBar"></div>
+
+            <div class="method">
+              <h3>🌐 Méthode 3: Sites de téléchargement en ligne</h3>
+              <p>Collez l'URL dans ces services en ligne:</p>
+              <div style="text-align: center; margin: 15px 0;">
+                <a href="https://savefrom.net/" target="_blank" class="extension-link">SaveFrom.net</a>
+                <a href="https://9xbuddy.com/" target="_blank" class="extension-link">9xBuddy</a>
+                <a href="https://keepvid.pro/" target="_blank" class="extension-link">KeepVid</a>
+              </div>
+              <div class="warning">
+                ⚠️ Attention: Vérifiez que ces sites sont sûrs et évitez les publicités douteuses
+              </div>
+            </div>
+
+            <div class="method">
+              <h3>🛠️ Méthode 4: JDownloader 2</h3>
+              <p>Logiciel de téléchargement automatique:</p>
+              <div class="code">
+                <button class="copy-btn" onclick="copyToClipboard('jd-url')">Copier URL</button>
+                <div id="jd-url">${embedUrl}</div>
+              </div>
+              <p>1. Copiez l'URL ci-dessus<br>
+              2. JDownloader la détectera automatiquement<br>
+              3. Choisissez la qualité et téléchargez</p>
+              <a href="https://jdownloader.org/download/index" target="_blank" class="extension-link">📥 Télécharger JDownloader 2</a>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+              <button onclick="window.close()" style="background: #666; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;">
+                ❌ Fermer
+              </button>
             </div>
           </div>
           
           <script>
-            let mediaRecorder;
-            let recordedChunks = [];
-            let isRecording = false;
-            
-            async function startCapture() {
-              try {
-                document.getElementById('status').innerHTML = '🔄 Démarrage de la capture...';
-                
-                // Capturer l'écran
-                const stream = await navigator.mediaDevices.getDisplayMedia({
-                  video: {
-                    width: ${settings.width},
-                    height: ${settings.height},
-                    frameRate: 30
-                  },
-                  audio: true
-                });
-                
-                // Configurer MediaRecorder
-                mediaRecorder = new MediaRecorder(stream, {
-                  mimeType: 'video/webm;codecs=vp9',
-                  videoBitsPerSecond: ${settings.bitrate}
-                });
-                
-                recordedChunks = [];
-                
-                mediaRecorder.ondataavailable = (event) => {
-                  if (event.data.size > 0) {
-                    recordedChunks.push(event.data);
-                  }
-                };
-                
-                mediaRecorder.onstop = () => {
-                  document.getElementById('status').innerHTML = '✅ Capture terminée - Prêt à télécharger';
-                  document.getElementById('downloadBtn').disabled = false;
-                  document.getElementById('stopBtn').disabled = true;
-                  isRecording = false;
-                };
-                
-                // Démarrer l'enregistrement
-                mediaRecorder.start(1000); // Chunk toutes les secondes
-                isRecording = true;
-                
-                document.getElementById('status').innerHTML = '🔴 Capture en cours - Lisez la vidéo dans l\\'iframe';
-                document.getElementById('stopBtn').disabled = false;
-                
-                // Simuler une barre de progression
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                  if (!isRecording) {
-                    clearInterval(progressInterval);
-                    return;
-                  }
-                  progress += 1;
-                  document.getElementById('progressBar').style.width = (progress % 100) + '%';
-                }, 1000);
-                
-              } catch (error) {
-                console.error('Erreur capture:', error);
-                document.getElementById('status').innerHTML = '❌ Erreur: ' + error.message;
-              }
+            function copyToClipboard(elementId) {
+              const element = document.getElementById(elementId);
+              const text = element.textContent;
+              navigator.clipboard.writeText(text).then(() => {
+                const btn = element.parentElement.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copié';
+                btn.style.background = '#00ff00';
+                setTimeout(() => {
+                  btn.textContent = originalText;
+                  btn.style.background = '#00ffff';
+                }, 2000);
+              });
             }
-            
-            function stopCapture() {
-              if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
-              }
-            }
-            
-            function downloadVideo() {
-              if (recordedChunks.length === 0) {
-                alert('Aucune vidéo capturée');
-                return;
-              }
-              
-              // Créer le blob vidéo
-              const blob = new Blob(recordedChunks, { type: 'video/webm' });
-              
-              // Créer le lien de téléchargement
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = '${fileName.replace('.mp4', '.webm')}';
-              a.click();
-              
-              URL.revokeObjectURL(url);
-              
-              document.getElementById('status').innerHTML = '💾 Téléchargement démarré !';
-            }
-            
-            // Message d'instructions
-            setTimeout(() => {
-              if (!isRecording) {
-                document.getElementById('status').innerHTML = '📝 Instructions: 1) Cliquez "Démarrer Capture" 2) Sélectionnez cette fenêtre pour la capture 3) Lisez la vidéo 4) Cliquez "Arrêter" puis "Télécharger"';
-              }
-            }, 3000);
           </script>
         </body>
         </html>
       `);
       
-      console.log('Interface de capture créée pour:', fileName);
+      console.log('Options de téléchargement modernes affichées pour:', fileName);
       
     } catch (error) {
-      console.error('Erreur création capture:', error);
+      console.error('Erreur options téléchargement:', error);
       setShowDownloadMenu(false);
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       alert(`Erreur: ${errorMessage}`);
@@ -714,8 +708,8 @@ const AnimePlayerPage: React.FC = () => {
 
   // Fonction pour télécharger la vidéo avec qualité choisie
   const downloadVideo = async (quality: 'faible' | 'moyenne' | 'HD') => {
-    // Lancer le système de capture vidéo
-    await downloadVideoCapture(quality);
+    // Afficher les options de téléchargement modernes
+    await showDownloadOptions(quality);
   };
 
   if (loading) {
