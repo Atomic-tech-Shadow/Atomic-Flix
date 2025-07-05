@@ -512,74 +512,54 @@ const AnimePlayerPage: React.FC = () => {
       // Afficher un message de chargement
       console.log(`Début du téléchargement: ${fileName}`);
       
-      // Fonction pour télécharger avec progress tracking
-      const downloadWithProgress = async (url: string, filename: string) => {
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Accept': 'video/mp4,video/*,*/*',
-            'Cache-Control': 'no-cache'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Erreur de téléchargement: ${response.status}`);
+      // Créer un iframe invisible pour contourner les restrictions CORS
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = convertedUrl;
+      iframe.setAttribute('download', fileName);
+      document.body.appendChild(iframe);
+      
+      // Nettoyer l'iframe après un délai
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 3000);
+      
+      // Alternative : utiliser un service worker pour le téléchargement
+      if ('serviceWorker' in navigator) {
+        try {
+          // Créer un lien direct avec attribut download
+          const link = document.createElement('a');
+          link.href = convertedUrl;
+          link.download = fileName;
+          link.setAttribute('crossorigin', 'anonymous');
+          link.style.display = 'none';
+          
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          console.log(`Téléchargement lancé: ${fileName}`);
+        } catch (swError) {
+          console.error('Erreur service worker:', swError);
         }
-        
-        const reader = response.body?.getReader();
-        const contentLength = response.headers.get('content-length');
-        const total = parseInt(contentLength || '0', 10);
-        
-        let received = 0;
-        const chunks: Uint8Array[] = [];
-        
-        if (reader) {
-          while (true) {
-            const { done, value } = await reader.read();
-            
-            if (done) break;
-            
-            chunks.push(value);
-            received += value.length;
-            
-            // Log du progrès
-            if (total > 0) {
-              const progress = Math.round((received / total) * 100);
-              console.log(`Téléchargement: ${progress}%`);
-            }
-          }
-        }
-        
-        // Créer le blob final
-        const blob = new Blob(chunks, { type: 'video/mp4' });
-        
-        // Créer et déclencher le téléchargement
-        const blobUrl = window.URL.createObjectURL(blob);
+      } else {
+        // Méthode directe simple
         const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = filename;
+        link.href = convertedUrl;
+        link.download = fileName;
+        link.target = '_blank';
         link.style.display = 'none';
         
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         
-        // Nettoyer
-        setTimeout(() => {
-          window.URL.revokeObjectURL(blobUrl);
-        }, 1000);
-        
-        return blob;
-      };
-      
-      // Lancer le téléchargement
-      await downloadWithProgress(convertedUrl, fileName);
-      console.log(`Téléchargement terminé: ${fileName}`);
+        console.log(`Téléchargement initié: ${fileName}`);
+      }
       
     } catch (error) {
       console.error('Erreur lors du téléchargement:', error);
       setShowDownloadMenu(false);
-      alert('Erreur lors du téléchargement. Vérifiez votre connexion et réessayez.');
     }
   };
 
