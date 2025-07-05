@@ -83,6 +83,7 @@ const AnimePlayerPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [episodeLoading, setEpisodeLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
 
   // Fonction pour les requêtes API externes uniquement
   const apiRequest = async (endpoint: string) => {
@@ -464,6 +465,57 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
+  // Fonction pour télécharger la vidéo avec qualité choisie
+  const downloadVideo = async (quality: 'faible' | 'moyenne' | 'HD') => {
+    if (!episodeDetails || !episodeDetails.sources.length) return;
+
+    try {
+      // Trouver la source avec la qualité demandée ou prendre la première disponible
+      let selectedSource = episodeDetails.sources[selectedPlayer];
+      
+      // Essayer de trouver une source avec la qualité spécifique
+      const qualityMap = {
+        'faible': ['360p', '480p', 'LOW', 'SD'],
+        'moyenne': ['720p', 'MD', 'MEDIUM', 'HD'],
+        'HD': ['1080p', 'FULLHD', 'FHD', 'HIGH', 'HD']
+      };
+      
+      const preferredQualities = qualityMap[quality];
+      const matchingSource = episodeDetails.sources.find(source => 
+        preferredQualities.some(q => source.quality.toUpperCase().includes(q))
+      );
+      
+      if (matchingSource) {
+        selectedSource = matchingSource;
+      }
+
+      // Créer le nom du fichier
+      const fileName = `${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber} (${selectedSource.quality}).mp4`;
+      
+      // Créer un lien de téléchargement
+      const link = document.createElement('a');
+      link.href = selectedSource.url;
+      link.download = fileName;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      
+      // Ajouter le lien au DOM, le cliquer, puis le supprimer
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Fermer le menu de téléchargement
+      setShowDownloadMenu(false);
+      
+      // Afficher un message de confirmation
+      console.log(`Téléchargement initié: ${fileName}`);
+      
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      alert('Erreur lors du téléchargement. Veuillez réessayer.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -649,13 +701,58 @@ const AnimePlayerPage: React.FC = () => {
               <ChevronLeft size={24} className="text-white" />
             </motion.button>
             
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
-            >
-              <Download size={24} className="text-white" />
-            </motion.button>
+            <div className="relative">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+                className="p-3 bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Download size={24} className="text-white" />
+              </motion.button>
+              
+              {/* Menu de téléchargement */}
+              <AnimatePresence>
+                {showDownloadMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                    className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 rounded-lg border border-gray-700 shadow-xl overflow-hidden"
+                  >
+                    <div className="p-2 bg-gray-700 text-center">
+                      <span className="text-white text-sm font-bold">Télécharger en :</span>
+                    </div>
+                    <div className="space-y-1 p-2">
+                      <motion.button
+                        whileHover={{ backgroundColor: '#374151' }}
+                        onClick={() => downloadVideo('faible')}
+                        className="w-full text-left px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors flex items-center gap-2"
+                      >
+                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <span>Qualité Faible (360p-480p)</span>
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ backgroundColor: '#374151' }}
+                        onClick={() => downloadVideo('moyenne')}
+                        className="w-full text-left px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors flex items-center gap-2"
+                      >
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span>Qualité Moyenne (720p)</span>
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ backgroundColor: '#374151' }}
+                        onClick={() => downloadVideo('HD')}
+                        className="w-full text-left px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors flex items-center gap-2"
+                      >
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span>Qualité HD (1080p)</span>
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             
             <motion.button
               whileHover={{ scale: 1.1 }}
