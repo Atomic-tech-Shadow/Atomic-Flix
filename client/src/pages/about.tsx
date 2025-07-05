@@ -2,6 +2,7 @@ import { Mail, MessageCircle, Heart, Code, Smartphone } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import MainLayout from "@/components/layout/main-layout";
 
 export default function About() {
   const openWhatsApp = () => {
@@ -13,7 +14,7 @@ export default function About() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-4">
+    <MainLayout>
       <div className="max-w-4xl mx-auto space-y-8 pt-8">
         
         {/* Header */}
@@ -155,6 +156,6 @@ export default function About() {
           </p>
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 }
