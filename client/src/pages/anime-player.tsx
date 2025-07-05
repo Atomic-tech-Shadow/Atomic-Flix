@@ -465,8 +465,59 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
+  // Fonction pour extraire la vraie URL de vidéo depuis l'embed
+  const extractDirectVideoUrl = async (embedUrl: string): Promise<string> => {
+    try {
+      // Si c'est une URL embed, essayer d'extraire la vraie URL
+      if (embedUrl.includes('/embed/')) {
+        const response = await fetch(embedUrl);
+        const html = await response.text();
+        
+        // Rechercher les patterns d'URL de vidéo dans le HTML
+        const videoUrlPatterns = [
+          /src="([^"]*\.mp4[^"]*)"/g,
+          /source src="([^"]*\.mp4[^"]*)"/g,
+          /'([^']*\.mp4[^']*)'/g,
+          /"([^"]*\.mp4[^"]*)"/g,
+          /https:\/\/[^\s"'<>]*\.mp4/g
+        ];
+        
+        for (const pattern of videoUrlPatterns) {
+          const matches = html.match(pattern);
+          if (matches && matches.length > 0) {
+            // Extraire la première URL trouvée
+            let videoUrl = matches[0];
+            videoUrl = videoUrl.replace(/['"]/g, '').replace('src=', '');
+            
+            if (videoUrl.startsWith('http')) {
+              console.log('URL vidéo directe trouvée:', videoUrl);
+              return videoUrl;
+            }
+          }
+        }
+        
+        // Si aucune URL trouvée, construire une URL API typique
+        const urlParts = embedUrl.split('/');
+        const videoId = urlParts[urlParts.length - 1]?.split('?')[0];
+        const domain = new URL(embedUrl).origin;
+        const apiUrl = `${domain}/api/source/${videoId}`;
+        
+        console.log('URL API construite:', apiUrl);
+        return apiUrl;
+      }
+      
+      return embedUrl;
+    } catch (error) {
+      console.error('Erreur extraction URL:', error);
+      return embedUrl;
+    }
+  };
+
   // Fonction pour convertir l'URL selon la qualité choisie
-  const convertVideoUrl = (originalUrl: string, quality: 'faible' | 'moyenne' | 'HD'): string => {
+  const convertVideoUrl = async (originalUrl: string, quality: 'faible' | 'moyenne' | 'HD'): Promise<string> => {
+    // D'abord extraire la vraie URL de vidéo
+    const directUrl = await extractDirectVideoUrl(originalUrl);
+    
     // Définir les paramètres de qualité
     const qualityParams = {
       'faible': { resolution: '360p', bitrate: '400k' },
@@ -477,11 +528,12 @@ const AnimePlayerPage: React.FC = () => {
     const params = qualityParams[quality];
     
     // Si l'URL contient déjà des paramètres, ajouter les nôtres
-    const separator = originalUrl.includes('?') ? '&' : '?';
+    const separator = directUrl.includes('?') ? '&' : '?';
     
     // Construire l'URL avec les paramètres de qualité
-    const convertedUrl = `${originalUrl}${separator}quality=${params.resolution}&bitrate=${params.bitrate}&format=mp4`;
+    const convertedUrl = `${directUrl}${separator}quality=${params.resolution}&bitrate=${params.bitrate}&format=mp4`;
     
+    console.log(`URL finale pour ${quality}:`, convertedUrl);
     return convertedUrl;
   };
 
@@ -494,7 +546,7 @@ const AnimePlayerPage: React.FC = () => {
       const selectedSource = episodeDetails.sources[selectedPlayer];
       
       // Convertir l'URL selon la qualité choisie
-      const convertedUrl = convertVideoUrl(selectedSource.url, quality);
+      const convertedUrl = await convertVideoUrl(selectedSource.url, quality);
       
       // Définir les labels de qualité pour le nom de fichier
       const qualityLabels = {
