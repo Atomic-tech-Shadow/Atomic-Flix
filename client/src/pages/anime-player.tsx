@@ -506,33 +506,56 @@ const AnimePlayerPage: React.FC = () => {
       // Créer le nom du fichier avec la qualité convertie
       const fileName = `${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber} (${qualityLabels[quality]}).mp4`;
       
-      // Créer un lien de téléchargement avec l'URL convertie
+      // Fermer le menu de téléchargement
+      setShowDownloadMenu(false);
+      
+      // Afficher un message de chargement
+      console.log(`Début du téléchargement: ${fileName}`);
+      
+      // Récupérer la vidéo via fetch et la télécharger
+      const response = await fetch(convertedUrl, {
+        mode: 'cors',
+        credentials: 'omit'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      
+      // Convertir la réponse en blob
+      const blob = await response.blob();
+      
+      // Créer un lien de téléchargement avec le blob
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = convertedUrl;
+      link.href = url;
       link.download = fileName;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
+      link.style.display = 'none';
       
       // Ajouter le lien au DOM, le cliquer, puis le supprimer
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       
-      // Méthode alternative si le téléchargement direct ne fonctionne pas
+      // Nettoyer l'URL blob après utilisation
       setTimeout(() => {
-        // Ouvrir dans un nouvel onglet pour téléchargement manuel
-        window.open(convertedUrl, '_blank');
+        window.URL.revokeObjectURL(url);
       }, 100);
       
-      // Fermer le menu de téléchargement
-      setShowDownloadMenu(false);
-      
-      // Afficher un message de confirmation
-      console.log(`Téléchargement initié: ${fileName} avec URL convertie pour ${quality} qualité`);
+      console.log(`Téléchargement terminé: ${fileName}`);
       
     } catch (error) {
       console.error('Erreur lors du téléchargement:', error);
-      alert('Erreur lors du téléchargement. Veuillez réessayer.');
+      
+      // Fallback: ouvrir l'URL dans un nouvel onglet
+      const selectedSource = episodeDetails.sources[selectedPlayer];
+      const convertedUrl = convertVideoUrl(selectedSource.url, quality);
+      window.open(convertedUrl, '_blank');
+      
+      // Fermer le menu
+      setShowDownloadMenu(false);
+      
+      alert('Téléchargement automatique impossible. La vidéo s\'ouvrira dans un nouvel onglet - utilisez clic droit > Enregistrer sous pour télécharger.');
     }
   };
 
