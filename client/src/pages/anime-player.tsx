@@ -465,88 +465,83 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
-  // Fonction pour extraire la vraie URL de vidéo depuis l'embed
-  const extractDirectVideoUrl = async (embedUrl: string): Promise<string> => {
+  // Fonction pour obtenir l'URL de streaming directe via l'API
+  const getDirectStreamingUrl = async (episodeDetails: EpisodeDetails, quality: 'faible' | 'moyenne' | 'HD'): Promise<string> => {
     try {
-      // Si c'est une URL embed, essayer d'extraire la vraie URL
-      if (embedUrl.includes('/embed/')) {
-        const response = await fetch(embedUrl);
-        const html = await response.text();
-        
-        // Rechercher les patterns d'URL de vidéo dans le HTML
-        const videoUrlPatterns = [
-          /src="([^"]*\.mp4[^"]*)"/g,
-          /source src="([^"]*\.mp4[^"]*)"/g,
-          /'([^']*\.mp4[^']*)'/g,
-          /"([^"]*\.mp4[^"]*)"/g,
-          /https:\/\/[^\s"'<>]*\.mp4/g
-        ];
-        
-        for (const pattern of videoUrlPatterns) {
-          const matches = html.match(pattern);
-          if (matches && matches.length > 0) {
-            // Extraire la première URL trouvée
-            let videoUrl = matches[0];
-            videoUrl = videoUrl.replace(/['"]/g, '').replace('src=', '');
-            
-            if (videoUrl.startsWith('http')) {
-              console.log('URL vidéo directe trouvée:', videoUrl);
-              return videoUrl;
-            }
-          }
-        }
-        
-        // Si aucune URL trouvée, construire une URL API typique
-        const urlParts = embedUrl.split('/');
-        const videoId = urlParts[urlParts.length - 1]?.split('?')[0];
-        const domain = new URL(embedUrl).origin;
-        const apiUrl = `${domain}/api/source/${videoId}`;
-        
-        console.log('URL API construite:', apiUrl);
-        return apiUrl;
+      // Utiliser l'API anime-sama-scraper pour obtenir des sources directes
+      const embedUrl = episodeDetails.sources[selectedPlayer]?.url;
+      if (!embedUrl) {
+        throw new Error('Aucune source sélectionnée');
       }
       
+      console.log('Récupération source directe pour:', embedUrl);
+      
+      // Appeler l'API pour extraire les sources de streaming
+      const response = await fetch(`https://anime-sama-scraper.vercel.app/api/stream?url=${encodeURIComponent(embedUrl)}`);
+      
+      if (response.ok) {
+        const streamData = await response.json();
+        console.log('Sources de streaming reçues:', streamData);
+        
+        if (streamData.success && streamData.streams && streamData.streams.length > 0) {
+          // Rechercher la qualité demandée
+          const qualityMap = {
+            'faible': ['360p', '480p', 'low'],
+            'moyenne': ['720p', 'medium'],
+            'HD': ['1080p', '1440p', '4k', 'high', 'hd']
+          };
+          
+          const preferredQualities = qualityMap[quality];
+          
+          // Chercher une source avec la qualité demandée
+          for (const preferredQuality of preferredQualities) {
+            const stream = streamData.streams.find((s: any) => 
+              s.quality?.toLowerCase().includes(preferredQuality.toLowerCase()) ||
+              s.resolution?.toLowerCase().includes(preferredQuality.toLowerCase())
+            );
+            
+            if (stream && stream.url) {
+              console.log(`Source ${quality} trouvée:`, stream.url);
+              return stream.url;
+            }
+          }
+          
+          // Si aucune qualité spécifique trouvée, prendre la première
+          const firstStream = streamData.streams[0];
+          if (firstStream && firstStream.url) {
+            console.log('Utilisation de la première source disponible:', firstStream.url);
+            return firstStream.url;
+          }
+        }
+      }
+      
+      // Fallback : essayer d'extraire depuis l'embed
+      console.log('Tentative d\'extraction depuis embed...');
       return embedUrl;
+      
     } catch (error) {
-      console.error('Erreur extraction URL:', error);
-      return embedUrl;
+      console.error('Erreur récupération source directe:', error);
+      throw error;
     }
   };
 
-  // Fonction pour convertir l'URL selon la qualité choisie
-  const convertVideoUrl = async (originalUrl: string, quality: 'faible' | 'moyenne' | 'HD'): Promise<string> => {
-    // D'abord extraire la vraie URL de vidéo
-    const directUrl = await extractDirectVideoUrl(originalUrl);
-    
-    // Définir les paramètres de qualité
-    const qualityParams = {
-      'faible': { resolution: '360p', bitrate: '400k' },
-      'moyenne': { resolution: '720p', bitrate: '1500k' },
-      'HD': { resolution: '1080p', bitrate: '3000k' }
-    };
-    
-    const params = qualityParams[quality];
-    
-    // Si l'URL contient déjà des paramètres, ajouter les nôtres
-    const separator = directUrl.includes('?') ? '&' : '?';
-    
-    // Construire l'URL avec les paramètres de qualité
-    const convertedUrl = `${directUrl}${separator}quality=${params.resolution}&bitrate=${params.bitrate}&format=mp4`;
-    
-    console.log(`URL finale pour ${quality}:`, convertedUrl);
-    return convertedUrl;
-  };
-
-  // Fonction pour télécharger la vidéo avec qualité choisie
-  const downloadVideo = async (quality: 'faible' | 'moyenne' | 'HD') => {
-    if (!episodeDetails || !episodeDetails.sources.length) return;
+  // Fonction pour télécharger la vidéo avec qualité via l'API
+  const downloadVideoWithApi = async (quality: 'faible' | 'moyenne' | 'HD') => {
+    if (!episodeDetails || !episodeDetails.sources.length) {
+      console.error('Aucun épisode ou source disponible');
+      return;
+    }
 
     try {
-      // Prendre la source actuellement sélectionnée
-      const selectedSource = episodeDetails.sources[selectedPlayer];
+      setShowDownloadMenu(false);
+      console.log(`Début du téléchargement ${quality} pour:`, episodeDetails.title);
       
-      // Convertir l'URL selon la qualité choisie
-      const convertedUrl = await convertVideoUrl(selectedSource.url, quality);
+      // Obtenir l'URL de streaming directe via l'API
+      const streamingUrl = await getDirectStreamingUrl(episodeDetails, quality);
+      
+      if (!streamingUrl) {
+        throw new Error('Impossible d\'obtenir l\'URL de streaming');
+      }
       
       // Définir les labels de qualité pour le nom de fichier
       const qualityLabels = {
@@ -555,84 +550,37 @@ const AnimePlayerPage: React.FC = () => {
         'HD': '1080p'
       };
 
-      // Créer le nom du fichier avec la qualité convertie
+      // Créer le nom du fichier
       const fileName = `${episodeDetails.animeTitle} - Episode ${episodeDetails.episodeNumber} (${qualityLabels[quality]}).mp4`;
       
-      // Fermer le menu de téléchargement
-      setShowDownloadMenu(false);
+      console.log('URL de streaming obtenue:', streamingUrl);
+      console.log('Nom du fichier:', fileName);
       
-      // Afficher un message de chargement
-      console.log(`Début du téléchargement: ${fileName}`);
-      
-      // Créer un lien avec headers de téléchargement forcé
+      // Télécharger directement l'URL de streaming
       const link = document.createElement('a');
-      link.href = convertedUrl;
+      link.href = streamingUrl;
       link.download = fileName;
-      
-      // Forcer le téléchargement en ajoutant des attributs spéciaux
-      link.setAttribute('type', 'video/mp4');
-      link.setAttribute('target', '_self');
+      link.target = '_blank';
       link.style.display = 'none';
       
-      // Ajouter des headers personnalisés via un data URL
-      const dataUrl = `data:application/octet-stream;charset=utf-8;headers=Content-Disposition%3A%20attachment%3B%20filename%3D"${encodeURIComponent(fileName)}",${encodeURIComponent(convertedUrl)}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       
-      // Méthode alternative: utiliser un blob URL avec redirection
-      try {
-        const response = await fetch(convertedUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'video/mp4,video/*,*/*',
-            'Content-Type': 'application/octet-stream'
-          }
-        });
-        
-        if (response.ok) {
-          const blob = await response.blob();
-          const blobUrl = URL.createObjectURL(blob);
-          
-          link.href = blobUrl;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
-          // Nettoyer après utilisation
-          setTimeout(() => {
-            URL.revokeObjectURL(blobUrl);
-          }, 1000);
-          
-          console.log(`Téléchargement réussi: ${fileName}`);
-        } else {
-          throw new Error('Impossible de récupérer la vidéo');
-        }
-      } catch (error) {
-        console.error('Erreur téléchargement blob:', error);
-        
-        // Fallback: ouvrir avec instructions
-        const newWindow = window.open(convertedUrl, '_blank');
-        if (newWindow) {
-          // Injecter du JavaScript pour forcer le téléchargement
-          setTimeout(() => {
-            try {
-              const script = `
-                // Essayer de forcer le téléchargement
-                const link = document.createElement('a');
-                link.href = window.location.href;
-                link.download = '${fileName}';
-                link.click();
-              `;
-              newWindow.eval(script);
-            } catch (scriptError) {
-              console.error('Impossible d\'injecter le script:', scriptError);
-            }
-          }, 2000);
-        }
-      }
+      console.log(`Téléchargement lancé: ${fileName}`);
       
     } catch (error) {
-      console.error('Erreur lors du téléchargement:', error);
+      console.error('Erreur téléchargement:', error);
       setShowDownloadMenu(false);
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      alert(`Erreur lors du téléchargement: ${errorMessage}`);
     }
+  };
+
+  // Fonction pour télécharger la vidéo avec qualité choisie
+  const downloadVideo = async (quality: 'faible' | 'moyenne' | 'HD') => {
+    // Utiliser la nouvelle méthode avec l'API
+    await downloadVideoWithApi(quality);
   };
 
   if (loading) {
