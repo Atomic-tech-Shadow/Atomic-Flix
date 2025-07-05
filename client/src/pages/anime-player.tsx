@@ -564,49 +564,69 @@ const AnimePlayerPage: React.FC = () => {
       // Afficher un message de chargement
       console.log(`Début du téléchargement: ${fileName}`);
       
-      // Créer un iframe invisible pour contourner les restrictions CORS
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = convertedUrl;
-      iframe.setAttribute('download', fileName);
-      document.body.appendChild(iframe);
+      // Créer un lien avec headers de téléchargement forcé
+      const link = document.createElement('a');
+      link.href = convertedUrl;
+      link.download = fileName;
       
-      // Nettoyer l'iframe après un délai
-      setTimeout(() => {
-        document.body.removeChild(iframe);
-      }, 3000);
+      // Forcer le téléchargement en ajoutant des attributs spéciaux
+      link.setAttribute('type', 'video/mp4');
+      link.setAttribute('target', '_self');
+      link.style.display = 'none';
       
-      // Alternative : utiliser un service worker pour le téléchargement
-      if ('serviceWorker' in navigator) {
-        try {
-          // Créer un lien direct avec attribut download
-          const link = document.createElement('a');
-          link.href = convertedUrl;
-          link.download = fileName;
-          link.setAttribute('crossorigin', 'anonymous');
-          link.style.display = 'none';
+      // Ajouter des headers personnalisés via un data URL
+      const dataUrl = `data:application/octet-stream;charset=utf-8;headers=Content-Disposition%3A%20attachment%3B%20filename%3D"${encodeURIComponent(fileName)}",${encodeURIComponent(convertedUrl)}`;
+      
+      // Méthode alternative: utiliser un blob URL avec redirection
+      try {
+        const response = await fetch(convertedUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'video/mp4,video/*,*/*',
+            'Content-Type': 'application/octet-stream'
+          }
+        });
+        
+        if (response.ok) {
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
           
+          link.href = blobUrl;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
           
-          console.log(`Téléchargement lancé: ${fileName}`);
-        } catch (swError) {
-          console.error('Erreur service worker:', swError);
+          // Nettoyer après utilisation
+          setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+          }, 1000);
+          
+          console.log(`Téléchargement réussi: ${fileName}`);
+        } else {
+          throw new Error('Impossible de récupérer la vidéo');
         }
-      } else {
-        // Méthode directe simple
-        const link = document.createElement('a');
-        link.href = convertedUrl;
-        link.download = fileName;
-        link.target = '_blank';
-        link.style.display = 'none';
+      } catch (error) {
+        console.error('Erreur téléchargement blob:', error);
         
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        console.log(`Téléchargement initié: ${fileName}`);
+        // Fallback: ouvrir avec instructions
+        const newWindow = window.open(convertedUrl, '_blank');
+        if (newWindow) {
+          // Injecter du JavaScript pour forcer le téléchargement
+          setTimeout(() => {
+            try {
+              const script = `
+                // Essayer de forcer le téléchargement
+                const link = document.createElement('a');
+                link.href = window.location.href;
+                link.download = '${fileName}';
+                link.click();
+              `;
+              newWindow.eval(script);
+            } catch (scriptError) {
+              console.error('Impossible d\'injecter le script:', scriptError);
+            }
+          }, 2000);
+        }
       }
       
     } catch (error) {
