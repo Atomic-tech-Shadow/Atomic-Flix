@@ -146,6 +146,38 @@ export default function About() {
           </CardContent>
         </Card>
 
+        {/* Legal Links */}
+        <Card className="atomic-card border-gray-500/20 bg-black/40 backdrop-blur-md">
+          <CardHeader>
+            <CardTitle className="text-center text-gray-300">Documents Légaux</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap justify-center gap-4">
+              <a 
+                href="/privacy-policy" 
+                className="text-cyan-400 hover:text-cyan-300 underline transition-colors"
+              >
+                Politique de Confidentialité
+              </a>
+              <span className="text-gray-500">•</span>
+              <a 
+                href="/terms-of-service" 
+                className="text-cyan-400 hover:text-cyan-300 underline transition-colors"
+              >
+                Conditions d'Utilisation
+              </a>
+              <span className="text-gray-500">•</span>
+              <a 
+                href="/LICENSE.md" 
+                target="_blank"
+                className="text-cyan-400 hover:text-cyan-300 underline transition-colors"
+              >
+                Licence MIT
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Footer */}
         <div className="text-center py-8 atomic-fade-in">
           <p className="text-gray-400">

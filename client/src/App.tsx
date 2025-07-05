@@ -9,6 +9,8 @@ import AnimePage from "@/pages/anime";
 import AnimePlayerPage from "@/pages/anime-player";
 import MangaReaderPage from "@/pages/manga-reader";
 import AboutPage from "@/pages/about";
+import PrivacyPolicyPage from "@/pages/privacy-policy";
+import TermsOfServicePage from "@/pages/terms-of-service";
 
 function Router() {
   return (
@@ -19,6 +21,8 @@ function Router() {
       <Route path="/anime/:id/player" component={AnimePlayerPage} />
       <Route path="/manga/:id/reader" component={MangaReaderPage} />
       <Route path="/about" component={AboutPage} />
+      <Route path="/privacy-policy" component={PrivacyPolicyPage} />
+      <Route path="/terms-of-service" component={TermsOfServicePage} />
       <Route component={NotFound} />
     </Switch>
   );
