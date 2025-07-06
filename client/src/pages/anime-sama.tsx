@@ -158,23 +158,7 @@ const AnimeSamaPage: React.FC = () => {
     }
   };
 
-  // Charger les animes trending
-  const loadTrendingAnimes = async () => {
-    try {
-      const response = await animeAPI.getTrending();
-      
-      if (response && response.success && response.results) {
-        setPopularAnimes(response.results.slice(0, 24));
-        console.log('Contenu trending chargé:', response.results.length, 'éléments');
-      } else {
-        console.warn('Réponse API trending échouée:', response);
-        setPopularAnimes([]);
-      }
-    } catch (error) {
-      console.error('Erreur chargement trending:', error);
-      setPopularAnimes([]);
-    }
-  };
+
 
   // Gérer la recherche en temps réel
   useEffect(() => {
@@ -342,7 +326,7 @@ const AnimeSamaPage: React.FC = () => {
                   {/* Boutons d'action */}
                   <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                     <button
-                      onClick={() => loadTrendingAnimes()}
+                      onClick={() => loadPopularAnimes()}
                       className="group relative px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/25"
                     >
                       <span className="relative z-10">🚀 Découvrir maintenant</span>
