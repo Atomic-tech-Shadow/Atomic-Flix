@@ -318,14 +318,14 @@ const AnimeSamaPage: React.FC = () => {
                     Plongez dans l'univers infini<br />
                     des animes et mangas !
                   </p>
+                  
+                  {/* Logo centré sous le texte */}
+                  <div className="mt-6">
+                    <div className="text-white font-bold text-2xl atomic-gradient-text opacity-60">
+                      ATOMIC
+                    </div>
+                  </div>
                 </motion.div>
-              </div>
-
-              {/* Logo en bas à droite */}
-              <div className="absolute bottom-4 right-6 opacity-30">
-                <div className="text-white font-bold text-2xl atomic-gradient-text">
-                  ATOMIC
-                </div>
               </div>
 
 
