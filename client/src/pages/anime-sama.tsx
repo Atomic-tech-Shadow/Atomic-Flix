@@ -312,11 +312,11 @@ const AnimeSamaPage: React.FC = () => {
                   transition={{ delay: 0.3, duration: 0.6 }}
                 >
                   <h1 className="text-3xl md:text-5xl font-bold mb-2 atomic-gradient-text">
-                    NOUVELLE SAISON
+                    ATOMIC FLIX
                   </h1>
                   <p className="text-lg md:text-xl text-gray-200 mb-4 font-light">
-                    Montez dans le train pour<br />
-                    suivre les pépites du moment !
+                    Plongez dans l'univers infini<br />
+                    des animes et mangas !
                   </p>
                   
                   {/* Boutons d'action */}
