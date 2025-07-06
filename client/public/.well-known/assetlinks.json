@@ -1,12 +1,8 @@
-[
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "app.vercel.atomic_flix.twa",
-      "sha256_cert_fingerprints": [
-        "6F:F2:DC:DF:FC:E6:09:13:A3:72:AF:72:7C:2D:F4:3E:A4:62:44:C8:73:FA:39:24:45:34:15:FE:C1:DE:5E:3E"
-      ]
-    }
-  }
-]
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.atomic_flix.twa",
+        "sha256_cert_fingerprints": ["F9:30:6C:3D:AE:8B:1D:C0:CD:E5:F1:D3:7A:DA:70:61:7E:FE:64:62:0A:E4:C0:B4:21:68:E4:4F:FF:B9:9D:FC"]
+      }
+    }]
