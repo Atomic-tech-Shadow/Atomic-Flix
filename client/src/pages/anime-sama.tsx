@@ -318,24 +318,6 @@ const AnimeSamaPage: React.FC = () => {
                     Plongez dans l'univers infini<br />
                     des animes et mangas !
                   </p>
-                  
-                  {/* Boutons d'action */}
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                    <button
-                      onClick={() => loadPopularAnimes()}
-                      className="group relative px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/25"
-                    >
-                      <span className="relative z-10">🚀 Découvrir maintenant</span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </button>
-                    
-                    <button
-                      onClick={() => setSearchQuery('populaire')}
-                      className="px-6 py-3 border-2 border-cyan-400/50 text-cyan-400 font-semibold rounded-xl hover:bg-cyan-400/10 hover:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
-                    >
-                      🔍 Explorer le catalogue
-                    </button>
-                  </div>
                 </motion.div>
               </div>
 
