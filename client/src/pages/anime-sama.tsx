@@ -272,7 +272,7 @@ const AnimeSamaPage: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="mb-8 relative overflow-hidden rounded-2xl atomic-glass backdrop-blur-xl"
+              className="mb-8 relative overflow-hidden rounded-2xl atomic-glass backdrop-blur-xl h-64 md:h-72"
               style={{
                 background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(255, 0, 122, 0.1) 100%)',
                 border: '1px solid rgba(0, 240, 255, 0.2)'
@@ -307,25 +307,25 @@ const AnimeSamaPage: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/20" />
 
               {/* Contenu principal */}
-              <div className="relative z-10 px-6 py-12 md:px-12 md:py-16 text-center">
+              <div className="relative z-10 px-6 py-8 md:px-12 md:py-12 text-center flex flex-col justify-center h-full">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.6 }}
                 >
-                  <h1 className="text-4xl md:text-6xl font-bold mb-4 atomic-gradient-text">
+                  <h1 className="text-3xl md:text-5xl font-bold mb-2 atomic-gradient-text">
                     NOUVELLE SAISON
                   </h1>
-                  <p className="text-xl md:text-2xl text-gray-200 mb-8 font-light">
+                  <p className="text-lg md:text-xl text-gray-200 mb-4 font-light">
                     Montez dans le train pour<br />
                     suivre les pépites du moment !
                   </p>
                   
                   {/* Boutons d'action */}
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                     <button
                       onClick={() => loadPopularAnimes()}
-                      className="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/25"
+                      className="group relative px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/25"
                     >
                       <span className="relative z-10">🚀 Découvrir maintenant</span>
                       <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -333,45 +333,15 @@ const AnimeSamaPage: React.FC = () => {
                     
                     <button
                       onClick={() => setSearchQuery('populaire')}
-                      className="px-8 py-4 border-2 border-cyan-400/50 text-cyan-400 font-semibold rounded-xl hover:bg-cyan-400/10 hover:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
+                      className="px-6 py-3 border-2 border-cyan-400/50 text-cyan-400 font-semibold rounded-xl hover:bg-cyan-400/10 hover:border-cyan-400 transition-all duration-300 backdrop-blur-sm"
                     >
                       🔍 Explorer le catalogue
                     </button>
                   </div>
-
-                  {/* Statistiques */}
-                  <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-gray-300">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
-                      Milliers d'animes disponibles
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-pink-400 rounded-full animate-pulse"></span>
-                      Qualité HD & VF/VOSTFR
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></span>
-                      Mises à jour quotidiennes
-                    </div>
-                  </div>
                 </motion.div>
               </div>
 
-              {/* Effet de particules flottantes */}
-              <div className="absolute inset-0 pointer-events-none">
-                {[...Array(6)].map((_, i) => (
-                  <div
-                    key={`particle-${i}`}
-                    className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-pulse"
-                    style={{
-                      left: `${20 + i * 15}%`,
-                      top: `${30 + (i % 2) * 40}%`,
-                      animationDelay: `${i * 0.5}s`,
-                      animationDuration: `${2 + i * 0.3}s`
-                    }}
-                  />
-                ))}
-              </div>
+
             </motion.div>
 
             {/* Section Animes Populaires */}
