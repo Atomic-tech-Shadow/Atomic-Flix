@@ -274,27 +274,27 @@ const AnimeSamaPage: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="mb-8 relative overflow-hidden rounded-2xl atomic-glass backdrop-blur-xl h-64 md:h-72"
+              className="mb-8 relative overflow-hidden rounded-2xl"
               style={{
-                background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(255, 0, 122, 0.1) 100%)',
+                background: '#0A0A1A',
                 border: '1px solid rgba(0, 240, 255, 0.2)'
               }}
             >
-              {/* Images d'animes en mosaïque en arrière-plan */}
-              <div className="absolute inset-0 flex opacity-30">
+              {/* Images d'animes en mosaïque visible en haut */}
+              <div className="flex h-24 md:h-32">
                 {popularAnimes.slice(0, 8).map((anime, index) => (
                   <div
-                    key={`hero-bg-${index}`}
-                    className="flex-1 h-full overflow-hidden"
+                    key={`hero-mosaic-${index}`}
+                    className="flex-1 overflow-hidden"
                     style={{
-                      transform: `skew(${index % 2 === 0 ? '5deg' : '-5deg'})`,
-                      filter: 'brightness(0.6) saturate(1.2)'
+                      transform: `skew(${index % 2 === 0 ? '3deg' : '-3deg'})`,
+                      marginLeft: index > 0 ? '-2px' : '0'
                     }}
                   >
                     <img
                       src={anime.image}
-                      alt=""
-                      className="w-full h-full object-cover scale-110"
+                      alt={anime.title}
+                      className="w-full h-full object-cover brightness-90 hover:brightness-100 transition-all duration-300"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
@@ -304,12 +304,8 @@ const AnimeSamaPage: React.FC = () => {
                 ))}
               </div>
 
-              {/* Overlay gradients */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/80" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/20" />
-
               {/* Contenu principal */}
-              <div className="relative z-10 px-6 py-8 md:px-12 md:py-12 text-center flex flex-col justify-center h-full">
+              <div className="px-6 py-8 md:px-12 md:py-12 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -341,6 +337,13 @@ const AnimeSamaPage: React.FC = () => {
                     </button>
                   </div>
                 </motion.div>
+              </div>
+
+              {/* Logo en bas à droite */}
+              <div className="absolute bottom-4 right-6 opacity-30">
+                <div className="text-white font-bold text-2xl atomic-gradient-text">
+                  ATOMIC
+                </div>
               </div>
 
 
