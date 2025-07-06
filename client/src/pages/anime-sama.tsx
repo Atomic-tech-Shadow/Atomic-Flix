@@ -341,16 +341,10 @@ const AnimeSamaPage: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 className="mb-4"
               >
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-4">
                   <h2 className="atomic-gradient-text text-xl font-bold flex items-center gap-2">
                     🔥 Contenu Populaire 📈
                   </h2>
-                  <button 
-                    onClick={() => loadPopularAnimes()}
-                    className="text-cyan-400 text-sm hover:text-cyan-300 transition-all duration-300 px-3 py-1 rounded border border-cyan-500/30 hover:border-cyan-400/50 hover:bg-cyan-500/10 atomic-hover-scale"
-                  >
-                    Actualiser
-                  </button>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                   {popularAnimes.map((anime, index) => (
