@@ -25,26 +25,26 @@
   --radius: 0.5rem;
   
   /* ATOMIC FLIX Custom Colors */
-  --atomic-dark: hsl(0, 0%, 4%);
+  --atomic-dark: hsl(240, 43%, 5%);
   --atomic-gray: hsl(0, 0%, 10%);
   --atomic-gray-light: hsl(0, 0%, 15%);
-  --atomic-cyan: hsl(188, 95%, 42%);
-  --atomic-cyan-dark: hsl(188, 95%, 35%);
-  --atomic-blue: hsl(220, 91%, 56%);
-  --atomic-purple: hsl(269, 91%, 56%);
+  --atomic-cyan: hsl(188, 100%, 50%);
+  --atomic-cyan-dark: hsl(188, 100%, 40%);
+  --atomic-blue: hsl(188, 100%, 50%);
+  --atomic-purple: hsl(316, 100%, 49%);
   --atomic-orange: hsl(25, 95%, 53%);
-  --atomic-gradient-start: hsl(188, 95%, 42%);
-  --atomic-gradient-end: hsl(220, 91%, 56%);
+  --atomic-gradient-start: hsl(188, 100%, 50%);
+  --atomic-gradient-end: hsl(316, 100%, 49%);
 }
 
 .dark {
-  --background: hsl(0, 0%, 4%);
+  --background: hsl(240, 43%, 5%);
   --foreground: hsl(0, 0%, 98%);
   --muted: hsl(0, 0%, 10%);
   --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(0, 0%, 4%);
+  --popover: hsl(240, 43%, 5%);
   --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(0, 0%, 4%);
+  --card: hsl(240, 43%, 5%);
   --card-foreground: hsl(0, 0%, 98%);
   --border: hsl(240, 3.7%, 15.9%);
   --input: hsl(240, 3.7%, 15.9%);

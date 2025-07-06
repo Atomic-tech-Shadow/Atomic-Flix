@@ -5,8 +5,8 @@
   "description": "Plateforme de streaming d'anime moderne avec interface sombre et lecteur intégré",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f0f23",
-  "theme_color": "#00d4ff",
+  "background_color": "#0A0A1A",
+  "theme_color": "#00F0FF",
   "orientation": "portrait-primary",
   "scope": "/",
   "scope_extensions": [
