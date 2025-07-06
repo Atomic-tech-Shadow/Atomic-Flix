@@ -322,10 +322,12 @@ const AnimeSamaPage: React.FC = () => {
               </div>
 
               {/* Logo en bas à droite */}
-              <div className="absolute bottom-4 right-6 opacity-30">
-                <div className="text-white font-bold text-2xl atomic-gradient-text">
-                  ATOMIC
-                </div>
+              <div className="absolute bottom-4 right-6 opacity-60">
+                <img 
+                  src="/assets/atomic-logo-new.png" 
+                  alt="ATOMIC FLIX" 
+                  className="h-8 w-auto"
+                />
               </div>
 
 
