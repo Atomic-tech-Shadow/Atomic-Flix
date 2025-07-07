@@ -59,11 +59,16 @@ const root = createRoot(document.getElementById("root")!);
 const hideInitialLoader = () => {
   const loader = document.getElementById('initial-loader');
   if (loader) {
+    // Animation de fade out plus longue pour plus de fluidité
     loader.style.opacity = '0';
-    loader.style.transition = 'opacity 0.3s ease';
+    loader.style.transition = 'opacity 0.8s ease';
     setTimeout(() => {
-      loader.remove();
-    }, 300);
+      if (loader && loader.parentNode) {
+        loader.parentNode.removeChild(loader);
+      }
+      // Restaurer le scroll du body
+      document.body.style.overflow = '';
+    }, 800);
   }
 };
 
@@ -73,5 +78,10 @@ root.render(
   </ErrorBoundary>
 );
 
-// Masquer le loader après que React soit monté
-setTimeout(hideInitialLoader, 100);
+// Masquer le loader après que React soit monté avec un délai pour s'assurer que tout est chargé
+setTimeout(hideInitialLoader, 500);
+
+// Masquer le loader aussi si la page est déjà chargée
+if (document.readyState === 'complete') {
+  setTimeout(hideInitialLoader, 200);
+}
