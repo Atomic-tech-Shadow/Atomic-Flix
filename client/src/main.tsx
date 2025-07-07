@@ -1,44 +1,6 @@
-import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-
-// Error boundary pour capturer les erreurs
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4 text-red-400">Erreur de l'application</h1>
-            <p className="text-gray-300">{this.state.error?.message || 'Une erreur est survenue'}</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="mt-4 px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700"
-            >
-              Recharger l'application
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
@@ -53,35 +15,4 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-const root = createRoot(document.getElementById("root")!);
-
-// Masquer l'indicateur de chargement initial une fois que React est prêt
-const hideInitialLoader = () => {
-  const loader = document.getElementById('initial-loader');
-  if (loader) {
-    // Animation de fade out plus longue pour plus de fluidité
-    loader.style.opacity = '0';
-    loader.style.transition = 'opacity 0.8s ease';
-    setTimeout(() => {
-      if (loader && loader.parentNode) {
-        loader.parentNode.removeChild(loader);
-      }
-      // Restaurer le scroll du body
-      document.body.style.overflow = '';
-    }, 800);
-  }
-};
-
-root.render(
-  <ErrorBoundary>
-    <App />
-  </ErrorBoundary>
-);
-
-// Masquer le loader après que React soit monté avec un délai pour s'assurer que tout est chargé
-setTimeout(hideInitialLoader, 500);
-
-// Masquer le loader aussi si la page est déjà chargée
-if (document.readyState === 'complete') {
-  setTimeout(hideInitialLoader, 200);
-}
+createRoot(document.getElementById("root")!).render(<App />);
