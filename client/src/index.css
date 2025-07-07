@@ -91,88 +91,39 @@
     overflow: hidden;
   }
 
-  /* ATOMIC FLIX Animation Classes - Remplacement des @apply par du CSS pur */
+  /* ATOMIC FLIX Animation Classes */
   .atomic-hover-scale {
-    transition: all 0.3s ease-in-out;
-  }
-  
-  .atomic-hover-scale:hover {
-    transform: scale(1.05);
+    @apply transition-all duration-300 ease-in-out hover:scale-105;
   }
 
   .atomic-hover-glow {
-    transition: all 0.3s ease-in-out;
-  }
-  
-  .atomic-hover-glow:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 240, 255, 0.25), 0 4px 6px -2px rgba(0, 240, 255, 0.25);
+    @apply transition-all duration-300 ease-in-out hover:shadow-lg hover:shadow-cyan-500/25;
   }
 
   .atomic-button {
-    background: linear-gradient(to right, #06b6d4, #2563eb);
-    color: white;
-    font-weight: 500;
-    padding: 12px 24px;
-    border-radius: 8px;
-    transition: all 0.3s ease-in-out;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .atomic-button:hover {
-    background: linear-gradient(to right, #0891b2, #1d4ed8);
-    transform: scale(1.05);
-    box-shadow: 0 10px 15px -3px rgba(0, 240, 255, 0.25), 0 4px 6px -2px rgba(0, 240, 255, 0.25);
+    @apply bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 
+           text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 
+           hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25;
   }
 
   .atomic-card {
-    background: rgba(17, 24, 39, 0.5);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(31, 41, 55, 0.5);
-    border-radius: 12px;
-    padding: 24px;
-    transition: all 0.3s ease-in-out;
-  }
-  
-  .atomic-card:hover {
-    background: rgba(31, 41, 55, 0.5);
-    border-color: rgba(55, 65, 81, 0.5);
-    box-shadow: 0 10px 15px -3px rgba(0, 240, 255, 0.1), 0 4px 6px -2px rgba(0, 240, 255, 0.1);
-    transform: scale(1.02);
+    @apply bg-gray-900/50 backdrop-blur-sm border border-gray-800/50 rounded-xl p-6 
+           transition-all duration-300 hover:bg-gray-800/50 hover:border-gray-700/50 
+           hover:shadow-lg hover:shadow-cyan-500/10 hover:scale-[1.02];
   }
 
   .atomic-input {
-    background: rgba(17, 24, 39, 0.5);
-    border: 1px solid #374151;
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: white;
-    transition: all 0.3s ease-in-out;
-  }
-  
-  .atomic-input::placeholder {
-    color: #9ca3af;
-  }
-  
-  .atomic-input:focus {
-    outline: none;
-    border-color: #06b6d4;
-    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+    @apply bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 text-white 
+           placeholder-gray-400 transition-all duration-300 
+           focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none;
   }
 
   .atomic-gradient-text {
-    background: linear-gradient(to right, #22d3ee, #2563eb);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+    @apply bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent;
   }
 
   .atomic-glass {
-    background: rgba(17, 24, 39, 0.2);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(55, 65, 81, 0.3);
-    border-radius: 12px;
+    @apply bg-gray-900/20 backdrop-blur-md border border-gray-700/30 rounded-xl;
   }
 }
 
@@ -251,4 +202,4 @@
     transform: translateY(0);
     transition: all 0.4s ease-out;
   }
-}
+    }
