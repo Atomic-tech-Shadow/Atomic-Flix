@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App-simple";
+import App from "./App";
 import "./index.css";
 
 // Error boundary pour capturer les erreurs
@@ -54,8 +54,24 @@ if ('serviceWorker' in navigator) {
 }
 
 const root = createRoot(document.getElementById("root")!);
+
+// Masquer l'indicateur de chargement initial une fois que React est prêt
+const hideInitialLoader = () => {
+  const loader = document.getElementById('initial-loader');
+  if (loader) {
+    loader.style.opacity = '0';
+    loader.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => {
+      loader.remove();
+    }, 300);
+  }
+};
+
 root.render(
   <ErrorBoundary>
     <App />
   </ErrorBoundary>
 );
+
+// Masquer le loader après que React soit monté
+setTimeout(hideInitialLoader, 100);

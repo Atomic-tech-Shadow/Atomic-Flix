@@ -13,6 +13,7 @@ export default defineConfig({
   build: {
     outDir: "dist",
     minify: "esbuild",
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -30,5 +31,9 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5000,
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'wouter', '@tanstack/react-query'],
+    exclude: ['lucide-react']
   },
 });
