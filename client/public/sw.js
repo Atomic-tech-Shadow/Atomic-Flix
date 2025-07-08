@@ -66,7 +66,7 @@ self.addEventListener('sync', event => {
 // Push notifications
 self.addEventListener('push', event => {
   console.log('Push notification received');
-  
+
   let notificationData = {
     title: 'ATOMIC FLIX',
     body: 'Nouveau contenu disponible!',
@@ -74,7 +74,7 @@ self.addEventListener('push', event => {
     icon: '/assets/atomic-logo-new.png',
     badge: '/assets/atomic-logo-new.png'
   };
-  
+
   // Parser les données de la notification
   if (event.data) {
     try {
@@ -84,7 +84,7 @@ self.addEventListener('push', event => {
       notificationData.body = event.data.text();
     }
   }
-  
+
   const options = {
     body: notificationData.body,
     icon: notificationData.icon,
@@ -118,12 +118,12 @@ self.addEventListener('push', event => {
 // Gestion des clics sur les notifications
 self.addEventListener('notificationclick', event => {
   console.log('Notification click received.');
-  
+
   event.notification.close();
-  
+
   const notificationData = event.notification.data;
   let targetUrl = '/';
-  
+
   // Déterminer l'URL cible selon le type de notification
   if (notificationData) {
     switch (notificationData.type) {
@@ -146,7 +146,7 @@ self.addEventListener('notificationclick', event => {
         targetUrl = '/';
     }
   }
-  
+
   // Actions spécifiques selon le bouton cliqué
   if (event.action === 'explore' || event.action === 'view') {
     event.waitUntil(
@@ -161,7 +161,7 @@ self.addEventListener('notificationclick', event => {
       clients.openWindow(targetUrl)
     );
   }
-  
+
   // Envoyer un message au client principal
   event.waitUntil(
     clients.matchAll().then(clients => {
@@ -193,62 +193,88 @@ async function doBackgroundSync() {
 // Fonction de mise à jour du contenu
 async function updateContent() {
   console.log('Updating content in background...');
-  
+
   try {
     // Vérifier les nouveaux animes populaires
     const response = await fetch('https://anime-sama-scraper.vercel.app/api/trending');
     const data = await response.json();
-    
+
     if (data.success && data.results) {
       // Sauvegarder les nouveaux contenus dans le cache
       const cache = await caches.open(CACHE_NAME);
       await cache.put('/api/trending-cache', new Response(JSON.stringify(data)));
-      
+
       // Vérifier s'il y a de nouveaux animes
       const lastCheck = await cache.match('/api/last-check');
       let lastCheckData = null;
-      
+
       if (lastCheck) {
         lastCheckData = await lastCheck.json();
       }
-      
+
       // Comparer avec les données précédentes
       if (lastCheckData && lastCheckData.results) {
         const newAnimes = data.results.filter(anime => 
           !lastCheckData.results.some(oldAnime => oldAnime.id === anime.id)
         );
-        
+
         if (newAnimes.length > 0) {
-          // Envoyer notification pour les nouveaux épisodes
-          const animeNames = newAnimes.slice(0, 3).map(anime => anime.title).join(', ');
-          const bodyText = newAnimes.length === 1 
-            ? `${animeNames} - nouvel épisode disponible`
-            : `${animeNames}${newAnimes.length > 3 ? ' et autres' : ''} - nouveaux épisodes disponibles`;
-            
-          await self.registration.showNotification('New épisode ajouté 📢', {
-            body: bodyText,
-            icon: newAnimes[0] ? newAnimes[0].image : '/assets/atomic-logo-new.png',
-            image: newAnimes[0] ? newAnimes[0].image : undefined,
-            badge: '/assets/atomic-logo-new.png',
-            data: {
-              type: 'new-episode',
-              count: newAnimes.length,
-              animes: newAnimes
-            },
-            actions: [
-              { action: 'view', title: 'Voir les nouveaux épisodes' },
-              { action: 'dismiss', title: 'Plus tard' }
-            ]
-          });
+          // Construire le message de notification personnalisé
+          let notificationTitle = 'Nouveaux épisodes ajoutés 📢';
+          let bodyText = `${newAnimes.length} nouveaux épisodes disponibles`;
+          let notificationIcon = '/assets/atomic-logo-new.png';
+          let notificationImage = undefined;
+
+          if (newAnimes.length > 0) {
+            const firstAnime = newAnimes[0];
+            notificationIcon = firstAnime.image || '/assets/atomic-logo-new.png';
+            notificationImage = firstAnime.image;
+
+            if (newAnimes.length === 1) {
+              // Une seule série
+              notificationTitle = `📢 ${firstAnime.title}`;
+              bodyText = `Nouvel épisode disponible !`;
+              if (firstAnime.episodeNumber) {
+                bodyText = `Épisode ${firstAnime.episodeNumber} disponible !`;
+              }
+            } else if (newAnimes.length <= 3) {
+              // 2-3 séries, afficher tous les noms
+              const animeNames = newAnimes.map(anime => anime.title).join(', ');
+              notificationTitle = '📢 Nouveaux épisodes !';
+              bodyText = `${animeNames} - nouveaux épisodes disponibles`;
+            } else {
+              // Plus de 3 séries, afficher les 2 premiers + "et X autres"
+              const firstTwoNames = newAnimes.slice(0, 2).map(anime => anime.title).join(', ');
+              const remainingCount = newAnimes.length - 2;
+              notificationTitle = '📢 Nouveaux épisodes !';
+              bodyText = `${firstTwoNames} et ${remainingCount} autres séries - nouveaux épisodes disponibles`;
+            }
+
+            self.registration.showNotification(notificationTitle, {
+              body: bodyText,
+              icon: notificationIcon,
+              image: notificationImage,
+              badge: '/assets/atomic-logo-new.png',
+              data: {
+                type: 'new-episode',
+                count: newAnimes.length,
+                animes: newAnimes
+              },
+              actions: [
+                { action: 'view', title: 'Voir les nouveaux épisodes' },
+                { action: 'dismiss', title: 'Plus tard' }
+              ]
+            });
+          }
         }
       }
-      
+
       // Sauvegarder la dernière vérification
       await cache.put('/api/last-check', new Response(JSON.stringify(data)));
     }
   } catch (error) {
     console.error('Erreur lors de la mise à jour du contenu:', error);
   }
-  
+
   return Promise.resolve();
 }

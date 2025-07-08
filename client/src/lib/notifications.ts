@@ -241,22 +241,44 @@ export class NotificationManager {
   // Nouvelles fonctions de notification
   async notifyTrendingUpdate(count: number, animes?: any[]): Promise<void> {
     let body = `${count} nouveaux épisodes disponibles`;
+    let title = 'Nouveaux épisodes ajoutés 📢';
+    let icon = '/assets/atomic-logo-new.png';
+    let image = undefined;
     
-    // Ajouter les noms des animes si disponibles
+    // Personnaliser la notification selon le nombre d'animes
     if (animes && animes.length > 0) {
-      const animeNames = animes.slice(0, 3).map(anime => anime.title).join(', ');
-      body = animes.length === 1 
-        ? `${animeNames} - nouvel épisode disponible`
-        : `${animeNames}${animes.length > 3 ? ' et autres' : ''} - nouveaux épisodes disponibles`;
+      const firstAnime = animes[0];
+      icon = firstAnime.image || '/assets/atomic-logo-new.png';
+      image = firstAnime.image;
+      
+      if (animes.length === 1) {
+        // Une seule série
+        title = `📢 ${firstAnime.title}`;
+        body = `Nouvel épisode disponible !`;
+        if (firstAnime.episodeNumber) {
+          body = `Épisode ${firstAnime.episodeNumber} disponible !`;
+        }
+      } else if (animes.length <= 3) {
+        // 2-3 séries, afficher tous les noms
+        const animeNames = animes.map(anime => anime.title).join(', ');
+        title = '📢 Nouveaux épisodes !';
+        body = `${animeNames} - nouveaux épisodes disponibles`;
+      } else {
+        // Plus de 3 séries, afficher les 2 premiers + "et X autres"
+        const firstTwoNames = animes.slice(0, 2).map(anime => anime.title).join(', ');
+        const remainingCount = animes.length - 2;
+        title = '📢 Nouveaux épisodes !';
+        body = `${firstTwoNames} et ${remainingCount} autres séries - nouveaux épisodes disponibles`;
+      }
     }
 
     await this.showLocalNotification(
-      'Nouveaux épisodes ajoutés 📢',
+      title,
       {
         body,
         tag: 'trending-update',
-        icon: animes && animes[0] ? animes[0].image : '/assets/atomic-logo-new.png',
-        image: animes && animes[0] ? animes[0].image : undefined,
+        icon,
+        image,
         data: { type: 'trending', count, animes }
       }
     );
