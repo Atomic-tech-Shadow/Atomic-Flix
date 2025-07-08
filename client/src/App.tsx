@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Analytics } from "@vercel/analytics/react";
+import { NotificationWelcome } from "@/components/notifications/notification-welcome";
 import NotFound from "@/pages/not-found";
 import AnimeSamaPage from "@/pages/anime-sama";
 import AnimePage from "@/pages/anime";
@@ -35,6 +36,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <NotificationWelcome />
         <Analytics />
       </TooltipProvider>
     </QueryClientProvider>

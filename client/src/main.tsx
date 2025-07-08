@@ -11,8 +11,15 @@ if ('serviceWorker' in navigator) {
       console.log('SW registered: ', registration);
       
       // Initialiser les notifications
-      await notificationManager.init();
-      console.log('Notifications initialized');
+      const notificationsReady = await notificationManager.init();
+      console.log('Notifications initialized:', notificationsReady);
+      
+      // Vérifier si l'utilisateur souhaite activer les notifications automatiquement
+      const autoNotifications = localStorage.getItem('atomic-flix-auto-notifications');
+      if (autoNotifications === 'enabled' && notificationsReady) {
+        await notificationManager.requestPermission();
+        await notificationManager.schedulePeriodicNotifications();
+      }
     } catch (registrationError) {
       console.log('SW registration failed: ', registrationError);
     }

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Home, Film, BookOpen, Menu, X, Info } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { NotificationSetup } from "@/components/ui/notification-setup";
+import { NotificationButton } from "@/components/notifications/notification-button";
 // Logo is now served from public/assets
 
 export function Navbar() {
@@ -70,13 +70,16 @@ export function Navbar() {
             })}
           </div>
 
-          {/* Desktop Notifications */}
-          <div className="hidden md:flex items-center">
-            <NotificationSetup />
+          {/* Desktop Actions */}
+          <div className="hidden md:flex items-center space-x-2">
+            <NotificationButton />
           </div>
 
           {/* Mobile Icons */}
           <div className="md:hidden flex items-center space-x-2">
+            {/* Notification Button */}
+            <NotificationButton />
+            
             {/* Search Button */}
             <Button
               variant="ghost"

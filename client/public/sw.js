@@ -66,31 +66,52 @@ self.addEventListener('sync', event => {
 // Push notifications
 self.addEventListener('push', event => {
   console.log('Push notification received');
+  
+  let notificationData = {
+    title: 'ATOMIC FLIX',
+    body: 'Nouveau contenu disponible!',
+    type: 'general',
+    icon: '/assets/atomic-logo-new.png',
+    badge: '/assets/atomic-logo-new.png'
+  };
+  
+  // Parser les données de la notification
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      notificationData = { ...notificationData, ...data };
+    } catch (e) {
+      notificationData.body = event.data.text();
+    }
+  }
+  
   const options = {
-    body: event.data ? event.data.text() : 'Nouveau contenu disponible sur ATOMIC FLIX!',
-    icon: '/assets/atomic-logo.png',
-    badge: '/assets/atomic-logo.png',
-    vibrate: [100, 50, 100],
+    body: notificationData.body,
+    icon: notificationData.icon,
+    badge: notificationData.badge,
+    vibrate: [200, 100, 200],
     data: {
+      type: notificationData.type,
       dateOfArrival: Date.now(),
-      primaryKey: 1
+      ...notificationData
     },
     actions: [
       {
-        action: 'explore',
-        title: 'Explorer',
-        icon: '/assets/atomic-logo.png'
+        action: 'view',
+        title: 'Voir',
+        icon: '/assets/atomic-logo-new.png'
       },
       {
-        action: 'close',
-        title: 'Fermer',
-        icon: '/assets/atomic-logo.png'
+        action: 'dismiss',
+        title: 'Ignorer'
       }
-    ]
+    ],
+    requireInteraction: true,
+    silent: false
   };
 
   event.waitUntil(
-    self.registration.showNotification('ATOMIC FLIX', options)
+    self.registration.showNotification(notificationData.title, options)
   );
 });
 
@@ -100,11 +121,58 @@ self.addEventListener('notificationclick', event => {
   
   event.notification.close();
   
-  if (event.action === 'explore') {
+  const notificationData = event.notification.data;
+  let targetUrl = '/';
+  
+  // Déterminer l'URL cible selon le type de notification
+  if (notificationData) {
+    switch (notificationData.type) {
+      case 'new-anime':
+        targetUrl = '/';
+        break;
+      case 'new-episode':
+        targetUrl = notificationData.animeId ? `/anime/${notificationData.animeId}` : '/';
+        break;
+      case 'watchlist-update':
+        targetUrl = '/';
+        break;
+      case 'trending':
+        targetUrl = '/';
+        break;
+      case 'reminder':
+        targetUrl = '/';
+        break;
+      default:
+        targetUrl = '/';
+    }
+  }
+  
+  // Actions spécifiques selon le bouton cliqué
+  if (event.action === 'explore' || event.action === 'view') {
     event.waitUntil(
-      clients.openWindow('/')
+      clients.openWindow(targetUrl)
+    );
+  } else if (event.action === 'dismiss' || event.action === 'close') {
+    // Fermer la notification seulement
+    return;
+  } else {
+    // Clic sur la notification principale
+    event.waitUntil(
+      clients.openWindow(targetUrl)
     );
   }
+  
+  // Envoyer un message au client principal
+  event.waitUntil(
+    clients.matchAll().then(clients => {
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'NOTIFICATION_CLICKED',
+          notification: notificationData
+        });
+      });
+    })
+  );
 });
 
 // Synchronisation périodique
@@ -125,6 +193,56 @@ async function doBackgroundSync() {
 // Fonction de mise à jour du contenu
 async function updateContent() {
   console.log('Updating content in background...');
-  // Ici vous pourriez pré-charger du nouveau contenu
+  
+  try {
+    // Vérifier les nouveaux animes populaires
+    const response = await fetch('https://anime-sama-scraper.vercel.app/api/trending');
+    const data = await response.json();
+    
+    if (data.success && data.results) {
+      // Sauvegarder les nouveaux contenus dans le cache
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put('/api/trending-cache', new Response(JSON.stringify(data)));
+      
+      // Vérifier s'il y a de nouveaux animes
+      const lastCheck = await cache.match('/api/last-check');
+      let lastCheckData = null;
+      
+      if (lastCheck) {
+        lastCheckData = await lastCheck.json();
+      }
+      
+      // Comparer avec les données précédentes
+      if (lastCheckData && lastCheckData.results) {
+        const newAnimes = data.results.filter(anime => 
+          !lastCheckData.results.some(oldAnime => oldAnime.id === anime.id)
+        );
+        
+        if (newAnimes.length > 0) {
+          // Envoyer notification pour les nouveaux animes
+          await self.registration.showNotification('Nouveaux animes disponibles!', {
+            body: `${newAnimes.length} nouveaux animes sont maintenant disponibles sur ATOMIC FLIX`,
+            icon: '/assets/atomic-logo-new.png',
+            badge: '/assets/atomic-logo-new.png',
+            data: {
+              type: 'new-anime',
+              count: newAnimes.length,
+              animes: newAnimes
+            },
+            actions: [
+              { action: 'view', title: 'Voir les nouveaux animes' },
+              { action: 'dismiss', title: 'Plus tard' }
+            ]
+          });
+        }
+      }
+      
+      // Sauvegarder la dernière vérification
+      await cache.put('/api/last-check', new Response(JSON.stringify(data)));
+    }
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du contenu:', error);
+  }
+  
   return Promise.resolve();
 }
