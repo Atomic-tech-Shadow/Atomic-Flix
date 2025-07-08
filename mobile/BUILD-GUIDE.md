@@ -22,10 +22,11 @@ mobile/
 
 ## 🚀 Build Instructions
 
-### 1. Installation des Dépendances
+### 1. Installation des Dépendances (Corrigées SDK 53)
 ```bash
 cd mobile
 ./expo-install-deps.sh
+npx expo doctor  # Vérifier les problèmes
 ```
 
 ### 2. Démarrage Dev
@@ -35,14 +36,24 @@ npx expo start
 
 ### 3. Build Production
 
-#### Android APK
+#### Android APK (Moderne avec EAS)
 ```bash
-npx expo build:android --type apk
+# Installation EAS CLI
+npm install -g @expo/eas-cli
+
+# Login Expo
+eas login
+
+# Configuration
+eas build:configure
+
+# Build APK
+eas build --platform android --profile preview
 ```
 
 #### iOS (nécessite Apple Developer)
 ```bash
-npx expo build:ios --type archive
+eas build --platform ios --profile preview
 ```
 
 ### 4. Build Local avec EAS
