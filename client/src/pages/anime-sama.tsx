@@ -331,7 +331,7 @@ const AnimeSamaPage: React.FC = () => {
               >
                 <div className="mb-4">
                   <h2 className="atomic-gradient-text text-xl font-bold flex items-center gap-2">
-                    📥 derniers épisodes ajoutés
+                    📢 Nouveaux épisodes ajoutés
                   </h2>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">

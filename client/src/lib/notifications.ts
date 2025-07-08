@@ -251,7 +251,7 @@ export class NotificationManager {
     }
 
     await this.showLocalNotification(
-      'New épisode ajouté 📢',
+      'Nouveaux épisodes ajoutés 📢',
       {
         body,
         tag: 'trending-update',
