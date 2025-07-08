@@ -288,10 +288,10 @@ const HomeScreen: React.FC = () => {
           )
         )}
 
-        {/* Contenu populaire si pas de recherche */}
+        {/* Contenu trending si pas de recherche */}
         {!searchQuery.trim() && (
           renderSection(
-            '🔥 Contenu Populaire',
+            '🔥 Contenu Trending',
             trendingAnimes,
             loading
           )

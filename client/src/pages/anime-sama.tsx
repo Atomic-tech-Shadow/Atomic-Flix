@@ -28,11 +28,11 @@ const AnimeSamaPage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [popularAnimes, setPopularAnimes] = useState<SearchResult[]>([]);
+  const [trendingAnimes, setTrendingAnimes] = useState<SearchResult[]>([]);
 
-  // Charger les animes populaires au démarrage
+  // Charger les animes trending au démarrage
   useEffect(() => {
-    loadPopularAnimes();
+    loadTrendingAnimes();
   }, []);
 
   // Écouter les changements d'URL pour les paramètres de recherche
@@ -46,22 +46,22 @@ const AnimeSamaPage: React.FC = () => {
     }
   }, [window.location.search]);
 
-  // Charger tout le contenu populaire depuis l'API
-  const loadPopularAnimes = async () => {
+  // Charger tout le contenu trending depuis l'API
+  const loadTrendingAnimes = async () => {
     try {
       const response = await animeAPI.getTrending();
       
       if (response && response.success && response.results) {
         // Afficher tous les types de contenu de l'API : animes, mangas, films
-        setPopularAnimes(response.results.slice(0, 24)); // Augmenter le nombre d'éléments affichés
-        console.log('Contenu populaire chargé:', response.results.length, 'éléments');
+        setTrendingAnimes(response.results.slice(0, 24)); // Augmenter le nombre d'éléments affichés
+        console.log('Contenu trending chargé:', response.results.length, 'éléments');
       } else {
         console.warn('Réponse API trending échouée:', response);
-        setPopularAnimes([]);
+        setTrendingAnimes([]);
       }
     } catch (error) {
       console.error('Erreur chargement trending:', error);
-      setPopularAnimes([]);
+      setTrendingAnimes([]);
     }
   };
 
@@ -270,7 +270,7 @@ const AnimeSamaPage: React.FC = () => {
             >
               {/* Images d'animes en mosaïque visible en haut */}
               <div className="flex h-24 md:h-32">
-                {popularAnimes.slice(0, 8).map((anime, index) => (
+                {trendingAnimes.slice(0, 8).map((anime, index) => (
                   <div
                     key={`hero-mosaic-${index}`}
                     className="flex-1 overflow-hidden"
@@ -321,8 +321,8 @@ const AnimeSamaPage: React.FC = () => {
 
             </motion.div>
 
-            {/* Section Animes Populaires */}
-            {popularAnimes.length > 0 && (
+            {/* Section Animes Trending */}
+            {trendingAnimes.length > 0 && (
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -331,13 +331,13 @@ const AnimeSamaPage: React.FC = () => {
               >
                 <div className="mb-4">
                   <h2 className="atomic-gradient-text text-xl font-bold flex items-center gap-2">
-                    🔥 Contenu Populaire 📈
+                    📥 derniers épisodes ajoutés
                   </h2>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                  {popularAnimes.map((anime, index) => (
+                  {trendingAnimes.map((anime, index) => (
                     <motion.div
-                      key={`popular-${anime.id}-${index}`}
+                      key={`trending-${anime.id}-${index}`}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.1, duration: 0.3 }}
@@ -398,7 +398,7 @@ const AnimeSamaPage: React.FC = () => {
                 <button 
                   onClick={() => {
                     setError(null);
-                    loadPopularAnimes();
+                    loadTrendingAnimes();
                   }}
                   className="mt-2 text-cyan-400 hover:text-cyan-300 transition-colors"
                 >
@@ -407,15 +407,15 @@ const AnimeSamaPage: React.FC = () => {
               </div>
             )}
 
-            {/* Message vide si pas de contenu populaire et pas de chargement */}
-            {!loading && !error && popularAnimes.length === 0 && (
+            {/* Message vide si pas de contenu trending et pas de chargement */}
+            {!loading && !error && trendingAnimes.length === 0 && (
               <div className="text-center py-8">
-                <p className="text-gray-400">Aucun contenu populaire trouvé</p>
+                <p className="text-gray-400">Aucun contenu trending trouvé</p>
                 <button 
-                  onClick={() => loadPopularAnimes()}
+                  onClick={() => loadTrendingAnimes()}
                   className="mt-2 text-cyan-400 hover:text-cyan-300 transition-colors"
                 >
-                  Charger le contenu populaire
+                  Charger le contenu trending
                 </button>
               </div>
             )}
