@@ -35,10 +35,6 @@ export function NotificationSetup() {
     }
   };
 
-  const testNotification = async () => {
-    await notificationManager.notifyNewAnime('Attack on Titan Final Season');
-  };
-
   if (!isSupported) {
     return null;
   }
@@ -49,14 +45,6 @@ export function NotificationSetup() {
         <div className="flex items-center gap-2">
           <Bell className="h-4 w-4 text-cyan-400" />
           <span className="text-sm text-green-400">Notifications activées</span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={testNotification}
-            className="text-xs"
-          >
-            Test
-          </Button>
         </div>
       ) : permission === 'denied' ? (
         <div className="flex items-center gap-2">
