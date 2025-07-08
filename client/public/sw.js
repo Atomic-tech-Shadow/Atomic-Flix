@@ -219,18 +219,24 @@ async function updateContent() {
         );
         
         if (newAnimes.length > 0) {
-          // Envoyer notification pour les nouveaux animes
-          await self.registration.showNotification('Nouveaux animes disponibles!', {
-            body: `${newAnimes.length} nouveaux animes sont maintenant disponibles sur ATOMIC FLIX`,
-            icon: '/assets/atomic-logo-new.png',
+          // Envoyer notification pour les nouveaux épisodes
+          const animeNames = newAnimes.slice(0, 3).map(anime => anime.title).join(', ');
+          const bodyText = newAnimes.length === 1 
+            ? `${animeNames} - nouvel épisode disponible`
+            : `${animeNames}${newAnimes.length > 3 ? ' et autres' : ''} - nouveaux épisodes disponibles`;
+            
+          await self.registration.showNotification('New épisode ajouté 📢', {
+            body: bodyText,
+            icon: newAnimes[0] ? newAnimes[0].image : '/assets/atomic-logo-new.png',
+            image: newAnimes[0] ? newAnimes[0].image : undefined,
             badge: '/assets/atomic-logo-new.png',
             data: {
-              type: 'new-anime',
+              type: 'new-episode',
               count: newAnimes.length,
               animes: newAnimes
             },
             actions: [
-              { action: 'view', title: 'Voir les nouveaux animes' },
+              { action: 'view', title: 'Voir les nouveaux épisodes' },
               { action: 'dismiss', title: 'Plus tard' }
             ]
           });

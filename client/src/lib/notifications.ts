@@ -212,21 +212,25 @@ export class NotificationManager {
 
   private async checkForNewContent(): Promise<void> {
     try {
-      // Vérifier s'il y a de nouveaux animes populaires
+      // Vérifier s'il y a de nouveaux animes trending
       const { animeAPI } = await import('./api');
       const response = await animeAPI.getTrending();
       
       if (response && response.success && response.results) {
         // Récupérer les derniers animes vus
         const lastSeenAnimes = JSON.parse(localStorage.getItem('atomic-flix-last-seen') || '[]');
-        const currentAnimes = response.results.slice(0, 5).map((anime: any) => anime.id);
+        const currentAnimes = response.results.slice(0, 5);
+        const currentAnimeIds = currentAnimes.map((anime: any) => anime.id);
         
         // Vérifier les nouveaux animes
-        const newAnimes = currentAnimes.filter((id: string) => !lastSeenAnimes.includes(id));
+        const newAnimeIds = currentAnimeIds.filter((id: string) => !lastSeenAnimes.includes(id));
         
-        if (newAnimes.length > 0) {
-          await this.notifyTrendingUpdate(newAnimes.length);
-          localStorage.setItem('atomic-flix-last-seen', JSON.stringify(currentAnimes));
+        if (newAnimeIds.length > 0) {
+          // Récupérer les données complètes des nouveaux animes
+          const newAnimes = currentAnimes.filter((anime: any) => newAnimeIds.includes(anime.id));
+          
+          await this.notifyTrendingUpdate(newAnimeIds.length, newAnimes);
+          localStorage.setItem('atomic-flix-last-seen', JSON.stringify(currentAnimeIds));
         }
       }
     } catch (error) {
@@ -235,13 +239,25 @@ export class NotificationManager {
   }
 
   // Nouvelles fonctions de notification
-  async notifyTrendingUpdate(count: number): Promise<void> {
+  async notifyTrendingUpdate(count: number, animes?: any[]): Promise<void> {
+    let body = `${count} nouveaux épisodes disponibles`;
+    
+    // Ajouter les noms des animes si disponibles
+    if (animes && animes.length > 0) {
+      const animeNames = animes.slice(0, 3).map(anime => anime.title).join(', ');
+      body = animes.length === 1 
+        ? `${animeNames} - nouvel épisode disponible`
+        : `${animeNames}${animes.length > 3 ? ' et autres' : ''} - nouveaux épisodes disponibles`;
+    }
+
     await this.showLocalNotification(
-      'Nouveaux animes populaires!',
+      'New épisode ajouté 📢',
       {
-        body: `${count} nouveaux animes sont maintenant populaires sur ATOMIC FLIX`,
+        body,
         tag: 'trending-update',
-        data: { type: 'trending', count }
+        icon: animes && animes[0] ? animes[0].image : '/assets/atomic-logo-new.png',
+        image: animes && animes[0] ? animes[0].image : undefined,
+        data: { type: 'trending', count, animes }
       }
     );
   }

@@ -36,9 +36,9 @@ export function NotificationWelcome() {
         
         // Envoyer une notification de bienvenue
         await notificationManager.showLocalNotification(
-          "Bienvenue sur ATOMIC FLIX!",
+          "Bienvenue sur ATOMIC FLIX! 📢",
           {
-            body: "Vous recevrez maintenant les dernières mises à jour d'animes et mangas",
+            body: "Vous recevrez maintenant les nouveaux épisodes ajoutés",
             tag: "welcome-notification"
           }
         );
@@ -109,7 +109,7 @@ export function NotificationWelcome() {
             <ul className="space-y-1 ml-4">
               <li className="flex items-center gap-2">
                 <Check className="w-3 h-3 text-cyan-400" />
-                <span>Nouveaux animes populaires</span>
+                <span>Nouveaux épisodes ajoutés</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-3 h-3 text-cyan-400" />
