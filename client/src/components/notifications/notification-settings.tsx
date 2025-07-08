@@ -111,38 +111,7 @@ export function NotificationSettings({ isOpen, onClose }: NotificationSettingsPr
     }
   };
 
-  const testNotification = async () => {
-    if (permissionStatus !== 'granted') {
-      toast({
-        title: "Permissions requises",
-        description: "Activez d'abord les notifications",
-        variant: "destructive"
-      });
-      return;
-    }
 
-    try {
-      await notificationManager.showLocalNotification(
-        "Test de notification",
-        {
-          body: "Ceci est une notification de test d'ATOMIC FLIX",
-          tag: "test-notification"
-        }
-      );
-      
-      toast({
-        title: "Notification envoyée",
-        description: "Vérifiez vos notifications système",
-      });
-    } catch (error) {
-      console.error('Erreur lors de l\'envoi de la notification de test:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer la notification de test",
-        variant: "destructive"
-      });
-    }
-  };
 
   if (!isOpen) return null;
 
@@ -252,15 +221,7 @@ export function NotificationSettings({ isOpen, onClose }: NotificationSettingsPr
                 </div>
               </div>
               
-              <div className="border-t border-gray-800 pt-4">
-                <Button
-                  onClick={testNotification}
-                  variant="outline"
-                  className="w-full border-gray-700 text-gray-300 hover:bg-gray-800"
-                >
-                  Tester les notifications
-                </Button>
-              </div>
+
             </div>
           )}
         </CardContent>

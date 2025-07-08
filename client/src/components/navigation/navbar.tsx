@@ -105,8 +105,8 @@ export function Navbar() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="space-y-1 pb-3 pt-2">
+          <div className="md:hidden border-t bg-background/95 backdrop-blur">
+            <div className="space-y-1 pb-3 pt-2 px-2">
               {navigation.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -114,10 +114,10 @@ export function Navbar() {
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      "flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                      "flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-medium transition-all duration-200 hover:bg-gray-800/50 hover:text-cyan-400",
                       location === item.href
-                        ? "bg-accent text-accent-foreground"
-                        : "text-muted-foreground"
+                        ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
+                        : "text-gray-300"
                     )}
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -127,9 +127,12 @@ export function Navbar() {
                 );
               })}
               
-              {/* Mobile Notifications */}
-              <div className="px-3 py-2">
-                <NotificationSetup />
+              {/* Mobile Notifications Settings */}
+              <div className="px-4 py-3 border-t border-gray-800 mt-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">Paramètres de notification</span>
+                  <NotificationButton />
+                </div>
               </div>
             </div>
 
