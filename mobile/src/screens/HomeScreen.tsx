@@ -291,7 +291,7 @@ const HomeScreen: React.FC = () => {
         {/* Contenu trending si pas de recherche */}
         {!searchQuery.trim() && (
           renderSection(
-            '🔥 Contenu Trending',
+            '📥 derniers épisodes ajoutés',
             trendingAnimes,
             loading
           )
