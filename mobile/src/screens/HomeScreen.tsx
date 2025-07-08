@@ -9,45 +9,50 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  StyleSheet,
+  SafeAreaView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
 import { SearchResult } from '../types';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
-const { width } = Dimensions.get('window');
-const cardWidth = (width - 48) / 2;
+const { width, height } = Dimensions.get('window');
 
-// Adaptation directe du code anime-sama.tsx
+// Reproduction exacte de anime-sama.tsx
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [trendingAnimes, setTrendingAnimes] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [popularAnimes, setPopularAnimes] = useState<SearchResult[]>([]);
 
-  // Configuration API externe identique au site web
+  // Configuration API identique au site web
   const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
 
-  // Fonction utilitaire pour les requêtes API (identique au site web)
-  const apiRequest = async (endpoint: string, options = {}) => {
-    const maxRetries = 2;
+  // Fonction API identique au site web
+  const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
+    const maxRetries = 3;
     let attempt = 0;
     
     while (attempt < maxRetries) {
       try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
           method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
           ...options
         });
-        
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }

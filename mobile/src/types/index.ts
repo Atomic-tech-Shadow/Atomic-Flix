@@ -1,10 +1,4 @@
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp: string;
-  meta?: any;
-}
-
+// Types identiques au site web pour assurer la synchronisation
 export interface SearchResult {
   id: string;
   title: string;
