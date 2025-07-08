@@ -10,7 +10,7 @@
     "check": "tsc"
   },
   "dependencies": {
-    "@expo/cli": "^0.24.17",
+    "@expo/cli": "^0.24.19",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@radix-ui/react-accordion": "^1.2.4",
@@ -46,6 +46,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^3.6.0",
+    "eas-cli": "^16.14.0",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^11.13.1",
     "input-otp": "^1.4.2",
