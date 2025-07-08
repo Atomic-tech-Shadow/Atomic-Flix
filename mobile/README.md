@@ -1,38 +1,29 @@
-# 🤖 ATOMIC FLIX Mobile - Build APK Termux
+# 🤖 ATOMIC FLIX Mobile - Build APK
 
-## Configuration Complète
+## Configuration React Native
 
-Application React Native optimisée pour build APK dans Termux, basée sur :
+Application mobile optimisée pour build APK :
 - **Expo SDK 53** + **React Native 0.79.3** + **React 19**
-- **EAS Build Cloud** (pas de SDK Android local requis)
-- **Termux optimizations** (wake lock, cache, storage)
+- **EAS Build Cloud** (compilation serveur)
+- **Termux compatible** avec optimisations spéciales
 
-## Quick Start Termux
+## Quick Start
 
-### 1. Setup Initial (une fois)
-```bash
-npm run termux:setup
-```
-
-### 2. Validation Configuration
-```bash
-npm run termux:validate
-```
-
-### 3. Build APK
-```bash
-npm run termux:build
-```
-
-## Build APK Standard
-
-### Méthode Cloud (Recommandée Termux)
+### Build APK Standard
 ```bash
 expo login
 eas build --platform android --profile preview
 ```
 
-### Scripts Disponibles
+### Build APK Termux
+```bash
+npm run termux:setup      # Configuration une fois
+npm run termux:validate   # Vérification environnement
+npm run termux:build      # Build APK optimisé
+```
+
+## Scripts Disponibles
+
 ```bash
 npm run start:tunnel        # Dev server avec tunnel
 npm run termux:setup        # Configuration Termux
@@ -42,25 +33,12 @@ npm run build:android       # Build APK standard
 npm run build:production    # Build production
 ```
 
-## Configuration Termux
-
-### Packages Requis
-- `nodejs-lts python build-essential git`
-- `@expo/cli eas-cli`
-- `termux-api` (pour wake lock)
-
-### Optimisations
-- **Wake lock**: `termux-wake-lock` avant builds longs
-- **Cache npm**: Configuration stockage interne
-- **Legacy deps**: `--legacy-peer-deps` pour React 19
-
 ## Fichiers Termux
 
 - `termux-setup.sh` - Configuration automatique
 - `termux-build-apk.sh` - Build APK optimisé
 - `termux-validate.sh` - Test environnement
-- `TERMUX-GUIDE.md` - Documentation complète
-- `TERMUX-FINAL.md` - Guide final
+- `TERMUX-FINAL.md` - Guide complet
 
 ## Résultat
 
