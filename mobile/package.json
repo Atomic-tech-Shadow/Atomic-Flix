@@ -6,7 +6,11 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "install-deps": "./expo-install-deps.sh",
+    "build:android": "npx expo build:android --type apk",
+    "build:ios": "npx expo build:ios --type archive",
+    "clean": "expo r -c"
   },
   "dependencies": {
     "expo": "~53.0.16",

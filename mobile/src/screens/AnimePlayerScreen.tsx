@@ -2,20 +2,23 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
+  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
+  StyleSheet,
+  SafeAreaView,
   Dimensions,
-  ScrollView,
+  Alert,
 } from 'react-native';
-import { WebView } from 'react-native-webview';
-import { useQuery } from '@tanstack/react-query';
-import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
+// Note: WebView nécessite installation manuelle avec --legacy-peer-deps
+// import { WebView } from 'react-native-webview';
+import { StatusBar } from 'expo-status-bar';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/Ionicons';
+import type { RouteProp } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
-import { animeAPI } from '../services/api';
-import { Episode, VideoSource, Season } from '../types';
+import { Episode, VideoSource, EpisodeDetails } from '../types/index';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type AnimePlayerScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AnimePlayer'>;
@@ -23,6 +26,7 @@ type AnimePlayerScreenRouteProp = RouteProp<RootStackParamList, 'AnimePlayer'>;
 
 const { width, height } = Dimensions.get('window');
 
+// Reproduction exacte de anime-player.tsx
 const AnimePlayerScreen: React.FC = () => {
   const navigation = useNavigation<AnimePlayerScreenNavigationProp>();
   const route = useRoute<AnimePlayerScreenRouteProp>();
@@ -30,247 +34,560 @@ const AnimePlayerScreen: React.FC = () => {
 
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
-  const [selectedServer, setSelectedServer] = useState<VideoSource | null>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState('VF');
-  const [showEpisodeList, setShowEpisodeList] = useState(false);
+  const [currentSources, setCurrentSources] = useState<VideoSource[]>([]);
+  const [selectedSource, setSelectedSource] = useState<VideoSource | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [episodeLoading, setEpisodeLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Chargement des données de l'anime pour obtenir les épisodes
-  const { data: animeData, isLoading: isAnimeLoading } = useQuery({
-    queryKey: ['anime', animeUrl],
-    queryFn: () => animeAPI.getAnimeData(animeUrl),
-    retry: 2,
-  });
+  // Configuration API identique au site web
+  const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
 
-  // Chargement des détails de l'épisode sélectionné
-  const { data: episodeData, isLoading: isEpisodeLoading } = useQuery({
-    queryKey: ['episode', currentEpisode?.url],
-    queryFn: () => currentEpisode ? animeAPI.getEpisodeDetails(currentEpisode.url) : null,
-    enabled: !!currentEpisode,
-    retry: 2,
-  });
+  // Fonction API identique au site web
+  const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
+    const maxRetries = 3;
+    let attempt = 0;
+    
+    while (attempt < maxRetries) {
+      try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          ...options
+        });
 
-  useEffect(() => {
-    if (animeData?.success && seasonData) {
-      // Simuler le chargement des épisodes de la saison sélectionnée
-      // En production, ceci devrait utiliser l'API pour charger les épisodes réels
-      const mockEpisodes: Episode[] = Array.from({ length: seasonData.episodeCount }, (_, i) => ({
-        id: `${seasonData.value}-ep-${i + 1}`,
-        title: `Épisode ${i + 1}`,
-        episodeNumber: i + 1,
-        url: `${seasonData.url}/episode-${i + 1}`,
-        language: selectedLanguage,
-        available: true,
-      }));
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error(data.error || 'API request failed');
+        }
+        return data;
+      } catch (error) {
+        attempt++;
+        console.warn(`API request attempt ${attempt} failed:`, error);
+        if (attempt >= maxRetries) {
+          throw error;
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      }
+    }
+  };
+
+  // Charger les épisodes de la saison (identique au site web)
+  const loadSeasonEpisodes = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiRequest(`/episodes/${encodeURIComponent(animeUrl)}/${seasonData.value}`);
+      const episodesList = response.data || [];
+      setEpisodes(episodesList);
       
-      setEpisodes(mockEpisodes);
-      if (mockEpisodes.length > 0) {
-        setCurrentEpisode(mockEpisodes[0]);
+      // Auto-charger le premier épisode
+      if (episodesList.length > 0) {
+        await loadEpisodeSources(episodesList[0]);
       }
+    } catch (error) {
+      console.error('Erreur lors du chargement des épisodes:', error);
+      setError('Impossible de charger les épisodes. Vérifiez votre connexion.');
+    } finally {
+      setLoading(false);
     }
-  }, [animeData, seasonData, selectedLanguage]);
+  };
 
-  useEffect(() => {
-    if (episodeData?.success && episodeData.data.sources.length > 0) {
-      setSelectedServer(episodeData.data.sources[0]);
-    }
-  }, [episodeData]);
-
-  const handleEpisodeSelect = (episode: Episode) => {
+  // Charger les sources d'un épisode (identique au site web)
+  const loadEpisodeSources = async (episode: Episode) => {
+    setEpisodeLoading(true);
     setCurrentEpisode(episode);
-    setShowEpisodeList(false);
-  };
+    setCurrentSources([]);
+    setSelectedSource(null);
 
-  const handleServerSelect = (server: VideoSource) => {
-    setSelectedServer(server);
-  };
-
-  const handleNextEpisode = () => {
-    if (currentEpisode && episodes.length > 0) {
-      const currentIndex = episodes.findIndex(ep => ep.id === currentEpisode.id);
-      if (currentIndex < episodes.length - 1) {
-        setCurrentEpisode(episodes[currentIndex + 1]);
+    try {
+      const response = await apiRequest(`/embed/${encodeURIComponent(episode.url)}`);
+      const sources = response.data || [];
+      setCurrentSources(sources);
+      
+      // Auto-sélectionner la première source
+      if (sources.length > 0) {
+        setSelectedSource(sources[0]);
       }
+    } catch (error) {
+      console.error('Erreur lors du chargement des sources:', error);
+      Alert.alert('Erreur', 'Impossible de charger les sources vidéo.');
+    } finally {
+      setEpisodeLoading(false);
     }
   };
 
-  const handlePreviousEpisode = () => {
-    if (currentEpisode && episodes.length > 0) {
-      const currentIndex = episodes.findIndex(ep => ep.id === currentEpisode.id);
-      if (currentIndex > 0) {
-        setCurrentEpisode(episodes[currentIndex - 1]);
-      }
-    }
-  };
+  // Effet initial
+  useEffect(() => {
+    loadSeasonEpisodes();
+  }, []);
 
-  if (isAnimeLoading) {
-    return (
-      <View style={{ flex: 1, backgroundColor: '#0f172a', justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#0ea5e9" />
-        <Text style={{ color: '#94a3b8', marginTop: 10 }}>Chargement des épisodes...</Text>
+  // Composant Header avec navigation
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons name="arrow-back" size={24} color="#ffffff" />
+      </TouchableOpacity>
+      <View style={styles.headerInfo}>
+        <Text style={styles.headerTitle} numberOfLines={1}>
+          {animeTitle}
+        </Text>
+        <Text style={styles.headerSubtitle} numberOfLines={1}>
+          {seasonData.name} • {currentEpisode ? `Épisode ${currentEpisode.episodeNumber}` : 'Chargement...'}
+        </Text>
       </View>
+    </View>
+  );
+
+  // Composant Lecteur Vidéo
+  const renderVideoPlayer = () => {
+    if (!selectedSource) {
+      return (
+        <View style={styles.playerContainer}>
+          <View style={styles.playerPlaceholder}>
+            <Ionicons name="play-circle" size={64} color="#6b7280" />
+            <Text style={styles.placeholderText}>
+              {episodeLoading ? 'Chargement...' : 'Sélectionnez un épisode'}
+            </Text>
+          </View>
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.playerContainer}>
+        {/* WebView temporairement remplacé par placeholder */}
+        <View style={styles.webViewPlaceholder}>
+          <Ionicons name="videocam" size={64} color="#00ffff" />
+          <Text style={styles.webViewPlaceholderText}>
+            Lecteur vidéo
+          </Text>
+          <Text style={styles.webViewUrl} numberOfLines={1}>
+            {selectedSource.url}
+          </Text>
+          <Text style={styles.webViewNote}>
+            📱 Installation WebView requise pour la lecture vidéo
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  // Composant Sélecteur de Serveurs
+  const renderServerSelector = () => {
+    if (currentSources.length === 0) return null;
+
+    return (
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Ionicons name="server" size={20} color="#00ffff" />
+          <Text style={styles.sectionTitle}>
+            Serveurs disponibles ({currentSources.length})
+          </Text>
+        </View>
+        
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.serversContainer}>
+            {currentSources.map((source, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.serverButton,
+                  selectedSource?.url === source.url && styles.serverButtonActive
+                ]}
+                onPress={() => setSelectedSource(source)}
+                activeOpacity={0.8}
+              >
+                <View style={styles.serverButtonContent}>
+                  <Ionicons 
+                    name="play" 
+                    size={16} 
+                    color={selectedSource?.url === source.url ? "#ffffff" : "#00ffff"} 
+                  />
+                  <Text style={[
+                    styles.serverButtonText,
+                    selectedSource?.url === source.url && styles.serverButtonTextActive
+                  ]}>
+                    {source.server || `Serveur ${index + 1}`}
+                  </Text>
+                </View>
+                {source.quality && (
+                  <Text style={styles.serverQuality}>{source.quality}</Text>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  };
+
+  // Composant Liste des Épisodes
+  const renderEpisodesList = () => {
+    if (episodes.length === 0) return null;
+
+    return (
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Ionicons name="list" size={20} color="#00ffff" />
+          <Text style={styles.sectionTitle}>
+            Épisodes ({episodes.length})
+          </Text>
+        </View>
+        
+        <View style={styles.episodesGrid}>
+          {episodes.map((episode, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.episodeButton,
+                currentEpisode?.episodeNumber === episode.episodeNumber && styles.episodeButtonActive,
+                !episode.available && styles.episodeButtonDisabled
+              ]}
+              onPress={() => episode.available ? loadEpisodeSources(episode) : null}
+              disabled={!episode.available || episodeLoading}
+              activeOpacity={0.8}
+            >
+              <View style={styles.episodeButtonContent}>
+                <View style={styles.episodeIcon}>
+                  {episodeLoading && currentEpisode?.episodeNumber === episode.episodeNumber ? (
+                    <ActivityIndicator size="small" color="#00ffff" />
+                  ) : (
+                    <Ionicons 
+                      name={episode.available ? "play" : "lock-closed"} 
+                      size={16} 
+                      color={
+                        currentEpisode?.episodeNumber === episode.episodeNumber 
+                          ? "#ffffff" 
+                          : episode.available 
+                            ? "#00ffff" 
+                            : "#6b7280"
+                      } 
+                    />
+                  )}
+                </View>
+                
+                <View style={styles.episodeInfo}>
+                  <Text style={[
+                    styles.episodeNumber,
+                    currentEpisode?.episodeNumber === episode.episodeNumber && styles.episodeNumberActive,
+                    !episode.available && styles.episodeNumberDisabled
+                  ]}>
+                    Épisode {episode.episodeNumber}
+                  </Text>
+                  
+                  {episode.title && (
+                    <Text style={[
+                      styles.episodeTitle,
+                      currentEpisode?.episodeNumber === episode.episodeNumber && styles.episodeTitleActive,
+                      !episode.available && styles.episodeTitleDisabled
+                    ]} numberOfLines={1}>
+                      {episode.title}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  // État de chargement
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" backgroundColor="#0a0a0a" />
+        {renderHeader()}
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#00ffff" />
+          <Text style={styles.loadingText}>Chargement des épisodes...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // État d'erreur
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" backgroundColor="#0a0a0a" />
+        {renderHeader()}
+        <View style={styles.errorContainer}>
+          <Ionicons name="warning" size={48} color="#ef4444" />
+          <Text style={styles.errorTitle}>Erreur</Text>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={loadSeasonEpisodes}>
+            <Text style={styles.retryText}>Réessayer</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#0f172a' }}>
-      {/* Lecteur vidéo */}
-      <View style={{ height: height * 0.3, backgroundColor: '#000' }}>
-        {isEpisodeLoading ? (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator size="large" color="#0ea5e9" />
-            <Text style={{ color: '#94a3b8', marginTop: 10 }}>Chargement du lecteur...</Text>
-          </View>
-        ) : selectedServer ? (
-          <WebView
-            source={{ uri: selectedServer.url }}
-            style={{ flex: 1 }}
-            allowsFullscreenVideo
-            mediaPlaybackRequiresUserAction={false}
-            startInLoadingState={true}
-            renderLoading={() => (
-              <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' }}>
-                <ActivityIndicator size="large" color="#0ea5e9" />
-              </View>
-            )}
-          />
-        ) : (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Icon name="tv" size={48} color="#6b7280" />
-            <Text style={{ color: '#94a3b8', marginTop: 10 }}>Aucun serveur disponible</Text>
-          </View>
-        )}
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="light" backgroundColor="#0a0a0a" />
+      
+      <View style={styles.content}>
+        {renderHeader()}
+        {renderVideoPlayer()}
+        
+        <ScrollView 
+          style={styles.controlsScrollView}
+          showsVerticalScrollIndicator={false}
+        >
+          {renderServerSelector()}
+          {renderEpisodesList()}
+        </ScrollView>
       </View>
-
-      {/* Contrôles et informations */}
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
-        {/* Titre de l'épisode */}
-        <Text style={{ color: '#f8fafc', fontSize: 20, fontWeight: 'bold', marginBottom: 5 }}>
-          {currentEpisode?.title || 'Sélectionnez un épisode'}
-        </Text>
-        <Text style={{ color: '#94a3b8', fontSize: 14, marginBottom: 20 }}>
-          {animeTitle} • Saison {seasonData.number}
-        </Text>
-
-        {/* Contrôles de navigation des épisodes */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
-          <TouchableOpacity
-            onPress={handlePreviousEpisode}
-            disabled={!currentEpisode || episodes.findIndex(ep => ep.id === currentEpisode.id) === 0}
-            style={{
-              backgroundColor: '#334155',
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingHorizontal: 15,
-              paddingVertical: 10,
-              borderRadius: 20,
-              opacity: (!currentEpisode || episodes.findIndex(ep => ep.id === currentEpisode.id) === 0) ? 0.5 : 1,
-            }}
-          >
-            <Icon name="chevron-back" size={16} color="#f8fafc" />
-            <Text style={{ color: '#f8fafc', marginLeft: 5 }}>Précédent</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setShowEpisodeList(!showEpisodeList)}
-            style={{
-              backgroundColor: '#0ea5e9',
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingHorizontal: 15,
-              paddingVertical: 10,
-              borderRadius: 20,
-            }}
-          >
-            <Icon name="list" size={16} color="white" />
-            <Text style={{ color: 'white', marginLeft: 5 }}>Épisodes</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handleNextEpisode}
-            disabled={!currentEpisode || episodes.findIndex(ep => ep.id === currentEpisode.id) === episodes.length - 1}
-            style={{
-              backgroundColor: '#334155',
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingHorizontal: 15,
-              paddingVertical: 10,
-              borderRadius: 20,
-              opacity: (!currentEpisode || episodes.findIndex(ep => ep.id === currentEpisode.id) === episodes.length - 1) ? 0.5 : 1,
-            }}
-          >
-            <Text style={{ color: '#f8fafc', marginRight: 5 }}>Suivant</Text>
-            <Icon name="chevron-forward" size={16} color="#f8fafc" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Sélecteur de serveur */}
-        {episodeData?.success && episodeData.data.sources.length > 0 && (
-          <>
-            <Text style={{ color: '#f8fafc', fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
-              Serveurs disponibles
-            </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
-              {episodeData.data.sources.map((server, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handleServerSelect(server)}
-                  style={{
-                    backgroundColor: selectedServer?.server === server.server ? '#0ea5e9' : '#334155',
-                    paddingHorizontal: 15,
-                    paddingVertical: 8,
-                    borderRadius: 20,
-                    marginRight: 10,
-                  }}
-                >
-                  <Text style={{
-                    color: selectedServer?.server === server.server ? 'white' : '#94a3b8',
-                    fontWeight: selectedServer?.server === server.server ? 'bold' : 'normal',
-                  }}>
-                    {server.server} - {server.quality}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </>
-        )}
-
-        {/* Liste des épisodes */}
-        {showEpisodeList && (
-          <>
-            <Text style={{ color: '#f8fafc', fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
-              Liste des épisodes
-            </Text>
-            {episodes.map((episode, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => handleEpisodeSelect(episode)}
-                style={{
-                  backgroundColor: currentEpisode?.id === episode.id ? '#0ea5e9' : '#1e293b',
-                  padding: 15,
-                  borderRadius: 12,
-                  marginBottom: 10,
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <Text style={{
-                  color: currentEpisode?.id === episode.id ? 'white' : '#f8fafc',
-                  fontSize: 16,
-                  fontWeight: currentEpisode?.id === episode.id ? 'bold' : 'normal',
-                }}>
-                  {episode.title}
-                </Text>
-                {currentEpisode?.id === episode.id && (
-                  <Icon name="play-circle" size={20} color="white" />
-                )}
-              </TouchableOpacity>
-            ))}
-          </>
-        )}
-      </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0a0a0a',
+  },
+  content: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: 'rgba(10,10,10,0.95)',
+  },
+  backButton: {
+    padding: 8,
+    marginRight: 12,
+  },
+  headerInfo: {
+    flex: 1,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#9ca3af',
+    marginTop: 2,
+  },
+  playerContainer: {
+    height: height * 0.25,
+    backgroundColor: '#000000',
+    position: 'relative',
+  },
+  webViewPlaceholder: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1a1a1a',
+    paddingHorizontal: 20,
+  },
+  webViewPlaceholderText: {
+    color: '#00ffff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 12,
+  },
+  webViewUrl: {
+    color: '#9ca3af',
+    fontSize: 12,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  webViewNote: {
+    color: '#6b7280',
+    fontSize: 11,
+    marginTop: 12,
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  playerPlaceholder: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1a1a1a',
+  },
+  placeholderText: {
+    color: '#6b7280',
+    marginTop: 12,
+    fontSize: 16,
+  },
+  controlsScrollView: {
+    flex: 1,
+  },
+  section: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginLeft: 8,
+  },
+  serversContainer: {
+    flexDirection: 'row',
+    paddingVertical: 8,
+  },
+  serverButton: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0,255,255,0.2)',
+    minWidth: 100,
+  },
+  serverButtonActive: {
+    backgroundColor: '#00ffff',
+    borderColor: '#00ffff',
+  },
+  serverButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  serverButtonText: {
+    color: '#00ffff',
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  serverButtonTextActive: {
+    color: '#ffffff',
+  },
+  serverQuality: {
+    color: '#9ca3af',
+    fontSize: 10,
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  episodesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  episodeButton: {
+    width: '48%',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0,255,255,0.2)',
+  },
+  episodeButtonActive: {
+    backgroundColor: 'rgba(0,255,255,0.2)',
+    borderColor: '#00ffff',
+  },
+  episodeButtonDisabled: {
+    opacity: 0.5,
+    borderColor: 'rgba(107,114,128,0.2)',
+  },
+  episodeButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+  },
+  episodeIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  episodeInfo: {
+    flex: 1,
+  },
+  episodeNumber: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  episodeNumberActive: {
+    color: '#00ffff',
+  },
+  episodeNumberDisabled: {
+    color: '#6b7280',
+  },
+  episodeTitle: {
+    fontSize: 11,
+    color: '#9ca3af',
+    marginTop: 2,
+  },
+  episodeTitleActive: {
+    color: '#d1d5db',
+  },
+  episodeTitleDisabled: {
+    color: '#6b7280',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    color: '#9ca3af',
+    marginTop: 12,
+    fontSize: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ef4444',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  errorText: {
+    color: '#9ca3af',
+    textAlign: 'center',
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  retryButton: {
+    backgroundColor: '#ef4444',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryText: {
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+});
 
 export default AnimePlayerScreen;

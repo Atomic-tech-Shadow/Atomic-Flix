@@ -6,23 +6,27 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  StyleSheet,
+  SafeAreaView,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/Ionicons';
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import type { RouteProp } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
-import { Season, AnimeData } from '../types';
+import { AnimeData, Season } from '../types/index';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type AnimeDetailScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AnimeDetail'>;
 type AnimeDetailScreenRouteProp = RouteProp<RootStackParamList, 'AnimeDetail'>;
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-// Direct adaptation of anime.tsx
+// Reproduction exacte de anime.tsx
 const AnimeDetailScreen: React.FC = () => {
   const navigation = useNavigation<AnimeDetailScreenNavigationProp>();
   const route = useRoute<AnimeDetailScreenRouteProp>();
@@ -32,343 +36,513 @@ const AnimeDetailScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Configuration API externe (identique au site web)
+  // Configuration API identique au site web
   const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
 
-  // Fonction pour les requêtes API avec timeout (identique au site web)
-  const apiRequest = async (endpoint: string, timeoutMs = 20000) => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  // Fonction API identique au site web
+  const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
+    const maxRetries = 3;
+    let attempt = 0;
     
-    try {
-      console.log('Requête API:', endpoint);
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    while (attempt < maxRetries) {
+      try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          ...options
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error(data.error || 'API request failed');
+        }
+        return data;
+      } catch (error) {
+        attempt++;
+        console.warn(`API request attempt ${attempt} failed:`, error);
+        if (attempt >= maxRetries) {
+          throw error;
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
       }
-      
-      const data = await response.json();
-      console.log('Données reçues:', data);
-      return data;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('Timeout: La requête a pris trop de temps');
-      }
-      throw error;
     }
   };
 
-  // Charger les données d'anime (identique au site web)
+  // Charger les données de l'anime (identique au site web)
   const loadAnimeData = async () => {
-    if (!animeUrl) return;
-    
     setLoading(true);
     setError(null);
-    
+
     try {
-      const response = await apiRequest(`/api/anime?url=${encodeURIComponent(animeUrl)}`);
-      
-      if (response && response.success && response.data) {
-        console.log('Données anime reçues:', response.data);
-        setAnimeData(response.data);
-      } else {
-        throw new Error('Données anime invalides');
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
-      console.error('Erreur chargement anime:', errorMessage);
-      
-      if (errorMessage.includes('Timeout')) {
-        setError('Le chargement prend trop de temps. Vérifiez votre connexion internet.');
-      } else if (errorMessage.includes('404')) {
-        setError('Cet anime n\'existe pas ou n\'est plus disponible.');
-      } else if (errorMessage.includes('500')) {
-        setError('Erreur temporaire du serveur. Veuillez réessayer plus tard.');
-      } else {
-        setError('Impossible de charger les détails de l\'anime. Veuillez réessayer.');
-      }
+      const response = await apiRequest(`/anime/${encodeURIComponent(animeUrl)}`);
+      setAnimeData(response.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des données de l\'anime:', error);
+      setError('Impossible de charger les données de l\'anime. Vérifiez votre connexion.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Charger les données au montage du composant
+  // Navigation vers le lecteur (identique au site web)
+  const goToPlayer = (season: Season) => {
+    if (!animeData) return;
+
+    navigation.navigate('AnimePlayer', {
+      animeUrl: animeData.url,
+      seasonData: season,
+      animeTitle: animeData.title,
+    });
+  };
+
+  // Effet initial
   useEffect(() => {
     loadAnimeData();
   }, [animeUrl]);
 
-  const handleSeasonPress = (season: Season) => {
-    if (season.available) {
-      navigation.navigate('AnimePlayer', {
-        animeUrl,
-        seasonData: season,
-        animeTitle,
-      });
-    } else {
-      Alert.alert('Non disponible', 'Cette saison n\'est pas encore disponible.');
-    }
-  };
+  // Composant Header avec navigation
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons name="arrow-back" size={24} color="#ffffff" />
+      </TouchableOpacity>
+      <Text style={styles.headerTitle} numberOfLines={1}>
+        {animeTitle}
+      </Text>
+    </View>
+  );
 
-  const handleMangaPress = () => {
-    navigation.navigate('MangaReader', {
-      mangaUrl: animeUrl,
-      mangaTitle: animeTitle,
-    });
-  };
+  // Composant Banner principal
+  const renderBanner = () => {
+    if (!animeData) return null;
 
-  const getAvailableLanguages = () => {
-    if (!animeData?.success || !animeData.data.seasons) return [];
-    const languages = new Set<string>();
-    animeData.data.seasons.forEach(season => {
-      season.languages.forEach(lang => languages.add(lang));
-    });
-    return Array.from(languages);
-  };
-
-  const getFilteredSeasons = () => {
-    if (!animeData?.success || !animeData.data.seasons) return [];
-    return animeData.data.seasons.filter(season => 
-      season.languages.includes(selectedLanguage)
-    );
-  };
-
-  if (isLoading) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#0f172a', justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#0ea5e9" />
-        <Text style={{ color: '#94a3b8', marginTop: 10 }}>Chargement...</Text>
-      </View>
-    );
-  }
-
-  if (error || !animeData?.success) {
-    return (
-      <View style={{ flex: 1, backgroundColor: '#0f172a', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-        <Icon name="alert-circle" size={48} color="#ef4444" />
-        <Text style={{ color: '#ef4444', marginTop: 10, textAlign: 'center' }}>
-          Erreur lors du chargement des détails
-        </Text>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{
-            backgroundColor: '#0ea5e9',
-            paddingHorizontal: 20,
-            paddingVertical: 10,
-            borderRadius: 20,
-            marginTop: 20,
-          }}
-        >
-          <Text style={{ color: 'white', fontWeight: 'bold' }}>Retour</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  const anime = animeData.data;
-  const availableLanguages = getAvailableLanguages();
-  const filteredSeasons = getFilteredSeasons();
-
-  return (
-    <ScrollView style={{ flex: 1, backgroundColor: '#0f172a' }}>
-      {/* Image de couverture avec overlay */}
-      <View style={{ position: 'relative', height: 300 }}>
+      <View style={styles.bannerContainer}>
         <Image
-          source={{ uri: anime.image }}
-          style={{ width: '100%', height: '100%' }}
+          source={{ uri: animeData.image }}
+          style={styles.bannerImage}
           resizeMode="cover"
         />
         <LinearGradient
-          colors={['transparent', 'rgba(15, 23, 42, 0.8)', '#0f172a']}
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 150,
-          }}
+          colors={['transparent', 'rgba(0,0,0,0.8)', '#0a0a0a']}
+          style={styles.bannerGradient}
         />
-      </View>
-
-      <View style={{ padding: 20 }}>
-        {/* Titre et informations de base */}
-        <Text style={{ color: '#f8fafc', fontSize: 24, fontWeight: 'bold', marginBottom: 10 }}>
-          {anime.title}
-        </Text>
-
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 15 }}>
-          <View style={{
-            backgroundColor: '#0ea5e9',
-            paddingHorizontal: 8,
-            paddingVertical: 4,
-            borderRadius: 6,
-            marginRight: 8,
-            marginBottom: 8,
-          }}>
-            <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-              {anime.status}
-            </Text>
-          </View>
-          <View style={{
-            backgroundColor: '#d946ef',
-            paddingHorizontal: 8,
-            paddingVertical: 4,
-            borderRadius: 6,
-            marginRight: 8,
-            marginBottom: 8,
-          }}>
-            <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-              {anime.year}
-            </Text>
-          </View>
-        </View>
-
-        {/* Genres */}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 20 }}>
-          {anime.genres.map((genre, index) => (
-            <View
-              key={index}
-              style={{
-                backgroundColor: '#334155',
-                paddingHorizontal: 8,
-                paddingVertical: 4,
-                borderRadius: 6,
-                marginRight: 8,
-                marginBottom: 8,
-              }}
-            >
-              <Text style={{ color: '#94a3b8', fontSize: 12 }}>{genre}</Text>
+        
+        <View style={styles.bannerContent}>
+          <Image
+            source={{ uri: animeData.image }}
+            style={styles.posterImage}
+            resizeMode="cover"
+          />
+          
+          <View style={styles.bannerInfo}>
+            <Text style={styles.animeTitle}>{animeData.title}</Text>
+            
+            <View style={styles.metaContainer}>
+              <View style={styles.statusBadge}>
+                <Text style={styles.statusText}>{animeData.status}</Text>
+              </View>
+              {animeData.year && (
+                <Text style={styles.yearText}>{animeData.year}</Text>
+              )}
             </View>
-          ))}
-        </View>
 
-        {/* Synopsis */}
-        <Text style={{ color: '#f8fafc', fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
-          Synopsis
-        </Text>
-        <Text style={{ color: '#94a3b8', fontSize: 14, lineHeight: 20, marginBottom: 20 }}>
-          {anime.synopsis}
-        </Text>
-
-        {/* Sélecteur de langue */}
-        {availableLanguages.length > 1 && (
-          <>
-            <Text style={{ color: '#f8fafc', fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
-              Langue
-            </Text>
-            <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-              {availableLanguages.map((language) => (
-                <TouchableOpacity
-                  key={language}
-                  onPress={() => setSelectedLanguage(language)}
-                  style={{
-                    backgroundColor: selectedLanguage === language ? '#0ea5e9' : '#334155',
-                    paddingHorizontal: 15,
-                    paddingVertical: 8,
-                    borderRadius: 20,
-                    marginRight: 10,
-                  }}
-                >
-                  <Text style={{
-                    color: selectedLanguage === language ? 'white' : '#94a3b8',
-                    fontWeight: selectedLanguage === language ? 'bold' : 'normal',
-                  }}>
-                    {language}
-                  </Text>
-                </TouchableOpacity>
+            <View style={styles.genresContainer}>
+              {animeData.genres.slice(0, 3).map((genre, index) => (
+                <View key={index} style={styles.genreBadge}>
+                  <Text style={styles.genreText}>{genre}</Text>
+                </View>
               ))}
             </View>
-          </>
-        )}
-
-        {/* Bouton Manga (si disponible) */}
-        <TouchableOpacity
-          onPress={handleMangaPress}
-          style={{
-            backgroundColor: '#d946ef',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 15,
-            borderRadius: 25,
-            marginBottom: 20,
-          }}
-        >
-          <Icon name="book" size={20} color="white" style={{ marginRight: 8 }} />
-          <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>
-            Lire le Manga
-          </Text>
-        </TouchableOpacity>
-
-        {/* Liste des saisons */}
-        <Text style={{ color: '#f8fafc', fontSize: 16, fontWeight: 'bold', marginBottom: 15 }}>
-          Saisons disponibles
-        </Text>
-
-        {filteredSeasons.length === 0 ? (
-          <View style={{
-            backgroundColor: '#1e293b',
-            padding: 20,
-            borderRadius: 12,
-            alignItems: 'center',
-          }}>
-            <Icon name="warning" size={32} color="#f59e0b" />
-            <Text style={{ color: '#f59e0b', marginTop: 10, textAlign: 'center' }}>
-              Aucune saison disponible en {selectedLanguage}
-            </Text>
           </View>
-        ) : (
-          filteredSeasons.map((season, index) => (
+        </View>
+      </View>
+    );
+  };
+
+  // Composant Synopsis
+  const renderSynopsis = () => {
+    if (!animeData?.synopsis) return null;
+
+    return (
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Ionicons name="information-circle" size={20} color="#00ffff" />
+          <Text style={styles.sectionTitle}>Synopsis</Text>
+        </View>
+        <Text style={styles.synopsisText}>{animeData.synopsis}</Text>
+      </View>
+    );
+  };
+
+  // Composant Grille des Saisons
+  const renderSeasons = () => {
+    if (!animeData?.seasons || animeData.seasons.length === 0) return null;
+
+    return (
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Ionicons name="play-circle" size={20} color="#00ffff" />
+          <Text style={styles.sectionTitle}>
+            Saisons disponibles ({animeData.seasons.length})
+          </Text>
+        </View>
+        
+        <View style={styles.seasonsGrid}>
+          {animeData.seasons.map((season, index) => (
             <TouchableOpacity
               key={index}
-              onPress={() => handleSeasonPress(season)}
+              style={[
+                styles.seasonCard,
+                !season.available && styles.seasonCardDisabled
+              ]}
+              onPress={() => season.available ? goToPlayer(season) : null}
               disabled={!season.available}
-              style={{
-                backgroundColor: season.available ? '#1e293b' : '#374151',
-                padding: 15,
-                borderRadius: 12,
-                marginBottom: 10,
-                opacity: season.available ? 1 : 0.6,
-              }}
+              activeOpacity={0.8}
             >
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <View style={{ flex: 1 }}>
-                  <Text style={{
-                    color: season.available ? '#f8fafc' : '#94a3b8',
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    marginBottom: 4,
-                  }}>
+              <View style={styles.seasonCardContent}>
+                <View style={styles.seasonIcon}>
+                  <Ionicons 
+                    name={season.available ? "play" : "lock-closed"} 
+                    size={24} 
+                    color={season.available ? "#00ffff" : "#6b7280"} 
+                  />
+                </View>
+                
+                <View style={styles.seasonInfo}>
+                  <Text style={[
+                    styles.seasonName,
+                    !season.available && styles.seasonNameDisabled
+                  ]}>
                     {season.name}
                   </Text>
-                  <Text style={{
-                    color: '#94a3b8',
-                    fontSize: 14,
-                  }}>
-                    {season.episodeCount} épisodes • {season.languages.join(', ')}
+                  
+                  <Text style={[
+                    styles.seasonMeta,
+                    !season.available && styles.seasonMetaDisabled
+                  ]}>
+                    {season.episodeCount} épisodes
                   </Text>
+                  
+                  <View style={styles.seasonLanguages}>
+                    {season.languages.map((lang, langIndex) => (
+                      <View key={langIndex} style={styles.languageBadge}>
+                        <Text style={styles.languageText}>{lang}</Text>
+                      </View>
+                    ))}
+                  </View>
                 </View>
-                <Icon
-                  name={season.available ? "play-circle" : "lock-closed"}
-                  size={24}
-                  color={season.available ? "#0ea5e9" : "#6b7280"}
-                />
+
+                {season.available && (
+                  <Ionicons name="chevron-forward" size={20} color="#6b7280" />
+                )}
               </View>
             </TouchableOpacity>
-          ))
-        )}
+          ))}
+        </View>
       </View>
-    </ScrollView>
+    );
+  };
+
+  // État de chargement
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" backgroundColor="#0a0a0a" />
+        {renderHeader()}
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#00ffff" />
+          <Text style={styles.loadingText}>Chargement de l'anime...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // État d'erreur
+  if (error || !animeData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" backgroundColor="#0a0a0a" />
+        {renderHeader()}
+        <View style={styles.errorContainer}>
+          <Ionicons name="warning" size={48} color="#ef4444" />
+          <Text style={styles.errorTitle}>Erreur</Text>
+          <Text style={styles.errorText}>
+            {error || 'Impossible de charger les données de l\'anime'}
+          </Text>
+          <TouchableOpacity style={styles.retryButton} onPress={loadAnimeData}>
+            <Text style={styles.retryText}>Réessayer</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="light" backgroundColor="#0a0a0a" />
+      
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        {renderBanner()}
+        {renderSynopsis()}
+        {renderSeasons()}
+      </ScrollView>
+
+      {/* Header flottant */}
+      <View style={styles.floatingHeader}>
+        {renderHeader()}
+      </View>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0a0a0a',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  floatingHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    backgroundColor: 'rgba(10,10,10,0.9)',
+    paddingTop: 40,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  backButton: {
+    padding: 8,
+    marginRight: 12,
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  bannerContainer: {
+    position: 'relative',
+    height: height * 0.5,
+  },
+  bannerImage: {
+    width: '100%',
+    height: '100%',
+  },
+  bannerGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '60%',
+  },
+  bannerContent: {
+    position: 'absolute',
+    bottom: 20,
+    left: 16,
+    right: 16,
+    flexDirection: 'row',
+  },
+  posterImage: {
+    width: 120,
+    height: 170,
+    borderRadius: 12,
+    marginRight: 16,
+  },
+  bannerInfo: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  animeTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 8,
+    lineHeight: 28,
+  },
+  metaContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  statusBadge: {
+    backgroundColor: 'rgba(0,255,255,0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginRight: 12,
+  },
+  statusText: {
+    color: '#00ffff',
+    fontWeight: '600',
+    fontSize: 12,
+  },
+  yearText: {
+    color: '#9ca3af',
+    fontSize: 14,
+  },
+  genresContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  genreBadge: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginRight: 8,
+    marginBottom: 4,
+  },
+  genreText: {
+    color: '#d1d5db',
+    fontSize: 10,
+  },
+  section: {
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginLeft: 8,
+  },
+  synopsisText: {
+    color: '#d1d5db',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  seasonsGrid: {
+    gap: 12,
+  },
+  seasonCard: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(0,255,255,0.2)',
+    overflow: 'hidden',
+  },
+  seasonCardDisabled: {
+    opacity: 0.5,
+    borderColor: 'rgba(107,114,128,0.2)',
+  },
+  seasonCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  seasonIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(0,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  seasonInfo: {
+    flex: 1,
+  },
+  seasonName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 4,
+  },
+  seasonNameDisabled: {
+    color: '#6b7280',
+  },
+  seasonMeta: {
+    fontSize: 12,
+    color: '#9ca3af',
+    marginBottom: 8,
+  },
+  seasonMetaDisabled: {
+    color: '#6b7280',
+  },
+  seasonLanguages: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  languageBadge: {
+    backgroundColor: 'rgba(0,255,255,0.2)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginRight: 4,
+  },
+  languageText: {
+    color: '#00ffff',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    color: '#9ca3af',
+    marginTop: 12,
+    fontSize: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ef4444',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  errorText: {
+    color: '#9ca3af',
+    textAlign: 'center',
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  retryButton: {
+    backgroundColor: '#ef4444',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryText: {
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+});
 
 export default AnimeDetailScreen;

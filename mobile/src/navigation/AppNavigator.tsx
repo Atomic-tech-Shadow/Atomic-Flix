@@ -3,11 +3,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 
-// Import screens
-import HomeScreen from '../screens/HomeScreen_new';
-import AnimeDetailScreen from '../screens/AnimeDetailScreen_exact';
-import AnimePlayerScreen from '../screens/AnimePlayerScreen_exact';
-import MangaReaderScreen from '../screens/MangaReaderScreen_exact';
+// Import screens - exact reproductions of web pages
+import HomeScreen from '../screens/HomeScreen';
+import AnimeDetailScreen from '../screens/AnimeDetailScreen';
+import AnimePlayerScreen from '../screens/AnimePlayerScreen';
+import MangaReaderScreen from '../screens/MangaReaderScreen';
 
 export type RootStackParamList = {
   Home: undefined;
