@@ -1,0 +1,64 @@
+{
+  "appName": "ATOMIC FLIX",
+  "packageName": "com.atomicflix.app",
+  "version": "1.0.0",
+  "versionCode": 1,
+  "requiredAssets": {
+    "icons": [
+      {
+        "name": "app-icon-512.png",
+        "size": "512x512",
+        "format": "PNG",
+        "required": true
+      },
+      {
+        "name": "app-icon-114.png",
+        "size": "114x114",
+        "format": "PNG",
+        "required": true
+      }
+    ],
+    "screenshots": [
+      {
+        "name": "screenshot-home.png",
+        "size": "1080x1920",
+        "description": "Page d'accueil avec recherche"
+      },
+      {
+        "name": "screenshot-anime.png",
+        "size": "1080x1920",
+        "description": "Page détails anime"
+      },
+      {
+        "name": "screenshot-player.png",
+        "size": "1080x1920",
+        "description": "Lecteur vidéo"
+      },
+      {
+        "name": "screenshot-manga.png",
+        "size": "1080x1920",
+        "description": "Lecteur manga",
+        "optional": true
+      }
+    ],
+    "graphics": [
+      {
+        "name": "feature-graphic.png",
+        "size": "1024x500",
+        "description": "Bannière principale"
+      },
+      {
+        "name": "promo-graphic.png",
+        "size": "180x120",
+        "description": "Graphique promotionnel",
+        "optional": true
+      }
+    ]
+  },
+  "stores": {
+    "amazon": {
+      "url": "https://developer.amazon.com/apps-and-games",
+      "requirements": "android-publish-guide.md"
+    }
+  }
+}
