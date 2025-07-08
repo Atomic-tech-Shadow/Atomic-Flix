@@ -1,29 +1,39 @@
 # 🚀 Guide de Build APK - ATOMIC FLIX Mobile
 
-## Méthodes pour créer l'APK
+## Configuration Validée ✅
 
-### Méthode 1: EAS Build (Recommandée)
+✅ **Expo SDK 53** (Compatible avec React Native 0.79.3)  
+✅ **React 19** (Dernière version stable)  
+✅ **React Navigation 6** (Compatible SDK 53)  
+✅ **EAS Build configuré** pour générer des APK
 
-1. **Installation des outils:**
-   ```bash
-   npm install -g @expo/cli eas-cli
-   ```
+## Méthode Recommandée: EAS Build
 
-2. **Installation des dépendances:**
-   ```bash
-   cd mobile
-   npm install --legacy-peer-deps
-   ```
+### 1. Installation des outils
+```bash
+npm install -g @expo/cli eas-cli
+```
 
-3. **Login Expo:**
-   ```bash
-   expo login
-   ```
+### 2. Installation des dépendances
+```bash
+cd mobile
+npm install
+```
 
-4. **Build APK:**
-   ```bash
-   eas build --platform android --profile preview
-   ```
+### 3. Login Expo
+```bash
+expo login
+```
+
+### 4. Build APK
+```bash
+eas build --platform android --profile preview
+```
+
+### 5. Script automatisé
+```bash
+./build-apk-final.sh
+```
 
 ### Méthode 2: Expo Build (Legacy)
 

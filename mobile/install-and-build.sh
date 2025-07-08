@@ -16,9 +16,9 @@ fi
 echo "🧹 Cleaning existing dependencies..."
 rm -rf node_modules package-lock.json
 
-# Installer les dépendances via npm avec legacy-peer-deps
+# Installer les dépendances via npm avec overrides pour React 19
 echo "📦 Installing dependencies..."
-npm install --legacy-peer-deps
+npm install
 
 # Vérifier l'installation
 if [ $? -ne 0 ]; then
