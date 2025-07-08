@@ -61,11 +61,6 @@ export const animeAPI = {
     return await apiRequest('/trending');
   },
   
-  // Récupérer les animes populaires
-  getPopular: async () => {
-    return await apiRequest('/popular');
-  },
-  
   // Rechercher des animes
   search: async (query: string) => {
     return await apiRequest(`/search?query=${encodeURIComponent(query)}`);
