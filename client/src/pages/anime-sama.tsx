@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ArrowLeft } from 'lucide-react';
+import { Search, ArrowLeft, Heart, Clock, Filter, Star } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import MainLayout from '@/components/layout/main-layout';
@@ -29,13 +29,20 @@ const AnimeSamaPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [watchHistory, setWatchHistory] = useState<{[key: string]: number}>({});
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [popularAnimes, setPopularAnimes] = useState<SearchResult[]>([]);
+  const [activeCategory, setActiveCategory] = useState<'all' | 'anime' | 'manga'>('all');
 
-  // Charger l'historique au démarrage et vérifier les paramètres de recherche
+  // Charger l'historique et les favoris au démarrage
   useEffect(() => {
     const savedHistory = localStorage.getItem('animeWatchHistory');
     if (savedHistory) {
       setWatchHistory(JSON.parse(savedHistory));
+    }
+    
+    const savedFavorites = localStorage.getItem('animeFavorites');
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites));
     }
     
     // Charger les animes populaires au démarrage
@@ -158,6 +165,38 @@ const AnimeSamaPage: React.FC = () => {
     }
   };
 
+  // Fonctions pour gérer les favoris
+  const toggleFavorite = (animeId: string) => {
+    const newFavorites = favorites.includes(animeId)
+      ? favorites.filter(id => id !== animeId)
+      : [...favorites, animeId];
+    
+    setFavorites(newFavorites);
+    localStorage.setItem('animeFavorites', JSON.stringify(newFavorites));
+  };
+
+  // Filtrer le contenu par catégorie
+  const getFilteredContent = () => {
+    if (activeCategory === 'all') return popularAnimes;
+    if (activeCategory === 'anime') return popularAnimes.filter(item => 
+      item.type !== 'manga' && item.type !== 'scan'
+    );
+    if (activeCategory === 'manga') return popularAnimes.filter(item => 
+      item.type === 'manga' || item.type === 'scan'
+    );
+    return popularAnimes;
+  };
+
+  // Obtenir l'historique récent
+  const getRecentHistory = () => {
+    return popularAnimes.filter(anime => watchHistory[anime.id]);
+  };
+
+  // Obtenir les favoris
+  const getFavoriteAnimes = () => {
+    return popularAnimes.filter(anime => favorites.includes(anime.id));
+  };
+
 
 
   // Gérer la recherche en temps réel
@@ -254,6 +293,21 @@ const AnimeSamaPage: React.FC = () => {
                   )}
                   
                   {/* Titre superposé sur l'image */}
+                  {/* Bouton favoris */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(anime.id);
+                    }}
+                    className={`absolute top-2 right-2 p-2 rounded-full backdrop-blur-sm transition-all duration-300 ${
+                      favorites.includes(anime.id)
+                        ? 'bg-red-500/80 text-white hover:bg-red-500'
+                        : 'bg-black/50 text-gray-400 hover:bg-black/70 hover:text-red-400'
+                    }`}
+                  >
+                    <Heart className={`w-4 h-4 ${favorites.includes(anime.id) ? 'fill-current' : ''}`} />
+                  </button>
+
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-4 pb-3">
                     <h3 className="text-white font-semibold text-sm leading-tight mb-2 group-hover:text-cyan-400 transition-all duration-300">{anime.title}</h3>
                     <div className="flex justify-between items-center">
@@ -333,8 +387,129 @@ const AnimeSamaPage: React.FC = () => {
 
             </motion.div>
 
+            {/* Navigation par catégories */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-8"
+            >
+              <div className="flex flex-wrap gap-3 mb-6">
+                <button
+                  onClick={() => setActiveCategory('all')}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                    activeCategory === 'all'
+                      ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/25'
+                      : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                  }`}
+                >
+                  <Filter className="w-4 h-4" />
+                  Tout ({popularAnimes.length})
+                </button>
+                <button
+                  onClick={() => setActiveCategory('anime')}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                    activeCategory === 'anime'
+                      ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/25'
+                      : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                  }`}
+                >
+                  <Star className="w-4 h-4" />
+                  Animes ({popularAnimes.filter(item => item.type !== 'manga' && item.type !== 'scan').length})
+                </button>
+                <button
+                  onClick={() => setActiveCategory('manga')}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                    activeCategory === 'manga'
+                      ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/25'
+                      : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                  }`}
+                >
+                  📚 Mangas ({popularAnimes.filter(item => item.type === 'manga' || item.type === 'scan').length})
+                </button>
+              </div>
+            </motion.div>
+
+            {/* Section Historique récent */}
+            {getRecentHistory().length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <Clock className="w-6 h-6 text-cyan-400" />
+                  <h2 className="text-2xl font-bold text-white">Historique récent</h2>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                  {getRecentHistory().slice(0, 12).map((anime, index) => (
+                    <motion.div
+                      key={`history-${anime.id}-${index}`}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05, duration: 0.3 }}
+                      onClick={() => loadAnimeDetails(anime.id, anime.type)}
+                      className="cursor-pointer group overflow-hidden atomic-hover-scale h-56 sm:h-64 md:h-72 rounded-lg relative"
+                    >
+                      <img
+                        src={anime.image}
+                        alt={anime.title}
+                        className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                      />
+                      <div className="absolute top-2 left-2 bg-cyan-500 text-white text-xs px-2 py-1 rounded-full">
+                        Ep {watchHistory[anime.id]}
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-4 pb-3">
+                        <h3 className="text-white font-semibold text-sm leading-tight mb-2 group-hover:text-cyan-400 transition-all duration-300">{anime.title}</h3>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Section Favoris */}
+            {getFavoriteAnimes().length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <Heart className="w-6 h-6 text-red-400 fill-current" />
+                  <h2 className="text-2xl font-bold text-white">Mes favoris</h2>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                  {getFavoriteAnimes().slice(0, 12).map((anime, index) => (
+                    <motion.div
+                      key={`favorite-${anime.id}-${index}`}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05, duration: 0.3 }}
+                      onClick={() => loadAnimeDetails(anime.id, anime.type)}
+                      className="cursor-pointer group overflow-hidden atomic-hover-scale h-56 sm:h-64 md:h-72 rounded-lg relative"
+                    >
+                      <img
+                        src={anime.image}
+                        alt={anime.title}
+                        className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                      />
+                      <div className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full">
+                        <Heart className="w-3 h-3 fill-current" />
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-4 pb-3">
+                        <h3 className="text-white font-semibold text-sm leading-tight mb-2 group-hover:text-cyan-400 transition-all duration-300">{anime.title}</h3>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* Section Animes Populaires */}
-            {popularAnimes.length > 0 && (
+            {getFilteredContent().length > 0 && (
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -343,11 +518,13 @@ const AnimeSamaPage: React.FC = () => {
               >
                 <div className="mb-4">
                   <h2 className="atomic-gradient-text text-xl font-bold flex items-center gap-2">
-                    🔥 Contenu Populaire 📈
+                    🔥 {activeCategory === 'all' ? 'Contenu Populaire' : 
+                        activeCategory === 'anime' ? 'Animes Populaires' : 
+                        'Mangas Populaires'} 📈
                   </h2>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                  {popularAnimes.map((anime, index) => (
+                  {getFilteredContent().map((anime, index) => (
                     <motion.div
                       key={`popular-${anime.id}-${index}`}
                       initial={{ opacity: 0, scale: 0.9 }}
@@ -379,10 +556,26 @@ const AnimeSamaPage: React.FC = () => {
                       </div>
                       
                       {watchHistory[anime.id] && (
-                        <div className="absolute top-2 right-2 bg-cyan-500 text-white text-xs px-2 py-1 rounded-full">
+                        <div className="absolute top-2 right-12 bg-cyan-500 text-white text-xs px-2 py-1 rounded-full">
                           Ep {watchHistory[anime.id]}
                         </div>
                       )}
+
+                      {/* Bouton favoris */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(anime.id);
+                        }}
+                        className={`absolute top-2 right-2 p-2 rounded-full backdrop-blur-sm transition-all duration-300 ${
+                          favorites.includes(anime.id)
+                            ? 'bg-red-500/80 text-white hover:bg-red-500'
+                            : 'bg-black/50 text-gray-400 hover:bg-black/70 hover:text-red-400'
+                        }`}
+                      >
+                        <Heart className={`w-4 h-4 ${favorites.includes(anime.id) ? 'fill-current' : ''}`} />
+                      </button>
+
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                       
                       {/* Titre superposé sur l'image */}
