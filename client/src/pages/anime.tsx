@@ -1,31 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'wouter';
-import { ChevronLeft, ChevronRight, ChevronDown, AlertCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useLocation } from 'wouter';
+import { AlertCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useLocation } from 'wouter';
 import MainLayout from '@/components/layout/main-layout';
-import { SectionLoading } from '@/components/ui/loading-spinner';
-import { FloatingBackButton } from '@/components/navigation/floating-back-button';
-import { BreadcrumbNav } from '@/components/navigation/breadcrumb-nav';
+import { PageLoading } from '@/components/ui/loading-spinner';
+// import { FloatingBackButton } from '@/components/navigation/floating-back-button';
+// import { BreadcrumbNav } from '@/components/navigation/breadcrumb-nav';
 import { animeAPI } from '@/lib/api';
 
-interface Episode {
-  id: string;
-  title: string;
-  episodeNumber: number;
-  url: string;
-  language: string;
-  available: boolean;
-}
+// interface Episode {
+//   id: string;
+//   title: string;
+//   episodeNumber: number;
+//   url: string;
+//   language: string;
+//   available: boolean;
+// }
 
-interface VideoSource {
-  url: string;
-  server: string;
-  quality: string;
-  language: string;
-  type: string;
-  serverIndex: number;
-}
+// interface VideoSource {
+//   url: string;
+//   server: string;
+//   quality: string;
+//   language: string;
+//   type: string;
+//   serverIndex: number;
+// }
 
 interface Season {
   number: number;
@@ -49,22 +49,22 @@ interface AnimeData {
   url: string;
 }
 
-interface EpisodeDetails {
-  id: string;
-  title: string;
-  animeTitle: string;
-  episodeNumber: number;
-  sources: VideoSource[];
-  availableServers: string[];
-  url: string;
-}
+// interface EpisodeDetails {
+//   id: string;
+//   title: string;
+//   animeTitle: string;
+//   episodeNumber: number;
+//   sources: VideoSource[];
+//   availableServers: string[];
+//   url: string;
+// }
 
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp: string;
-  meta?: any;
-}
+// interface ApiResponse<T> {
+//   success: boolean;
+//   data: T;
+//   timestamp: string;
+//   meta?: any;
+// }
 
 const AnimePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -73,40 +73,40 @@ const AnimePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Configuration API externe
-  const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
+  // Configuration API externe (non utilisée actuellement)
+  // const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
 
-  // Fonction pour les requêtes API avec timeout augmenté
-  const apiRequest = async (endpoint: string, timeoutMs = 20000) => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-    
-    try {
-      console.log('Requête API:', endpoint);
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('Timeout: La requête a pris trop de temps');
-      }
-      throw error;
-    }
-  };
+  // Fonction pour les requêtes API avec timeout augmenté (non utilisée actuellement)
+  // const apiRequest = async (endpoint: string, timeoutMs = 20000) => {
+  //   const controller = new AbortController();
+  //   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  //   
+  //   try {
+  //     console.log('Requête API:', endpoint);
+  //     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       signal: controller.signal
+  //     });
+  //     
+  //     clearTimeout(timeoutId);
+  //     
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  //     }
+  //     
+  //     const data = await response.json();
+  //     return data;
+  //   } catch (error) {
+  //     clearTimeout(timeoutId);
+  //     if (error instanceof Error && error.name === 'AbortError') {
+  //       throw new Error('Timeout: La requête a pris trop de temps');
+  //     }
+  //     throw error;
+  //   }
+  // };
 
   // Charger les données de l'anime avec approche hybride
   useEffect(() => {

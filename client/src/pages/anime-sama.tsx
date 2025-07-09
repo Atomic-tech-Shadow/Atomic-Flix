@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import MainLayout from '@/components/layout/main-layout';
 import { SectionLoading } from '@/components/ui/loading-spinner';
@@ -15,12 +15,12 @@ interface SearchResult {
   image: string;
 }
 
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp: string;
-  meta?: any;
-}
+// interface ApiResponse<T> {
+//   success: boolean;
+//   data: T;
+//   timestamp: string;
+//   meta?: any;
+// }
 
 const AnimeSamaPage: React.FC = () => {
   const [, navigate] = useLocation();
@@ -65,39 +65,39 @@ const AnimeSamaPage: React.FC = () => {
     }
   };
 
-  // Configuration API externe
-  const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
+  // Configuration API externe (non utilisée actuellement)
+  // const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
 
-  // Fonction utilitaire pour les requêtes API externes
-  const apiRequest = async (endpoint: string, options = {}) => {
-    const maxRetries = 2;
-    let attempt = 0;
-    
-    while (attempt < maxRetries) {
-      try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-          method: 'GET',
-          ...options
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        return await response.json();
-      } catch (error) {
-        attempt++;
-        console.log(`Tentative ${attempt}/${maxRetries} échouée:`, error);
-        
-        if (attempt >= maxRetries) {
-          console.error('Erreur API après', maxRetries, 'tentatives:', error);
-          throw error;
-        }
-        
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-      }
-    }
-  };
+  // Fonction utilitaire pour les requêtes API externes (non utilisée actuellement)
+  // const apiRequest = async (endpoint: string, options = {}) => {
+  //   const maxRetries = 2;
+  //   let attempt = 0;
+  //   
+  //   while (attempt < maxRetries) {
+  //     try {
+  //       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  //         method: 'GET',
+  //         ...options
+  //       });
+  //       
+  //       if (!response.ok) {
+  //         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  //       }
+  //       
+  //       return await response.json();
+  //     } catch (error) {
+  //       attempt++;
+  //       console.log(`Tentative ${attempt}/${maxRetries} échouée:`, error);
+  //       
+  //       if (attempt >= maxRetries) {
+  //         console.error('Erreur API après', maxRetries, 'tentatives:', error);
+  //         throw error;
+  //       }
+  //       
+  //       await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+  //     }
+  //   }
+  // };
 
   // Recherche d'animes
   const searchAnimes = async (query: string) => {

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'wouter';
+import { useParams, useLocation } from 'wouter';
 import { ChevronLeft, ChevronRight, ArrowLeft, ZoomIn, ZoomOut, List, Book } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'wouter';
 import MainLayout from '@/components/layout/main-layout';
 
 interface MangaChapter {
@@ -40,7 +41,7 @@ interface MangaData {
 
 const MangaReaderPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [, navigate] = useLocation();
+  const [, ] = useLocation();
   
   // Récupérer les paramètres de l'URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -56,12 +57,12 @@ const MangaReaderPage: React.FC = () => {
   const [selectedChapter, setSelectedChapter] = useState<MangaChapter | null>(null);
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  const [loadingChapters, setLoadingChapters] = useState(false);
+  // const [loadingChapters, setLoadingChapters] = useState(false);
   const [loadingPages, setLoadingPages] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showChapterList, setShowChapterList] = useState(false);
   const [zoom, setZoom] = useState(1);
-  const [readingMode, setReadingMode] = useState<'single' | 'double'>('single');
+  // const [readingMode, setReadingMode] = useState<'single' | 'double'>('single');
 
   // Fonction pour les requêtes API externes uniquement
   const apiRequest = async (endpoint: string) => {
@@ -135,7 +136,7 @@ const MangaReaderPage: React.FC = () => {
   // Charger les chapitres d'une saison/scan
   const loadSeasonChapters = async (season: MangaSeason, language: string = 'VF') => {
     try {
-      setLoadingChapters(true);
+      setLoadingPages(true);
       console.log('Chargement des chapitres pour:', season.value, 'langue:', language);
       
       const response = await apiRequest(
@@ -176,7 +177,7 @@ const MangaReaderPage: React.FC = () => {
       console.error('Erreur chargement chapitres:', error);
       setError('Erreur lors du chargement des chapitres');
     } finally {
-      setLoadingChapters(false);
+      setLoadingPages(false);
     }
   };
 

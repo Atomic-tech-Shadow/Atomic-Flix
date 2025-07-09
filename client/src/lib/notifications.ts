@@ -244,13 +244,13 @@ export class NotificationManager {
     let body = `${count} nouveaux épisodes disponibles`;
     let title = 'Nouveaux épisodes ajoutés 📢';
     let icon = '/assets/atomic-logo-new.png';
-    let image = undefined;
+    // Image support varies by browser
     
     // Personnaliser la notification selon le nombre d'animes
     if (animes && animes.length > 0) {
       const firstAnime = animes[0];
       icon = firstAnime.image || '/assets/atomic-logo-new.png';
-      image = firstAnime.image;
+      // image = firstAnime.image; // Not supported in all browsers
       
       if (animes.length === 1) {
         // Une seule série
