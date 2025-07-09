@@ -48,65 +48,65 @@ const MangaReaderScreen: React.FC = () => {
   const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
 
   // Fonction API identique au site web
-  const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-    const maxRetries = 3;
-    let attempt = 0;
-    
-    while (attempt < maxRetries) {
-      try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          ...options
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+  const apiRequest = async (endpoint: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
         }
-        
-        const data = await response.json();
-        if (!data.success) {
-          throw new Error(data.error || 'API request failed');
-        }
-        return data;
-      } catch (error) {
-        attempt++;
-        console.warn(`API request attempt ${attempt} failed:`, error);
-        if (attempt >= maxRetries) {
-          throw error;
-        }
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Erreur API:', error);
+      throw error;
     }
   };
 
   // Charger les données du manga (identique au site web)
   const loadMangaData = async () => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await apiRequest(`/anime/${encodeURIComponent(mangaUrl)}`);
-      const data = response.data;
-      setMangaData(data);
+      setLoading(true);
+      setError(null);
       
-      // Filtrer les saisons manga/scan
-      const mangaSeasons = data.seasons.filter((season: MangaSeason) => 
-        season.name.toLowerCase().includes('manga') || 
-        season.name.toLowerCase().includes('scan')
-      );
-      setSeasons(mangaSeasons);
+      const extractedId = mangaUrl.split('/').pop() || mangaUrl;
+      console.log('Chargement manga ID:', extractedId);
       
-      // Auto-sélectionner la première saison manga
-      if (mangaSeasons.length > 0) {
-        await loadSeasonChapters(mangaSeasons[0]);
+      const animeResponse = await apiRequest(`/api/anime/${extractedId}`);
+      console.log('Réponse anime:', animeResponse);
+      
+      if (animeResponse && animeResponse.success && animeResponse.data) {
+        setMangaData(animeResponse.data);
+        
+        const seasonsResponse = await apiRequest(`/api/seasons/${extractedId}`);
+        
+        if (seasonsResponse && seasonsResponse.success && seasonsResponse.seasons) {
+          const scans = seasonsResponse.seasons.filter((season: any) => season.contentType === 'manga');
+          console.log('Scans trouvés:', scans);
+          
+          setSeasons(scans);
+          
+          if (scans.length > 0) {
+            let seasonToSelect = scans[0];
+            setSelectedSeason(seasonToSelect);
+            
+            await loadSeasonChapters(seasonToSelect, 'VF');
+          } else {
+            setError('Aucun scan disponible pour cet anime');
+          }
+        }
+      } else {
+        setError('Impossible de charger les données du manga');
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des données du manga:', error);
-      setError('Impossible de charger les données du manga. Vérifiez votre connexion.');
+      console.error('Erreur chargement manga:', error);
+      setError('Erreur lors du chargement du manga');
     } finally {
       setLoading(false);
     }
@@ -114,18 +114,38 @@ const MangaReaderScreen: React.FC = () => {
 
   // Charger les chapitres d'une saison (identique au site web)
   const loadSeasonChapters = async (season: MangaSeason, language: string = 'VF') => {
-    setChaptersLoading(true);
-    setSelectedSeason(season);
-    setChapters([]);
-    setCurrentChapter(null);
-
     try {
-      const response = await apiRequest(`/episodes/${encodeURIComponent(mangaUrl)}/${season.value}`);
-      const chaptersList = response.data || [];
-      setChapters(chaptersList);
+      setChaptersLoading(true);
+      setSelectedSeason(season);
+      setChapters([]);
+      setCurrentChapter(null);
+      
+      const extractedId = mangaUrl.split('/').pop() || mangaUrl;
+      console.log('Chargement chapitres pour:', extractedId, 'saison:', season.value);
+      
+      const response = await apiRequest(`/api/chapters/${extractedId}/${season.value}?language=${language}`);
+      console.log('Chapitres reçus:', response);
+      
+      if (response && response.success && response.chapters) {
+        const formattedChapters = response.chapters.map((chapter: any, index: number) => ({
+          id: `${extractedId}-${season.value}-ch${chapter.number || index + 1}`,
+          title: chapter.title || `Chapitre ${chapter.number || index + 1}`,
+          number: chapter.number || index + 1,
+          url: chapter.url || `https://anime-sama.fr/catalogue/${extractedId}/${season.value}/scan/${chapter.number || index + 1}`,
+          pages: chapter.pages || [],
+          available: chapter.available !== false,
+          language: language
+        }));
+        
+        setChapters(formattedChapters);
+        console.log('Chapitres formatés:', formattedChapters.length);
+      } else {
+        console.warn('Aucun chapitre trouvé dans la réponse API');
+        setError('Aucun chapitre disponible pour cette saison');
+      }
     } catch (error) {
-      console.error('Erreur lors du chargement des chapitres:', error);
-      Alert.alert('Erreur', 'Impossible de charger les chapitres.');
+      console.error('Erreur chargement chapitres:', error);
+      setError('Erreur lors du chargement des chapitres');
     } finally {
       setChaptersLoading(false);
     }
@@ -133,23 +153,34 @@ const MangaReaderScreen: React.FC = () => {
 
   // Charger les pages d'un chapitre (identique au site web)
   const loadChapterPages = async (chapter: MangaChapter) => {
-    setPagesLoading(true);
-    setCurrentChapter(chapter);
-    setCurrentPages([]);
-    setCurrentPageIndex(0);
-
     try {
-      // Note: L'API pour les pages de manga n'est pas encore implémentée
-      // Cette partie sera disponible quand l'API sera développée
-      const pages = [
-        'https://via.placeholder.com/800x1200/1a1a1a/ffffff?text=Page+1',
-        'https://via.placeholder.com/800x1200/1a1a1a/ffffff?text=Page+2',
-        'https://via.placeholder.com/800x1200/1a1a1a/ffffff?text=Page+3',
-      ];
-      setCurrentPages(pages);
+      setPagesLoading(true);
+      setCurrentChapter(chapter);
+      setCurrentPages([]);
+      setCurrentPageIndex(0);
+      
+      console.log('Chargement pages du chapitre:', chapter.number);
+      
+      const response = await apiRequest(`/api/pages?url=${encodeURIComponent(chapter.url)}`);
+      console.log('Pages reçues:', response);
+      
+      if (response && response.success && response.pages && response.pages.length > 0) {
+        setCurrentPages(response.pages);
+        console.log('Pages chargées:', response.pages.length, 'pages disponibles');
+      } else {
+        console.warn('Aucune page trouvée dans la réponse API');
+        // Fallback avec pages de démonstration
+        const demoPages = [
+          'https://via.placeholder.com/800x1200/1a1a1a/ffffff?text=Page+1+-+API+en+developpement',
+          'https://via.placeholder.com/800x1200/1a1a1a/ffffff?text=Page+2+-+API+en+developpement',
+          'https://via.placeholder.com/800x1200/1a1a1a/ffffff?text=Page+3+-+API+en+developpement'
+        ];
+        setCurrentPages(demoPages);
+        setError('API pages manga en développement - pages de démonstration affichées');
+      }
     } catch (error) {
-      console.error('Erreur lors du chargement des pages:', error);
-      Alert.alert('Erreur', 'Impossible de charger les pages du chapitre.');
+      console.error('Erreur chargement pages:', error);
+      setError('Erreur lors du chargement des pages');
     } finally {
       setPagesLoading(false);
     }

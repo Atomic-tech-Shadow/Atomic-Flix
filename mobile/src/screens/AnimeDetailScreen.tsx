@@ -40,52 +40,58 @@ const AnimeDetailScreen: React.FC = () => {
   const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
 
   // Fonction API identique au site web
-  const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-    const maxRetries = 3;
-    let attempt = 0;
+  const apiRequest = async (endpoint: string, timeoutMs = 20000) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     
-    while (attempt < maxRetries) {
-      try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          ...options
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        if (!data.success) {
-          throw new Error(data.error || 'API request failed');
-        }
-        return data;
-      } catch (error) {
-        attempt++;
-        console.warn(`API request attempt ${attempt} failed:`, error);
-        if (attempt >= maxRetries) {
-          throw error;
-        }
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+    try {
+      console.log('Requête API:', endpoint);
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Timeout: La requête a pris trop de temps');
+      }
+      throw error;
     }
   };
 
   // Charger les données de l'anime (identique au site web)
   const loadAnimeData = async () => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await apiRequest(`/anime/${encodeURIComponent(animeUrl)}`);
-      setAnimeData(response.data);
+      setLoading(true);
+      setError(null);
+      
+      const extractedId = animeUrl.split('/').pop() || animeUrl;
+      console.log('Chargement anime ID:', extractedId);
+      
+      const response = await apiRequest(`/api/anime/${extractedId}`);
+      console.log('Réponse anime:', response);
+      
+      if (response && response.success && response.data) {
+        setAnimeData(response.data);
+      } else {
+        console.error('Réponse API anime invalide:', response);
+        setError('Impossible de charger les données de l\'anime');
+      }
     } catch (error) {
-      console.error('Erreur lors du chargement des données de l\'anime:', error);
-      setError('Impossible de charger les données de l\'anime. Vérifiez votre connexion.');
+      console.error('Erreur chargement anime:', error);
+      setError('Erreur lors du chargement de l\'anime');
     } finally {
       setLoading(false);
     }

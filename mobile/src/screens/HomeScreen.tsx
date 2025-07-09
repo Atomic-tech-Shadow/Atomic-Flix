@@ -40,36 +40,31 @@ const HomeScreen: React.FC = () => {
   const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
 
   // Fonction API identique au site web
-  const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-    const maxRetries = 3;
+  const apiRequest = async (endpoint: string, options = {}) => {
+    const maxRetries = 2;
     let attempt = 0;
     
     while (attempt < maxRetries) {
       try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
           method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
           ...options
         });
-
+        
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        const data = await response.json();
-        if (!data.success) {
-          throw new Error(data.error || 'API request failed');
-        }
-        return data;
+        return await response.json();
       } catch (error) {
         attempt++;
-        console.warn(`API request attempt ${attempt} failed:`, error);
+        console.log(`Tentative ${attempt}/${maxRetries} échouée:`, error);
+        
         if (attempt >= maxRetries) {
+          console.error('Erreur API après', maxRetries, 'tentatives:', error);
           throw error;
         }
+        
         await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
       }
     }
@@ -77,15 +72,23 @@ const HomeScreen: React.FC = () => {
 
   // Charger les animes trending (identique au site web)
   const loadTrendingAnimes = async () => {
-    setLoading(true);
-    setError(null);
-    
     try {
-      const response = await apiRequest('/trending');
-      setTrendingAnimes(response.data || []);
+      setLoading(true);
+      setError(null);
+      
+      const response = await apiRequest('/api/trending');
+      console.log('Trending animes response:', response);
+      
+      if (response && response.success && response.data) {
+        setTrendingAnimes(response.data);
+      } else {
+        console.warn('Réponse API trending inattendue:', response);
+        setTrendingAnimes([]);
+      }
     } catch (error) {
-      console.error('Erreur lors du chargement des animes trending:', error);
-      setError('Impossible de charger les animes populaires. Vérifiez votre connexion.');
+      console.error('Erreur trending animes:', error);
+      setError('Impossible de charger les animes trending');
+      setTrendingAnimes([]);
     } finally {
       setLoading(false);
     }
@@ -97,6 +100,28 @@ const HomeScreen: React.FC = () => {
       setSearchResults([]);
       return;
     }
+    
+    try {
+      setSearchLoading(true);
+      setError(null);
+      
+      const response = await apiRequest(`/api/search?q=${encodeURIComponent(query.trim())}`);
+      console.log('Search response:', response);
+      
+      if (response && response.success && response.data) {
+        setSearchResults(response.data);
+      } else {
+        console.warn('Réponse API search inattendue:', response);
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error('Erreur search animes:', error);
+      setError('Erreur lors de la recherche');
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
     setSearchLoading(true);
     setError(null);

@@ -44,58 +44,68 @@ const AnimePlayerScreen: React.FC = () => {
   const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
 
   // Fonction API identique au site web
-  const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-    const maxRetries = 3;
-    let attempt = 0;
-    
-    while (attempt < maxRetries) {
-      try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          ...options
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+  const apiRequest = async (endpoint: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
         }
-        
-        const data = await response.json();
-        if (!data.success) {
-          throw new Error(data.error || 'API request failed');
-        }
-        return data;
-      } catch (error) {
-        attempt++;
-        console.warn(`API request attempt ${attempt} failed:`, error);
-        if (attempt >= maxRetries) {
-          throw error;
-        }
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Erreur API:', error);
+      throw error;
     }
   };
 
   // Charger les épisodes de la saison (identique au site web)
   const loadSeasonEpisodes = async () => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await apiRequest(`/episodes/${encodeURIComponent(animeUrl)}/${seasonData.value}`);
-      const episodesList = response.data || [];
-      setEpisodes(episodesList);
+      setLoading(true);
+      setError(null);
       
-      // Auto-charger le premier épisode
-      if (episodesList.length > 0) {
-        await loadEpisodeSources(episodesList[0]);
+      const extractedId = animeUrl.split('/').pop() || animeUrl;
+      const languageCode = 'vf'; // Par défaut VF
+      
+      console.log('Chargement épisodes pour:', extractedId, 'saison:', seasonData.value);
+      
+      const response = await apiRequest(`/api/episodes/${extractedId}?season=${seasonData.value}&language=${languageCode}`);
+      console.log('Épisodes reçus:', response);
+      
+      if (response && response.success && response.episodes) {
+        const formattedEpisodes = response.episodes.map((ep: any, index: number) => {
+          const episodeNumber = ep.number || (index + 1);
+          const episodeTitle = ep.title || `Épisode ${episodeNumber}`;
+          
+          return {
+            id: `${extractedId}-${seasonData.value}-ep${episodeNumber}-${languageCode}`,
+            title: episodeTitle,
+            episodeNumber: episodeNumber,
+            url: ep.url || `https://anime-sama.fr/catalogue/${extractedId}/${seasonData.value}/${languageCode}/episode-${episodeNumber}`,
+            language: languageCode.toUpperCase(),
+            available: ep.available !== false,
+            streamingSources: ep.streamingSources || []
+          };
+        });
+        
+        setEpisodes(formattedEpisodes);
+        
+        if (formattedEpisodes.length > 0) {
+          await loadEpisodeSources(formattedEpisodes[0]);
+        }
+      } else {
+        setError('Aucun épisode trouvé pour cette saison');
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des épisodes:', error);
-      setError('Impossible de charger les épisodes. Vérifiez votre connexion.');
+      console.error('Erreur chargement épisodes:', error);
+      setError('Erreur lors du chargement des épisodes');
     } finally {
       setLoading(false);
     }
@@ -103,23 +113,30 @@ const AnimePlayerScreen: React.FC = () => {
 
   // Charger les sources d'un épisode (identique au site web)
   const loadEpisodeSources = async (episode: Episode) => {
-    setEpisodeLoading(true);
-    setCurrentEpisode(episode);
-    setCurrentSources([]);
-    setSelectedSource(null);
-
+    if (!episode) return;
+    
     try {
-      const response = await apiRequest(`/embed/${encodeURIComponent(episode.url)}`);
-      const sources = response.data || [];
-      setCurrentSources(sources);
+      setEpisodeLoading(true);
+      setCurrentEpisode(episode);
+      setCurrentSources([]);
+      setSelectedSource(null);
       
-      // Auto-sélectionner la première source
-      if (sources.length > 0) {
-        setSelectedSource(sources[0]);
+      console.log('Récupération sources streaming pour épisode:', episode.episodeNumber);
+      
+      const response = await apiRequest(`/api/embed?url=${encodeURIComponent(episode.url)}`);
+      console.log('Sources streaming reçues:', response);
+      
+      if (response && response.success && response.sources && response.sources.length > 0) {
+        setCurrentSources(response.sources);
+        setSelectedSource(response.sources[0]);
+        console.log('Sources streaming chargées:', response.sources.length, 'serveurs disponibles');
+      } else {
+        console.error('Aucune source trouvée dans la réponse API');
+        setError('Aucune source de streaming disponible pour cet épisode');
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des sources:', error);
-      Alert.alert('Erreur', 'Impossible de charger les sources vidéo.');
+      console.error('Erreur récupération sources API:', error);
+      setError('Erreur lors du chargement des sources de streaming');
     } finally {
       setEpisodeLoading(false);
     }
