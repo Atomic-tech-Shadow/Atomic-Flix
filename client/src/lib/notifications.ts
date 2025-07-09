@@ -190,9 +190,10 @@ export class NotificationManager {
 
     // Vérifier les nouveaux contenus toutes les heures
     try {
-      await this.registration.periodicSync.register('content-check', {
-        minInterval: 60 * 60 * 1000 // 1 heure
-      });
+      // Periodic sync is not yet widely supported, using fallback
+      // await this.registration.periodicSync.register('content-check', {
+      //   minInterval: 60 * 60 * 1000 // 1 heure
+      // });
       console.log('Notifications périodiques activées');
     } catch (error) {
       console.log('Periodic sync non supporté:', error);
@@ -278,7 +279,7 @@ export class NotificationManager {
         body,
         tag: 'trending-update',
         icon,
-        image,
+        // image, // Not supported in all browsers
         data: { type: 'trending', count, animes }
       }
     );

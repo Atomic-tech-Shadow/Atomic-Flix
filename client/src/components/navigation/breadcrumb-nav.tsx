@@ -2,7 +2,6 @@ import { ChevronRight, Home } from "lucide-react";
 import { Link } from "wouter";
 import {
   Breadcrumb,
-  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'wouter';
-import { ChevronLeft, ChevronRight, ArrowLeft, ZoomIn, ZoomOut, RotateCw, BookOpen, List, Book } from 'lucide-react';
+import { useParams } from 'wouter';
+import { ChevronLeft, ChevronRight, ArrowLeft, ZoomIn, ZoomOut, List, Book } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'wouter';
 import MainLayout from '@/components/layout/main-layout';
 
 interface MangaChapter {

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { ChevronLeft, ChevronRight, ChevronDown, Play, ArrowLeft, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'wouter';
 import MainLayout from '@/components/layout/main-layout';
-import { SectionLoading, PageLoading } from '@/components/ui/loading-spinner';
-import { FloatingBackButton } from '@/components/navigation/floating-back-button';
+import { SectionLoading } from '@/components/ui/loading-spinner';
 import { BreadcrumbNav } from '@/components/navigation/breadcrumb-nav';
 
 interface Episode {

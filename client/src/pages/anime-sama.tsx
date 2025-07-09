@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ArrowLeft } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import MainLayout from '@/components/layout/main-layout';

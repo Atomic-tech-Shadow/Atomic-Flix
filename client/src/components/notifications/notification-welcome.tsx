@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Bell, X, Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { notificationManager } from '@/lib/notifications';

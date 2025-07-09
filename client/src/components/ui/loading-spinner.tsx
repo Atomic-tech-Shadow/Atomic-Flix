@@ -1,4 +1,4 @@
-import React from 'react';
+// Loading spinner components
 import { motion } from 'framer-motion';
 
 interface LoadingSpinnerProps {

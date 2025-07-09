@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'wouter';
-import { ChevronLeft, ChevronRight, ChevronDown, Play, AlertCircle, ArrowLeft, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'wouter';
 import MainLayout from '@/components/layout/main-layout';
-import { SectionLoading, PageLoading } from '@/components/ui/loading-spinner';
+import { SectionLoading } from '@/components/ui/loading-spinner';
 import { FloatingBackButton } from '@/components/navigation/floating-back-button';
 import { BreadcrumbNav } from '@/components/navigation/breadcrumb-nav';
 import { animeAPI } from '@/lib/api';
