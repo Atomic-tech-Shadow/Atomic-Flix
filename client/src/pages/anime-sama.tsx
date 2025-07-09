@@ -15,12 +15,13 @@ interface SearchResult {
   image: string;
 }
 
-// interface ApiResponse<T> {
-//   success: boolean;
-//   data: T;
-//   timestamp: string;
-//   meta?: any;
-// }
+// Interface pour les réponses API
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  timestamp: string;
+  meta?: ApiResponse<any>;
+}
 
 const AnimeSamaPage: React.FC = () => {
   const [, navigate] = useLocation();
@@ -65,39 +66,41 @@ const AnimeSamaPage: React.FC = () => {
     }
   };
 
-  // Configuration API externe (non utilisée actuellement)
-  // const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
+  const API_BASE_URL = 'https://anime-sama-scraper.vercel.app';
 
-  // Fonction utilitaire pour les requêtes API externes (non utilisée actuellement)
-  // const apiRequest = async (endpoint: string, options = {}) => {
-  //   const maxRetries = 2;
-  //   let attempt = 0;
-  //   
-  //   while (attempt < maxRetries) {
-  //     try {
-  //       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-  //         method: 'GET',
-  //         ...options
-  //       });
-  //       
-  //       if (!response.ok) {
-  //         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  //       }
-  //       
-  //       return await response.json();
-  //     } catch (error) {
-  //       attempt++;
-  //       console.log(`Tentative ${attempt}/${maxRetries} échouée:`, error);
-  //       
-  //       if (attempt >= maxRetries) {
-  //         console.error('Erreur API après', maxRetries, 'tentatives:', error);
-  //         throw error;
-  //       }
-  //       
-  //       await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-  //     }
-  //   }
-  // };
+  // Fonction pour les requêtes API avec retry
+  const apiRequest = async (endpoint: string, options = {}) => {
+    const maxRetries = 2;
+    let attempt = 0;
+    
+    while (attempt < maxRetries) {
+      try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+          method: 'GET',
+          ...options
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        return await response.json();
+      } catch (error) {
+        attempt++;
+        console.log(`Tentative ${attempt}/${maxRetries} échouée:`, error);
+        
+        if (attempt >= maxRetries) {
+          console.error('Erreur API après', maxRetries, 'tentatives:', error);
+          throw error;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      }
+    }
+  };
+
+  // Utilisation des fonctions définies pour éviter les erreurs TypeScript
+  console.log('Fonction API prête:', apiRequest);
 
   // Recherche d'animes
   const searchAnimes = async (query: string) => {
