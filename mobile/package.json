@@ -11,42 +11,30 @@
     "termux:setup": "./termux-setup.sh",
     "termux:validate": "./termux-validate.sh",
     "termux:build": "./termux-build-apk.sh",
-    "build:android": "eas build --platform android --profile preview",
+    "build:android": "eas build --platform android",
     "build:production": "eas build --platform android --profile production",
     "clean": "expo r -c"
   },
   "dependencies": {
-    "expo": "~53.0.19",
-    "expo-status-bar": "~2.2.3",
-    "react": "19.1.0",
-    "react-native": "0.79.3",
+    "@egjs/hammerjs": "^2.0.17",
     "@react-navigation/native": "^6.0.0",
     "@react-navigation/stack": "^6.0.0",
-    "react-native-screens": "~4.4.2",
-    "react-native-safe-area-context": "~4.12.1",
-    "react-native-gesture-handler": "~2.20.2",
-    "react-native-reanimated": "~3.16.5",
-    "@expo/vector-icons": "^14.0.0",
-    "expo-linear-gradient": "~14.0.2",
-    "expo-av": "~15.0.1",
-    "@tanstack/react-query": "^5.60.5",
-    "expo-build-properties": "~0.14.0",
-    "nativewind": "^2.0.11",
-    "react-native-web": "~0.19.13"
+    "@types/hammerjs": "^2.0.46",
+    "expo": "~53.0.19",
+    "expo-av": "^15.1.7",
+    "expo-build-properties": "^0.14.8",
+    "expo-status-bar": "~2.2.3",
+    "hoist-non-react-statics": "^3.3.2",
+    "react": "19.1.0",
+    "react-freeze": "^1.0.4",
+    "react-native": "0.79.3",
+    "react-native-gesture-handler": "^2.27.1",
+    "react-native-reanimated": "^3.18.0",
+    "react-native-safe-area-context": "^5.5.2",
+    "react-native-screens": "^4.11.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@types/react": "~19.1.0",
-    "@types/react-native": "~0.79.3",
-    "typescript": "~5.8.3",
-    "tailwindcss": "^3.4.17",
-    "@types/react-native-vector-icons": "^6.4.18",
-    "babel-preset-expo": "~13.2.0"
-  },
-  "overrides": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "@types/react": "~19.1.0"
-  },
-  "private": true
+    "@types/react": "~19.0.10",
+    "typescript": "~5.8.3"
+  }
 }
