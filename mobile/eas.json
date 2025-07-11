@@ -16,7 +16,7 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
+        "gradleCommand": ":app:assembleRelease --no-daemon"
       },
       "env": {
         "NODE_ENV": "production"
