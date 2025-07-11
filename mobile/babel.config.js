@@ -1,9 +1,13 @@
+const path = require('path');
+
 module.exports = function(api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
+    presets: [
+      [path.resolve(__dirname, '../node_modules/babel-preset-expo')]
+    ],
     plugins: [
-      '@babel/plugin-transform-runtime',
+      [path.resolve(__dirname, '../node_modules/@babel/plugin-transform-runtime')],
       'react-native-reanimated/plugin',
     ],
   };
