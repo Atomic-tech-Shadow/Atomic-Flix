@@ -76,11 +76,11 @@ const HomeScreen: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await apiRequest('/api/trending');
+      const response = await apiRequest('/trending');
       console.log('Trending animes response:', response);
       
-      if (response && response.success && response.data) {
-        setTrendingAnimes(response.data);
+      if (response && response.success && response.results) {
+        setTrendingAnimes(response.results.slice(0, 24));
       } else {
         console.warn('Réponse API trending inattendue:', response);
         setTrendingAnimes([]);
@@ -105,11 +105,11 @@ const HomeScreen: React.FC = () => {
       setSearchLoading(true);
       setError(null);
       
-      const response = await apiRequest(`/api/search?q=${encodeURIComponent(query.trim())}`);
+      const response = await apiRequest(`/search?query=${encodeURIComponent(query.trim())}`);
       console.log('Search response:', response);
       
-      if (response && response.success && response.data) {
-        setSearchResults(response.data);
+      if (response && response.success && response.results) {
+        setSearchResults(response.results);
       } else {
         console.warn('Réponse API search inattendue:', response);
         setSearchResults([]);
@@ -289,6 +289,45 @@ const HomeScreen: React.FC = () => {
           </View>
         )}
 
+        {/* Bannière héro si pas de recherche */}
+        {!searchQuery.trim() && (
+          <View style={styles.heroSection}>
+            {/* Images d'animes en mosaïque */}
+            <View style={styles.heroBanner}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.heroImages}>
+                {trendingAnimes.slice(0, 10).map((anime, index) => (
+                  <Image
+                    key={index}
+                    source={{ uri: anime.image }}
+                    style={styles.heroImage}
+                    resizeMode="cover"
+                  />
+                ))}
+              </ScrollView>
+              <LinearGradient
+                colors={['transparent', 'rgba(10,10,26,0.9)', 'rgba(10,10,26,1)']}
+                style={styles.heroGradient}
+              />
+            </View>
+            
+            {/* Contenu de la bannière */}
+            <View style={styles.heroContent}>
+              <View style={styles.heroTitleContainer}>
+                <Text style={styles.heroTitle}>ATOMIC FLIX</Text>
+                <View style={styles.heroLogo}>
+                  <View style={styles.atomicSymbolSmall}>
+                    <View style={styles.atomicCoreSmall} />
+                    <View style={[styles.atomicRingSmall, styles.ringSmall1]} />
+                  </View>
+                </View>
+              </View>
+              <Text style={styles.heroSubtitle}>
+                Plongez dans l'univers infini{'\n'}des animes et mangas !
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* Résultats de recherche */}
         {searchQuery.trim() && (
           renderSection(
@@ -301,7 +340,7 @@ const HomeScreen: React.FC = () => {
         {/* Contenu trending si pas de recherche */}
         {!searchQuery.trim() && (
           renderSection(
-            '📥 derniers épisodes ajoutés',
+            '📥 Nouveaux épisodes ajoutés',
             trendingAnimes,
             loading
           )
@@ -486,31 +525,108 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
   },
-  errorContainer: {
+  // Styles pour la bannière héro
+  heroSection: {
+    marginHorizontal: 16,
+    marginBottom: 24,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#0a0a1a',
+    borderWidth: 1,
+    borderColor: 'rgba(0,240,255,0.2)',
+  },
+  heroBanner: {
+    height: 120,
+    position: 'relative',
+  },
+  heroImages: {
+    height: 120,
+  },
+  heroImage: {
+    width: 80,
+    height: 120,
+    marginRight: 2,
+  },
+  heroGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 120,
+  },
+  heroContent: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  heroTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  heroTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#00ffff',
+    marginRight: 12,
+  },
+  heroLogo: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 16,
+  },
+  atomicSymbolSmall: {
+    width: 24,
+    height: 24,
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  atomicCoreSmall: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#ff00ff',
+    position: 'absolute',
+  },
+  atomicRingSmall: {
+    position: 'absolute',
+    borderWidth: 1,
+    borderColor: '#ff00ff',
+    borderRadius: 50,
+  },
+  ringSmall1: {
+    width: 16,
+    height: 16,
+  },
+  heroSubtitle: {
+    fontSize: 16,
+    color: '#9ca3af',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  errorContainer: {
+    margin: 16,
+    padding: 16,
     backgroundColor: 'rgba(239,68,68,0.1)',
-    marginHorizontal: 16,
-    marginBottom: 20,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(239,68,68,0.3)',
+    alignItems: 'center',
   },
   errorText: {
     color: '#ef4444',
-    marginTop: 8,
-    textAlign: 'center',
     fontSize: 14,
+    textAlign: 'center',
+    marginVertical: 8,
   },
   retryButton: {
-    marginTop: 12,
-    backgroundColor: '#ef4444',
+    backgroundColor: '#00ffff',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
+    marginTop: 8,
   },
   retryText: {
-    color: '#ffffff',
+    color: '#000000',
     fontWeight: '600',
   },
 });
