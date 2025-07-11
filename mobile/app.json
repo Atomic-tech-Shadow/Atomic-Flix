@@ -20,12 +20,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0f172a"
       },
-      "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": false,
       "package": "com.atomicflix.mobile",
       "versionCode": 1,
       "minSdkVersion": 21,
-      "targetSdkVersion": 34,
-      "compileSdkVersion": 34,
+      "targetSdkVersion": 33,
+      "compileSdkVersion": 33,
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE",
@@ -37,16 +37,23 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-av",
       [
         "expo-build-properties",
         {
           "android": {
             "newArchEnabled": false,
-            "enableProguardInReleaseBuilds": true,
+            "enableProguardInReleaseBuilds": false,
             "minSdkVersion": 21,
-            "targetSdkVersion": 34,
-            "compileSdkVersion": 34
+            "targetSdkVersion": 33,
+            "compileSdkVersion": 33,
+            "packagingOptions": {
+              "pickFirst": [
+                "lib/x86/libc++_shared.so",
+                "lib/x86_64/libc++_shared.so",
+                "lib/arm64-v8a/libc++_shared.so",
+                "lib/armeabi-v7a/libc++_shared.so"
+              ]
+            }
           },
           "ios": {
             "newArchEnabled": false

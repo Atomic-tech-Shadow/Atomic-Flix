@@ -2,8 +2,16 @@
 
 ## Versions Android Supportées
 - **Minimum** : Android 5.0 (API 21) - Lollipop
-- **Cible** : Android 14 (API 34) - Latest
-- **Compilation** : Android 14 (API 34)
+- **Cible** : Android 13 (API 33) - Optimisée
+- **Compilation** : Android 13 (API 33)
+
+## Corrections Apportées
+✅ Résolution des erreurs CMake et Hermes
+✅ Désactivation de l'edge-to-edge qui causait des conflits
+✅ Configuration Gradle optimisée pour Termux
+✅ Désactivation de Proguard pour éviter les erreurs de build
+✅ Support multi-architecture (arm64-v8a, armeabi-v7a)
+✅ Moteur JavaScript JSC au lieu de Hermes
 
 ## Fonctionnalités par Version Android
 
@@ -46,9 +54,10 @@
 ✅ Permissions notifications granulaires
 ✅ Thème par app
 
-### Android 14 (API 34) - Actuel
+### Android 13 (API 33) - Cible Optimisée
 ✅ Toutes les fonctionnalités modernes
 ✅ Optimisations de performance
+✅ Compatibilité maximale avec les outils de build
 
 ## Instructions d'Installation
 

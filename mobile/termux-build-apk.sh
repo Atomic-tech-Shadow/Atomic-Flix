@@ -79,7 +79,12 @@ echo ""
 echo "⏱️  Le build peut prendre 5-15 minutes..."
 
 # Build avec EAS (cloud build - pas de ressources locales requises)
-eas build --platform android --profile preview --non-interactive --no-wait
+# Configuration optimisée pour éviter les erreurs CMake et Hermes
+export ANDROID_NATIVE_API_LEVEL=33
+export EXPO_USE_HERMES=false
+export EXPO_USE_FAST_RESOLVER=true
+
+eas build --platform android --profile preview --non-interactive --clear-cache
 
 # Vérifier le résultat
 if [ $? -eq 0 ]; then
