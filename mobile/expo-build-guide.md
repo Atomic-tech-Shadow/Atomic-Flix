@@ -35,6 +35,9 @@ eas build --platform android --profile preview --clear-cache
 - Support multi-architecture (arm64-v8a, armeabi-v7a)
 - Moteur JavaScript JSC (pas d'erreurs Hermes)
 - Gradle optimisé pour build cloud
+- Configuration Metro.js pour Expo.dev
+- Fichier .expobuild pour optimisations cloud
+- Résolution des conflits AAR metadata
 
 ### 4. Workflow GitHub
 
