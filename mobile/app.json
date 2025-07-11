@@ -23,7 +23,7 @@
       "edgeToEdgeEnabled": false,
       "package": "com.atomicflix.mobile",
       "versionCode": 1,
-      "minSdkVersion": 21,
+      "minSdkVersion": 24,
       "targetSdkVersion": 33,
       "compileSdkVersion": 33,
       "permissions": [
@@ -43,7 +43,7 @@
           "android": {
             "newArchEnabled": false,
             "enableProguardInReleaseBuilds": false,
-            "minSdkVersion": 21,
+            "minSdkVersion": 24,
             "targetSdkVersion": 33,
             "compileSdkVersion": 33,
             "packagingOptions": {

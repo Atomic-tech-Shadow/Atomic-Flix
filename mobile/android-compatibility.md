@@ -1,7 +1,7 @@
 # Configuration de Compatibilité Android pour ATOMIC FLIX
 
 ## Versions Android Supportées
-- **Minimum** : Android 5.0 (API 21) - Lollipop
+- **Minimum** : Android 7.0 (API 24) - Nougat
 - **Cible** : Android 13 (API 33) - Optimisée
 - **Compilation** : Android 13 (API 33)
 
@@ -15,14 +15,12 @@
 
 ## Fonctionnalités par Version Android
 
-### Android 5.0+ (API 21) - Support de Base
+### Android 7.0+ (API 24) - Support de Base
 ✅ Navigation dans l'application
-✅ Lecture vidéo basique
+✅ Lecture vidéo avancée avec expo-av
 ✅ Interface utilisateur responsive
 ✅ Connexion internet
 ✅ Stockage local
-
-### Android 6.0+ (API 23) - Permissions Runtime
 ✅ Permissions automatiques pour internet
 ✅ Gestion des permissions dynamiques
 
@@ -67,7 +65,7 @@
 3. Installez l'APK
 
 ### Méthode 2 : Google Play Store (Futur)
-- Compatible avec toutes les versions Android 5.0+
+- Compatible avec toutes les versions Android 7.0+
 - Installation automatique des mises à jour
 
 ## Optimisations Incluses
@@ -92,7 +90,7 @@
 - **APK Optimisé** : ~12-20 MB (avec Proguard)
 
 ## Appareils Testés
-✅ Samsung Galaxy (Android 5.0+)
+✅ Samsung Galaxy (Android 7.0+)
 ✅ Google Pixel (Android 7.0+)
 ✅ OnePlus (Android 8.0+)
 ✅ Xiaomi (Android 9.0+)
