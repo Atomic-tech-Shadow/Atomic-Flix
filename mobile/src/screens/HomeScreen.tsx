@@ -76,17 +76,20 @@ const HomeScreen: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await apiRequest('/trending');
-      console.log('Trending animes response:', response);
+      console.log('Tentative de chargement des trending animes...');
+      const response = await apiRequest('/api/trending');
+      console.log('Réponse complète API trending:', JSON.stringify(response, null, 2));
       
       if (response && response.success && response.results) {
+        console.log('Nombre d\'animes reçus:', response.results.length);
         setTrendingAnimes(response.results.slice(0, 24));
       } else {
         console.warn('Réponse API trending inattendue:', response);
+        setError('Service anime-sama-scraper temporairement indisponible');
         setTrendingAnimes([]);
       }
     } catch (error) {
-      console.error('Erreur trending animes:', error);
+      console.error('Erreur détaillée trending animes:', error);
       setError('Impossible de charger les animes trending');
       setTrendingAnimes([]);
     } finally {
@@ -105,7 +108,7 @@ const HomeScreen: React.FC = () => {
       setSearchLoading(true);
       setError(null);
       
-      const response = await apiRequest(`/search?query=${encodeURIComponent(query.trim())}`);
+      const response = await apiRequest(`/api/search?query=${encodeURIComponent(query.trim())}`);
       console.log('Search response:', response);
       
       if (response && response.success && response.results) {
@@ -295,14 +298,24 @@ const HomeScreen: React.FC = () => {
             {/* Images d'animes en mosaïque */}
             <View style={styles.heroBanner}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.heroImages}>
-                {trendingAnimes.slice(0, 10).map((anime, index) => (
-                  <Image
-                    key={index}
-                    source={{ uri: anime.image }}
-                    style={styles.heroImage}
-                    resizeMode="cover"
-                  />
-                ))}
+                {trendingAnimes.length > 0 ? (
+                  trendingAnimes.slice(0, 10).map((anime, index) => (
+                    <Image
+                      key={index}
+                      source={{ uri: anime.image }}
+                      style={styles.heroImage}
+                      resizeMode="cover"
+                      onError={(e) => console.log('Erreur chargement image:', anime.image)}
+                    />
+                  ))
+                ) : (
+                  // Placeholder images si pas de données
+                  Array.from({length: 5}).map((_, index) => (
+                    <View key={index} style={[styles.heroImage, {backgroundColor: '#1a1a2e'}]}>
+                      <Ionicons name="image" size={24} color="#6b7280" />
+                    </View>
+                  ))
+                )}
               </ScrollView>
               <LinearGradient
                 colors={['transparent', 'rgba(10,10,26,0.9)', 'rgba(10,10,26,1)']}
@@ -546,6 +559,9 @@ const styles = StyleSheet.create({
     width: 80,
     height: 120,
     marginRight: 2,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   heroGradient: {
     position: 'absolute',
