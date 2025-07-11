@@ -30,9 +30,12 @@
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease",
         "env": {
-          "ANDROID_COMPILE_SDK": "33",
-          "ANDROID_BUILD_TOOLS": "33.0.0",
-          "EXPO_SKIP_MANIFEST_VALIDATION": "1"
+          "ANDROID_COMPILE_SDK": "34",
+          "ANDROID_BUILD_TOOLS": "34.0.0",
+          "ANDROID_MIN_SDK": "21",
+          "ANDROID_TARGET_SDK": "34",
+          "EXPO_USE_HERMES": "false",
+          "EXPO_UNIVERSAL_ANDROID": "true"
         }
       },
       "env": {
