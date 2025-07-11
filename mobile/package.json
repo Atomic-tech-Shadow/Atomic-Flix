@@ -16,7 +16,7 @@
     "clean": "expo r -c"
   },
   "dependencies": {
-    "@babel/runtime": "7.20.13",
+    "@babel/runtime": "^7.27.6",
     "@egjs/hammerjs": "^2.0.17",
     "@react-navigation/native": "^6.0.0",
     "@react-navigation/stack": "^6.0.0",
