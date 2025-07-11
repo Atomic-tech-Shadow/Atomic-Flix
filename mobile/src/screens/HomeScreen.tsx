@@ -123,21 +123,6 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-    setSearchLoading(true);
-    setError(null);
-
-    try {
-      const response = await apiRequest(`/search?query=${encodeURIComponent(query.trim())}`);
-      setSearchResults(response.data || []);
-    } catch (error) {
-      console.error('Erreur lors de la recherche:', error);
-      setError('Erreur lors de la recherche. Veuillez réessayer.');
-      setSearchResults([]);
-    } finally {
-      setSearchLoading(false);
-    }
-  };
-
   // Navigation vers détails anime
   const navigateToAnime = (anime: SearchResult) => {
     navigation.navigate('AnimeDetail', {
