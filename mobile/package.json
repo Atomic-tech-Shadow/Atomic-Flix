@@ -37,7 +37,8 @@
     "expo-linear-gradient": "~14.1.5",
     "babel-preset-expo": "~13.0.0",
     "@babel/core": "^7.20.0",
-    "@babel/plugin-transform-runtime": "^7.20.0"
+    "@babel/plugin-transform-runtime": "^7.20.0",
+    "@babel/runtime": "^7.24.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.0",
