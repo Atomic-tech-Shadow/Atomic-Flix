@@ -16,6 +16,7 @@
     "clean": "expo r -c"
   },
   "dependencies": {
+    "@babel/runtime": "^7.24.0",
     "@egjs/hammerjs": "^2.0.17",
     "@react-navigation/native": "^6.0.0",
     "@react-navigation/stack": "^6.0.0",
@@ -36,7 +37,12 @@
     "expo-linear-gradient": "~14.1.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/plugin-transform-runtime": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "@babel/preset-react": "^7.24.0",
     "@types/react": "~19.0.10",
+    "babel-preset-expo": "~12.1.0",
     "typescript": "~5.8.3"
   }
 }
