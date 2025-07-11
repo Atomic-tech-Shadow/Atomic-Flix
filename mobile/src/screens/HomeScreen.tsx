@@ -223,12 +223,15 @@ const HomeScreen: React.FC = () => {
       
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle} numberOfLines={2}>
-          {anime.title}
+          {anime.title?.replace(/\n/g, ' ').replace(/\t/g, ' ').trim()}
         </Text>
         <View style={styles.cardMeta}>
-          <View style={styles.statusBadge}>
-            <Text style={styles.statusText}>{anime.status || anime.type}</Text>
-          </View>
+          <Text style={styles.statusText}>
+            {anime.status || 'En cours'}
+          </Text>
+          <Text style={styles.typeText}>
+            {anime.contentType || 'anime'}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -459,28 +462,34 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 20, // text-xl web
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#00ffff', // atomic-gradient-text (cyan)
     marginLeft: 8,
   },
   animeGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start', // pas space-between pour respecter gap du web
+    paddingHorizontal: 8, // match le padding du site web
   },
   animeCard: {
-    width: (width - 48) / 2,
-    marginBottom: 20,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    width: width > 1280 ? (width - 64) / 6 - 12 : // xl:grid-cols-6 web avec gap
+          width > 1024 ? (width - 64) / 5 - 12 : // lg:grid-cols-5 web avec gap
+          width > 768 ? (width - 64) / 4 - 12 :   // md:grid-cols-4 web avec gap
+          width > 640 ? (width - 64) / 3 - 12 :   // sm:grid-cols-3 web avec gap
+          (width - 64) / 2 - 12,                  // grid-cols-2 web avec gap
+    marginBottom: 12, // gap-3 web (12px)
+    marginRight: 12,  // gap-3 web (12px)
+    borderRadius: 8,  // rounded-lg web
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(0,255,255,0.2)',
+    position: 'relative', // pour overlay du hover effect
   },
   cardImageContainer: {
     position: 'relative',
-    height: 240,
+    height: width > 768 ? 288 : // md:h-72 web (288px)
+           width > 640 ? 256 :   // sm:h-64 web (256px)
+           224,                  // h-56 web (224px)
   },
   cardImage: {
     width: '100%',
@@ -494,29 +503,39 @@ const styles = StyleSheet.create({
     height: 60,
   },
   cardContent: {
-    padding: 12,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16, // p-4 web
+    backgroundColor: 'rgba(0,0,0,0.8)', // bg-gradient-to-t from-black/95 web
   },
   cardTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 14, // text-sm web
+    fontWeight: '600', // font-semibold web
     color: '#ffffff',
     marginBottom: 8,
-    lineHeight: 18,
+    lineHeight: 18, // leading-tight web
   },
   cardMeta: {
     flexDirection: 'row',
+    justifyContent: 'space-between', // justify-between web
     alignItems: 'center',
   },
   statusBadge: {
-    backgroundColor: 'rgba(0,255,255,0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    // Pas de badge, juste le texte comme le web
   },
   statusText: {
-    fontSize: 10,
-    color: '#00ffff',
-    fontWeight: '600',
+    fontSize: 12, // text-xs web
+    color: '#d1d5db', // text-gray-300 web
+    fontWeight: '400',
+    textTransform: 'uppercase', // uppercase web
+    letterSpacing: 1, // tracking-wide web
+  },
+  typeText: {
+    fontSize: 12, // text-xs web
+    color: 'rgba(0,255,255,0.8)', // text-cyan-400/80 web
+    fontWeight: '500', // font-medium web
   },
   loadingContainer: {
     alignItems: 'center',
@@ -538,28 +557,27 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
   },
-  // Styles pour la bannière héro
+  // Styles pour la bannière héro (dimensions identiques au site web)
   heroSection: {
-    marginHorizontal: 16,
-    marginBottom: 24,
-    borderRadius: 16,
+    marginHorizontal: 8, // margin px-2 web
+    marginBottom: 32, // mb-8 web
+    borderRadius: 16, // rounded-2xl web
     overflow: 'hidden',
     backgroundColor: '#0a0a1a',
     borderWidth: 1,
     borderColor: 'rgba(0,240,255,0.2)',
   },
   heroBanner: {
-    height: 120,
+    height: width > 768 ? 128 : 96, // h-24 md:h-32 web (96px/128px)
     position: 'relative',
   },
   heroImages: {
-    height: 120,
+    height: width > 768 ? 128 : 96,
   },
   heroImage: {
-    width: 80,
-    height: 120,
-    marginRight: 2,
-    borderRadius: 4,
+    width: (width - 16) / 8, // flex-1 divisé par 8 images comme le web
+    height: width > 768 ? 128 : 96,
+    marginRight: -2, // marginLeft: '-2px' web
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -568,19 +586,20 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 120,
+    height: width > 768 ? 128 : 96,
   },
   heroContent: {
-    padding: 20,
+    paddingHorizontal: width > 768 ? 48 : 24, // px-6 md:px-12 web
+    paddingVertical: width > 768 ? 48 : 32, // py-8 md:py-12 web
     alignItems: 'center',
   },
   heroTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8, // mb-2 web
   },
   heroTitle: {
-    fontSize: 32,
+    fontSize: width > 768 ? 48 : 30, // text-3xl md:text-5xl web (30px/48px)
     fontWeight: 'bold',
     color: '#00ffff',
     marginRight: 12,
@@ -614,10 +633,12 @@ const styles = StyleSheet.create({
     height: 16,
   },
   heroSubtitle: {
-    fontSize: 16,
-    color: '#9ca3af',
+    fontSize: width > 768 ? 20 : 18, // text-lg md:text-xl web (18px/20px)
+    color: '#e5e7eb', // text-gray-200 web
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: width > 768 ? 28 : 24,
+    fontWeight: '300', // font-light web
+    marginBottom: 16, // mb-4 web
   },
   errorContainer: {
     margin: 16,
