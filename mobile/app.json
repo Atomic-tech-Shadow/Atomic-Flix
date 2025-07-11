@@ -54,8 +54,9 @@
                 "lib/armeabi-v7a/libc++_shared.so"
               ]
             },
-            "enablePrereleaseSDK": true,
-            "proguardFiles": ["proguard-android.txt"]
+            "enablePrereleaseSDK": false,
+            "proguardFiles": ["proguard-android.txt"],
+            "usesCleartextTraffic": true
           },
           "ios": {
             "newArchEnabled": false

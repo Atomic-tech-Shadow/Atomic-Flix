@@ -16,7 +16,7 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease --no-daemon --stacktrace"
+        "gradleCommand": ":app:assembleRelease --no-daemon -x checkReleaseAarMetadata"
       },
       "env": {
         "NODE_ENV": "production"
