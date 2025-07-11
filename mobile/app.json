@@ -22,6 +22,10 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.atomicflix.mobile",
+      "versionCode": 1,
+      "minSdkVersion": 21,
+      "targetSdkVersion": 34,
+      "compileSdkVersion": 34,
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE",
@@ -39,7 +43,10 @@
         {
           "android": {
             "newArchEnabled": false,
-            "enableProguardInReleaseBuilds": true
+            "enableProguardInReleaseBuilds": true,
+            "minSdkVersion": 21,
+            "targetSdkVersion": 34,
+            "compileSdkVersion": 34
           },
           "ios": {
             "newArchEnabled": false
