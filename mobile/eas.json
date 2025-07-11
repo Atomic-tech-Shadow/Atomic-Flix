@@ -28,7 +28,12 @@
     "production": {
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
+        "gradleCommand": ":app:assembleRelease",
+        "env": {
+          "ANDROID_COMPILE_SDK": "33",
+          "ANDROID_BUILD_TOOLS": "33.0.0",
+          "EXPO_SKIP_MANIFEST_VALIDATION": "1"
+        }
       },
       "env": {
         "NODE_ENV": "production"
