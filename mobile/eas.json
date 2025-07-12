@@ -9,14 +9,16 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleDebug"
+        "gradleCommand": ":app:assembleDebug",
+        "credentials": "auto"
       }
     },
     "preview": {
-      "distribution": "internal",
+      "distribution": "internal", 
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease --no-daemon -x checkReleaseAarMetadata -x lintVitalAnalyzeRelease -x processReleaseGoogleServices"
+        "gradleCommand": ":app:assembleRelease --no-daemon -x checkReleaseAarMetadata -x lintVitalAnalyzeRelease -x processReleaseGoogleServices",
+        "credentials": "auto"
       },
       "env": {
         "NODE_ENV": "production",
@@ -32,11 +34,12 @@
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease",
+        "credentials": "auto",
         "env": {
-          "ANDROID_COMPILE_SDK": "34",
-          "ANDROID_BUILD_TOOLS": "34.0.0",
+          "ANDROID_COMPILE_SDK": "33",
+          "ANDROID_BUILD_TOOLS": "33.0.0",
           "ANDROID_MIN_SDK": "21",
-          "ANDROID_TARGET_SDK": "34",
+          "ANDROID_TARGET_SDK": "33",
           "EXPO_USE_HERMES": "false"
         }
       },
