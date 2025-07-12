@@ -25,6 +25,14 @@ const checks = [
     fix: 'Ajoutez "typescript": "~5.8.3" aux devDependencies'
   },
   {
+    name: '@types/react-native supprimé (obsolète)',
+    check: () => {
+      const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+      return !pkg.devDependencies || !pkg.devDependencies['@types/react-native'];
+    },
+    fix: 'React Native 0.79 fournit ses propres types - @types/react-native est obsolète'
+  },
+  {
     name: 'tsconfig.json existe',
     check: () => fs.existsSync('./tsconfig.json'),
     fix: 'Créez un fichier tsconfig.json avec la configuration Expo'
