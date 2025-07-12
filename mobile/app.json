@@ -20,12 +20,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0f172a"
       },
-      "edgeToEdgeEnabled": false,
       "package": "com.atomicflix.mobile",
       "versionCode": 1,
-      "minSdkVersion": 21,
-      "targetSdkVersion": 34,
-      "compileSdkVersion": 34,
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE",
@@ -55,10 +51,7 @@
                 "lib/arm64-v8a/libc++_shared.so",
                 "lib/armeabi-v7a/libc++_shared.so"
               ]
-            },
-            "enablePrereleaseSDK": false,
-            "proguardFiles": ["proguard-android.txt"],
-            "usesCleartextTraffic": true
+            }
           },
           "ios": {
             "newArchEnabled": false
