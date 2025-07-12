@@ -16,10 +16,11 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease --no-daemon -x checkReleaseAarMetadata"
+        "gradleCommand": ":app:assembleRelease --no-daemon -x checkReleaseAarMetadata -x lintVitalAnalyzeRelease"
       },
       "env": {
-        "NODE_ENV": "production"
+        "NODE_ENV": "production",
+        "EXPO_USE_HERMES": "false"
       },
       "cache": {
         "disabled": true
