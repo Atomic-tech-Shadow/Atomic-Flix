@@ -8,8 +8,7 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleDebug",
-        "credentials": "auto"
+        "gradleCommand": ":app:assembleDebug"
       },
       "env": {
         "NODE_ENV": "development",
@@ -17,11 +16,10 @@
       }
     },
     "preview": {
-      "distribution": "internal", 
+      "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease --no-daemon",
-        "credentials": "auto"
+        "gradleCommand": ":app:assembleRelease --no-daemon"
       },
       "env": {
         "NODE_ENV": "production",
@@ -33,22 +31,18 @@
         "disabled": true
       }
     },
-
     "production": {
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease",
-        "credentials": "auto",
-        "env": {
-          "ANDROID_COMPILE_SDK": "33",
-          "ANDROID_BUILD_TOOLS": "33.0.0",
-          "ANDROID_MIN_SDK": "21",
-          "ANDROID_TARGET_SDK": "33",
-          "EXPO_USE_HERMES": "false"
-        }
+        "gradleCommand": ":app:assembleRelease"
       },
       "env": {
-        "NODE_ENV": "production"
+        "NODE_ENV": "production",
+        "ANDROID_COMPILE_SDK": "33",
+        "ANDROID_BUILD_TOOLS": "33.0.0",
+        "ANDROID_MIN_SDK": "24",
+        "ANDROID_TARGET_SDK": "33",
+        "EXPO_USE_HERMES": "false"
       }
     }
   }
