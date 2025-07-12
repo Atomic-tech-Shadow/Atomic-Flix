@@ -2,8 +2,10 @@
 
 ## Versions Android Supportées
 - **Minimum** : Android 7.0 (API 24) - Nougat
-- **Cible** : Android 13 (API 33) - Optimisée
+- **Cible** : Android 13 (API 33) - Optimisée  
 - **Compilation** : Android 13 (API 33)
+
+> ⚠️ **Note importante** : Android 5.0-6.0 n'est pas supporté à cause des modules natifs React Native qui requièrent l'API 24 minimum.
 
 ## Corrections Apportées
 ✅ Résolution des erreurs CMake et Hermes
