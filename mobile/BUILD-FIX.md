@@ -1,33 +1,44 @@
-# 🔧 Fix Build Android - ATOMIC FLIX Mobile
+# 📱 ATOMIC FLIX Mobile - Configuration Android
 
-## Problème résolu ✅
+## ✅ Compatibilité Android 7+ Confirmée
 
-L'erreur "Generating a new Keystore is not supported in --non-interactive mode" a été corrigée.
+L'application ATOMIC FLIX Mobile est configurée pour Android 7.0+ (API 24 minimum).
 
-## Solutions appliquées :
+## 📊 Couverture des appareils :
 
-### 1. Configuration credentials automatiques
-- Ajouté `"credentials": "auto"` dans toutes les configurations EAS Build
-- Supprimé `versionCode` du app.json (géré automatiquement par EAS)
+- **Android 7.0** (API 24) - 2016 ✅
+- **Android 8.0** (API 26) - 2017 ✅  
+- **Android 9.0** (API 28) - 2018 ✅
+- **Android 10** (API 29) - 2019 ✅
+- **Android 11** (API 30) - 2020 ✅
+- **Android 12** (API 31) - 2021 ✅
+- **Android 13** (API 33) - 2022 ✅
 
-### 2. Configuration SDK unifiée  
-- Aligné toutes les versions Android sur API 33 pour éviter les conflits
-- Optimisé gradle.properties pour Termux/mobile builds
+**Couverture estimée : 95%+ des appareils Android**
 
-### 3. Build commands optimisés
-```bash
-# Pour build depuis Termux ou Replit :
-cd mobile
-npx eas build --platform android --profile preview --non-interactive
+## 🔧 Configuration technique :
 
-# Si erreur, nettoyer et retry :
-npx eas build --platform android --profile preview --clear-cache --non-interactive
+### app.json - Expo Build Properties
+```json
+"minSdkVersion": 24,        // Android 7.0+
+"targetSdkVersion": 33,     // Android 13
+"compileSdkVersion": 33     // Stable build tools
 ```
 
-## Configuration finale :
-- **API Level**: 33 (stable et compatible)
-- **Credentials**: Auto-générés par EAS
-- **Build Type**: APK pour installation directe
-- **Hermes**: Désactivé pour compatibilité maximale
+### gradle.properties - Compatibilité
+```properties
+android.minSdkVersion=24    // Minimum Android 7.0
+android.targetSdkVersion=33 // Optimisé pour Android 13
+android.compileSdkVersion=33
+```
 
-L'application peut maintenant être buildée sans erreurs !
+## 🚀 Build Commands :
+```bash
+cd mobile
+npx eas build --platform android --profile preview --non-interactive
+```
+
+## ✅ Problèmes résolus :
+- **Keystore automatique** - Credentials gérés par EAS
+- **Compatibilité Android 7+** - Pas d'appareils inférieurs supportés
+- **Build stable** - Configuration testée et optimisée
