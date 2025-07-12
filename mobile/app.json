@@ -23,7 +23,7 @@
       "edgeToEdgeEnabled": false,
       "package": "com.atomicflix.mobile",
       "versionCode": 1,
-      "minSdkVersion": 24,
+      "minSdkVersion": 21,
       "targetSdkVersion": 33,
       "compileSdkVersion": 33,
       "permissions": [

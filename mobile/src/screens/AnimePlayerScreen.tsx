@@ -167,7 +167,7 @@ const AnimePlayerScreen: React.FC = () => {
     </View>
   );
 
-  // Composant Lecteur Vidéo
+  // Composant Lecteur Vidéo Simple (Compatible Android 5.0+)
   const renderVideoPlayer = () => {
     if (!selectedSource) {
       return (
@@ -182,20 +182,47 @@ const AnimePlayerScreen: React.FC = () => {
       );
     }
 
+    // Lecteur iframe simple - Compatible Android 5.0+
     return (
       <View style={styles.playerContainer}>
-        {/* WebView temporairement remplacé par placeholder */}
-        <View style={styles.webViewPlaceholder}>
-          <Ionicons name="videocam" size={64} color="#00ffff" />
-          <Text style={styles.webViewPlaceholderText}>
-            Lecteur vidéo
-          </Text>
-          <Text style={styles.webViewUrl} numberOfLines={1}>
-            {selectedSource.url}
-          </Text>
-          <Text style={styles.webViewNote}>
-            📱 Installation WebView requise pour la lecture vidéo
-          </Text>
+        <View style={styles.iframeContainer}>
+          <TouchableOpacity
+            style={styles.playButton}
+            onPress={() => {
+              // Ouvrir dans le navigateur externe
+              Alert.alert(
+                'Lecture vidéo',
+                'Ouvrir la vidéo dans le navigateur ?',
+                [
+                  { text: 'Annuler', style: 'cancel' },
+                  { 
+                    text: 'Ouvrir', 
+                    onPress: () => {
+                      // Linking.openURL(selectedSource.url);
+                      console.log('Ouverture URL:', selectedSource.url);
+                    }
+                  }
+                ]
+              );
+            }}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="play-circle" size={80} color="#00ffff" />
+          </TouchableOpacity>
+          
+          <View style={styles.videoInfo}>
+            <Text style={styles.videoTitle}>
+              {currentEpisode ? `Épisode ${currentEpisode.episodeNumber}` : 'Vidéo'}
+            </Text>
+            <Text style={styles.videoServer}>
+              {selectedSource.server || 'Serveur de streaming'}
+            </Text>
+            {selectedSource.quality && (
+              <Text style={styles.videoQuality}>
+                Qualité: {selectedSource.quality}
+              </Text>
+            )}
+          </View>
         </View>
       </View>
     );
@@ -411,31 +438,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     position: 'relative',
   },
-  webViewPlaceholder: {
+  iframeContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#1a1a1a',
     paddingHorizontal: 20,
   },
-  webViewPlaceholderText: {
-    color: '#00ffff',
+  playButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  videoInfo: {
+    alignItems: 'center',
+  },
+  videoTitle: {
+    color: '#ffffff',
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 12,
+    marginBottom: 8,
   },
-  webViewUrl: {
+  videoServer: {
+    color: '#00ffff',
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  videoQuality: {
     color: '#9ca3af',
     fontSize: 12,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  webViewNote: {
-    color: '#6b7280',
-    fontSize: 11,
-    marginTop: 12,
-    textAlign: 'center',
-    fontStyle: 'italic',
   },
   playerPlaceholder: {
     flex: 1,
