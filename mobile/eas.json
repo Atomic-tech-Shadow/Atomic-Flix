@@ -16,11 +16,13 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease --no-daemon -x checkReleaseAarMetadata -x lintVitalAnalyzeRelease"
+        "gradleCommand": ":app:assembleRelease --no-daemon -x checkReleaseAarMetadata -x lintVitalAnalyzeRelease -x processReleaseGoogleServices"
       },
       "env": {
         "NODE_ENV": "production",
-        "EXPO_USE_HERMES": "false"
+        "EXPO_USE_HERMES": "false",
+        "JAVA_HOME": "$JAVA_HOME_17_X64",
+        "GRADLE_OPTS": "-Xmx4096m -XX:MaxMetaspaceSize=512m"
       },
       "cache": {
         "disabled": true
