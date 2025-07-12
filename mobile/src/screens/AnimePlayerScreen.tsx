@@ -53,11 +53,11 @@ const AnimePlayerScreen: React.FC = () => {
           'Content-Type': 'application/json',
         }
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      
+
       return await response.json();
     } catch (error) {
       console.error('Erreur API:', error);
@@ -70,20 +70,20 @@ const AnimePlayerScreen: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const extractedId = animeUrl.split('/').pop() || animeUrl;
       const languageCode = 'vf'; // Par défaut VF
-      
+
       console.log('Chargement épisodes pour:', extractedId, 'saison:', seasonData.value);
-      
+
       const response = await apiRequest(`/api/episodes/${extractedId}?season=${seasonData.value}&language=${languageCode}`);
       console.log('Épisodes reçus:', response);
-      
+
       if (response && response.success && response.episodes) {
         const formattedEpisodes = response.episodes.map((ep: any, index: number) => {
           const episodeNumber = ep.number || (index + 1);
           const episodeTitle = ep.title || `Épisode ${episodeNumber}`;
-          
+
           return {
             id: `${extractedId}-${seasonData.value}-ep${episodeNumber}-${languageCode}`,
             title: episodeTitle,
@@ -94,9 +94,9 @@ const AnimePlayerScreen: React.FC = () => {
             streamingSources: ep.streamingSources || []
           };
         });
-        
+
         setEpisodes(formattedEpisodes);
-        
+
         if (formattedEpisodes.length > 0) {
           await loadEpisodeSources(formattedEpisodes[0]);
         }
@@ -114,18 +114,18 @@ const AnimePlayerScreen: React.FC = () => {
   // Charger les sources d'un épisode (identique au site web)
   const loadEpisodeSources = async (episode: Episode) => {
     if (!episode) return;
-    
+
     try {
       setEpisodeLoading(true);
       setCurrentEpisode(episode);
       setCurrentSources([]);
       setSelectedSource(null);
-      
+
       console.log('Récupération sources streaming pour épisode:', episode.episodeNumber);
-      
+
       const response = await apiRequest(`/api/embed?url=${encodeURIComponent(episode.url)}`);
       console.log('Sources streaming reçues:', response);
-      
+
       if (response && response.success && response.sources && response.sources.length > 0) {
         setCurrentSources(response.sources);
         setSelectedSource(response.sources[0]);
@@ -209,7 +209,7 @@ const AnimePlayerScreen: React.FC = () => {
           >
             <Ionicons name="play-circle" size={80} color="#00ffff" />
           </TouchableOpacity>
-          
+
           <View style={styles.videoInfo}>
             <Text style={styles.videoTitle}>
               {currentEpisode ? `Épisode ${currentEpisode.episodeNumber}` : 'Vidéo'}
@@ -240,7 +240,7 @@ const AnimePlayerScreen: React.FC = () => {
             Serveurs disponibles ({currentSources.length})
           </Text>
         </View>
-        
+
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.serversContainer}>
             {currentSources.map((source, index) => (
@@ -289,7 +289,7 @@ const AnimePlayerScreen: React.FC = () => {
             Épisodes ({episodes.length})
           </Text>
         </View>
-        
+
         <View style={styles.episodesGrid}>
           {episodes.map((episode, index) => (
             <TouchableOpacity
@@ -321,7 +321,7 @@ const AnimePlayerScreen: React.FC = () => {
                     />
                   )}
                 </View>
-                
+
                 <View style={styles.episodeInfo}>
                   <Text style={[
                     styles.episodeNumber,
@@ -330,7 +330,7 @@ const AnimePlayerScreen: React.FC = () => {
                   ]}>
                     Épisode {episode.episodeNumber}
                   </Text>
-                  
+
                   {episode.title && (
                     <Text style={[
                       styles.episodeTitle,
@@ -384,11 +384,11 @@ const AnimePlayerScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" backgroundColor="#0a0a0a" />
-      
+
       <View style={styles.content}>
         {renderHeader()}
         {renderVideoPlayer()}
-        
+
         <ScrollView 
           style={styles.controlsScrollView}
           showsVerticalScrollIndicator={false}

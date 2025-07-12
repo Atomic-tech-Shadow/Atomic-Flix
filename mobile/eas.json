@@ -34,8 +34,7 @@
           "ANDROID_BUILD_TOOLS": "34.0.0",
           "ANDROID_MIN_SDK": "21",
           "ANDROID_TARGET_SDK": "34",
-          "EXPO_USE_HERMES": "false",
-          "EXPO_UNIVERSAL_ANDROID": "true"
+          "EXPO_USE_HERMES": "false"
         }
       },
       "env": {
