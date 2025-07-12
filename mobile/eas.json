@@ -17,34 +17,20 @@
       "distribution": "internal", 
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease --no-daemon --max-workers=2 -x checkReleaseAarMetadata -x lintVitalAnalyzeRelease -x processReleaseGoogleServices",
+        "gradleCommand": ":app:assembleRelease --no-daemon",
         "credentials": "auto"
       },
       "env": {
         "NODE_ENV": "production",
         "EXPO_USE_HERMES": "false",
         "JAVA_HOME": "$JAVA_HOME_17_X64",
-        "GRADLE_OPTS": "-Xmx3072m -XX:MaxMetaspaceSize=256m --no-daemon"
+        "GRADLE_OPTS": "-Xmx4096m -XX:MaxMetaspaceSize=512m"
       },
       "cache": {
         "disabled": true
       }
     },
-    "fast": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk",
-        "gradleCommand": ":app:assembleDebug --no-daemon --max-workers=1",
-        "credentials": "auto"
-      },
-      "env": {
-        "NODE_ENV": "development",
-        "EXPO_USE_HERMES": "false"
-      },
-      "cache": {
-        "disabled": true
-      }
-    },
+
     "production": {
       "android": {
         "buildType": "apk",
