@@ -688,28 +688,73 @@ const AnimePlayerPage: React.FC = () => {
           }
         });
 
-        // Bloquer les éléments avec des classes/IDs suspects silencieusement
-        const suspiciousSelectors = [
+        // Bloquer les overlays et popups qui apparaissent au clic
+        const popupSelectors = [
           '[class*="ad"]', '[id*="ad"]', '[class*="advertisement"]',
           '[id*="advertisement"]', '[class*="sponsor"]', '[id*="sponsor"]',
           '[class*="popup"]', '[id*="popup"]', '[class*="banner"]',
-          '[id*="banner"]', '.promo', '#promo'
+          '[id*="banner"]', '.promo', '#promo', '[class*="overlay"]',
+          '[id*="overlay"]', '[class*="modal"]', '[id*="modal"]',
+          '[style*="position: fixed"]', '[style*="position: absolute"]',
+          '[style*="z-index: 999"]', '[style*="z-index: 9999"]'
         ];
 
-        suspiciousSelectors.forEach(selector => {
+        popupSelectors.forEach(selector => {
           const elements = iframeDoc.querySelectorAll(selector);
           elements.forEach(element => {
             const rect = element.getBoundingClientRect();
+            const style = window.getComputedStyle(element);
             const hasAdKeywords = adBlockerPatterns.some(pattern => 
               element.className.toLowerCase().includes(pattern) ||
               element.id.toLowerCase().includes(pattern)
             );
             
-            if (hasAdKeywords || (rect.width > 200 && rect.height > 100)) {
+            // Détecter les overlays/popups par leur style
+            const isOverlay = style.position === 'fixed' || 
+                             style.position === 'absolute' ||
+                             parseInt(style.zIndex) > 100 ||
+                             (rect.width > window.innerWidth * 0.3 && rect.height > window.innerHeight * 0.3);
+            
+            if (hasAdKeywords || isOverlay) {
               element.style.display = 'none';
+              element.remove();
             }
           });
         });
+
+        // Bloquer window.open et les nouvelles fenêtres popup
+        if (iframeDoc.defaultView) {
+          const originalOpen = iframeDoc.defaultView.open;
+          iframeDoc.defaultView.open = function() {
+            return null; // Bloquer tous les window.open
+          };
+        }
+
+        // Intercepter tous les clics pour empêcher les popups
+        const blockPopupClicks = (e: Event) => {
+          const target = e.target as Element;
+          if (target) {
+            // Vérifier si l'élément cliqué pourrait déclencher une popup
+            const href = target.getAttribute('href');
+            const onclick = target.getAttribute('onclick');
+            
+            if (href && adBlockerPatterns.some(pattern => href.toLowerCase().includes(pattern))) {
+              e.preventDefault();
+              e.stopPropagation();
+              return false;
+            }
+            
+            if (onclick && (onclick.includes('window.open') || onclick.includes('popup'))) {
+              e.preventDefault();
+              e.stopPropagation();
+              return false;
+            }
+          }
+        };
+
+        // Ajouter l'intercepteur de clics
+        iframeDoc.addEventListener('click', blockPopupClicks, true);
+        iframeDoc.addEventListener('mousedown', blockPopupClicks, true);
 
         // Observer pour bloquer les nouveaux éléments automatiquement
         const observer = new MutationObserver((mutations) => {
@@ -718,9 +763,19 @@ const AnimePlayerPage: React.FC = () => {
               mutation.addedNodes.forEach((node) => {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                   const element = node as Element;
+                  
+                  // Bloquer immédiatement les nouveaux scripts/iframes suspects
                   if (element.tagName === 'SCRIPT' || element.tagName === 'IFRAME') {
                     const src = element.getAttribute('src') || '';
                     if (adBlockerPatterns.some(pattern => src.toLowerCase().includes(pattern))) {
+                      element.remove();
+                    }
+                  }
+                  
+                  // Bloquer les nouveaux overlays/popups
+                  if (element.tagName === 'DIV' || element.tagName === 'SPAN') {
+                    const style = window.getComputedStyle(element);
+                    if (style.position === 'fixed' && parseInt(style.zIndex) > 100) {
                       element.remove();
                     }
                   }
@@ -740,16 +795,75 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
+  // Ajouter du CSS dans l'iframe pour bloquer les popups
+  const injectAdBlockCSS = () => {
+    if (!iframeRef.current) return;
+
+    try {
+      const iframe = iframeRef.current;
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      
+      if (iframeDoc) {
+        // Créer le style CSS pour bloquer les overlays
+        const style = iframeDoc.createElement('style');
+        style.textContent = `
+          /* Bloquer tous les overlays suspects */
+          [class*="ad"], [id*="ad"],
+          [class*="popup"], [id*="popup"],
+          [class*="overlay"], [id*="overlay"],
+          [class*="modal"], [id*="modal"],
+          [class*="banner"], [id*="banner"],
+          [class*="sponsor"], [id*="sponsor"],
+          .promo, #promo {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+          }
+          
+          /* Bloquer les éléments en position fixed avec z-index élevé */
+          *[style*="position: fixed"][style*="z-index"],
+          *[style*="position: absolute"][style*="z-index"] {
+            display: none !important;
+          }
+          
+          /* Empêcher les clics sur les overlays */
+          body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+            pointer-events: none;
+          }
+        `;
+        
+        // Ajouter le style au head de l'iframe
+        const head = iframeDoc.head || iframeDoc.getElementsByTagName('head')[0];
+        if (head) {
+          head.appendChild(style);
+        }
+      }
+    } catch (error) {
+      // Erreur silencieuse
+    }
+  };
+
   // Effet pour activer le bloqueur de pub automatiquement et silencieusement
   useEffect(() => {
     if (iframeRef.current) {
       const iframe = iframeRef.current;
       
       const enableSilentAdBlocker = () => {
-        setTimeout(blockAds, 1000); // Attendre que l'iframe se charge
-        setTimeout(blockAds, 3000); // Deuxième passage pour les ads tardives
-        setTimeout(blockAds, 5000); // Troisième passage pour les ads dynamiques
-        setTimeout(blockAds, 8000); // Quatrième passage pour les ads très tardives
+        injectAdBlockCSS(); // Injecter le CSS d'abord
+        setTimeout(blockAds, 500); // Premier passage rapide
+        setTimeout(blockAds, 1500); // Deuxième passage
+        setTimeout(blockAds, 3000); // Troisième passage pour les ads tardives
+        setTimeout(blockAds, 5000); // Quatrième passage pour les ads dynamiques
+        setTimeout(blockAds, 8000); // Cinquième passage pour les ads très tardives
+        setTimeout(blockAds, 12000); // Sixième passage pour les ads post-interaction
       };
 
       iframe.addEventListener('load', enableSilentAdBlocker);
