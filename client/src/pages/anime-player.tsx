@@ -730,31 +730,68 @@ const AnimePlayerPage: React.FC = () => {
           };
         }
 
-        // Intercepter tous les clics pour empêcher les popups
+        // Intercepteur avancé pour bloquer les popups au clic sur play
         const blockPopupClicks = (e: Event) => {
           const target = e.target as Element;
           if (target) {
             // Vérifier si l'élément cliqué pourrait déclencher une popup
             const href = target.getAttribute('href');
             const onclick = target.getAttribute('onclick');
+            const classList = target.classList;
+            const tagName = target.tagName.toLowerCase();
             
+            // Bloquer les liens suspects
             if (href && adBlockerPatterns.some(pattern => href.toLowerCase().includes(pattern))) {
               e.preventDefault();
               e.stopPropagation();
               return false;
             }
             
-            if (onclick && (onclick.includes('window.open') || onclick.includes('popup'))) {
+            // Bloquer les onclick suspects
+            if (onclick && (onclick.includes('window.open') || onclick.includes('popup') || onclick.includes('ads'))) {
               e.preventDefault();
               e.stopPropagation();
               return false;
             }
+
+            // Protection spéciale pour les boutons play - autoriser seulement la lecture
+            if (tagName === 'button' || classList.contains('play') || classList.contains('player')) {
+              // Permettre seulement si c'est vraiment un bouton de lecture légitime
+              const isLegitPlayButton = target.closest('video') || 
+                                       target.closest('.video-player') ||
+                                       target.closest('.plyr') ||
+                                       classList.contains('vjs-play-control');
+              
+              if (!isLegitPlayButton) {
+                // Délai court pour permettre la lecture puis bloquer les popups
+                setTimeout(() => {
+                  // Bloquer toute nouvelle fenêtre qui s'ouvrirait après le clic
+                  if (iframeDoc.defaultView) {
+                    iframeDoc.defaultView.open = function() { return null; };
+                  }
+                }, 100);
+              }
+            }
+
+            // Bloquer spécifiquement les overlays qui apparaissent après un clic
+            setTimeout(() => {
+              const newOverlays = iframeDoc.querySelectorAll('[style*="position: fixed"], [style*="position: absolute"]');
+              newOverlays.forEach(overlay => {
+                const style = window.getComputedStyle(overlay);
+                if (parseInt(style.zIndex) > 100) {
+                  overlay.remove();
+                }
+              });
+            }, 50);
           }
         };
 
-        // Ajouter l'intercepteur de clics
+        // Protection multi-niveaux contre les popups
         iframeDoc.addEventListener('click', blockPopupClicks, true);
         iframeDoc.addEventListener('mousedown', blockPopupClicks, true);
+        iframeDoc.addEventListener('mouseup', blockPopupClicks, true);
+        iframeDoc.addEventListener('touchstart', blockPopupClicks, true);
+        iframeDoc.addEventListener('touchend', blockPopupClicks, true);
 
         // Observer pour bloquer les nouveaux éléments automatiquement
         const observer = new MutationObserver((mutations) => {
@@ -795,6 +832,65 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
+  // Bloquer les popups de serveurs vidéo au niveau JavaScript
+  const injectPopupBlocker = () => {
+    if (!iframeRef.current) return;
+
+    try {
+      const iframe = iframeRef.current;
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      const iframeWindow = iframe.contentWindow;
+      
+      if (iframeDoc && iframeWindow) {
+        // Bloquer window.open complètement
+        iframeWindow.open = function() { return null; };
+        
+        // Bloquer les événements suspects sur les éléments
+        const interceptEvents = (element: Element) => {
+          ['click', 'mousedown', 'mouseup', 'touchstart', 'touchend'].forEach(eventType => {
+            element.addEventListener(eventType, (e: Event) => {
+              const target = e.target as Element;
+              
+              // Vérifier si c'est un élément suspect
+              if (target && (
+                target.getAttribute('href')?.includes('ads') ||
+                target.getAttribute('onclick')?.includes('window.open') ||
+                target.classList.toString().includes('ad')
+              )) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
+              }
+            }, true);
+          });
+        };
+
+        // Appliquer l'interception à tous les éléments existants
+        const allElements = iframeDoc.querySelectorAll('*');
+        allElements.forEach(interceptEvents);
+
+        // Intercepter les nouveaux éléments ajoutés
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+              if (node.nodeType === Node.ELEMENT_NODE) {
+                interceptEvents(node as Element);
+              }
+            });
+          });
+        });
+
+        observer.observe(iframeDoc.body, {
+          childList: true,
+          subtree: true
+        });
+      }
+    } catch (error) {
+      // Erreur silencieuse
+    }
+  };
+
   // Ajouter du CSS dans l'iframe pour bloquer les popups
   const injectAdBlockCSS = () => {
     if (!iframeRef.current) return;
@@ -827,16 +923,16 @@ const AnimePlayerPage: React.FC = () => {
             display: none !important;
           }
           
-          /* Empêcher les clics sur les overlays */
-          body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 99999;
-            pointer-events: none;
+          /* Protection spéciale contre les overlays de serveurs vidéo */
+          div[style*="position: fixed"][style*="top: 0"][style*="left: 0"],
+          div[style*="position: absolute"][style*="top: 0"][style*="left: 0"] {
+            display: none !important;
+          }
+          
+          /* Empêcher les clics suspects */
+          a[href*="ads"], a[href*="popup"], a[onclick*="window.open"] {
+            pointer-events: none !important;
+            display: none !important;
           }
         `;
         
@@ -857,13 +953,19 @@ const AnimePlayerPage: React.FC = () => {
       const iframe = iframeRef.current;
       
       const enableSilentAdBlocker = () => {
-        injectAdBlockCSS(); // Injecter le CSS d'abord
+        injectPopupBlocker(); // Bloquer les popups JavaScript en premier
+        injectAdBlockCSS(); // Injecter le CSS ensuite
         setTimeout(blockAds, 500); // Premier passage rapide
         setTimeout(blockAds, 1500); // Deuxième passage
         setTimeout(blockAds, 3000); // Troisième passage pour les ads tardives
         setTimeout(blockAds, 5000); // Quatrième passage pour les ads dynamiques
         setTimeout(blockAds, 8000); // Cinquième passage pour les ads très tardives
         setTimeout(blockAds, 12000); // Sixième passage pour les ads post-interaction
+        
+        // Protection continue contre les popups sur les clics
+        setTimeout(() => {
+          injectPopupBlocker(); // Re-appliquer la protection popup
+        }, 15000);
       };
 
       iframe.addEventListener('load', enableSilentAdBlocker);
