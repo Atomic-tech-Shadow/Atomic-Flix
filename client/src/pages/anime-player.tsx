@@ -172,10 +172,18 @@ const AnimePlayerPage: React.FC = () => {
             setSelectedSeason(seasonToSelect);
             console.log('Début chargement épisodes pour saison:', seasonToSelect?.name);
             
-            // Charger les épisodes via l'API
+            // Charger les épisodes via l'API automatiquement avec la langue par défaut
             if (seasonToSelect) {
               console.log('Chargement épisodes via API...');
-              await loadSeasonEpisodes(seasonToSelect, true);
+              // S'assurer qu'une langue est sélectionnée par défaut
+              const defaultLanguage = seasonToSelect.languages.includes('VF') ? 'VF' : 
+                                    seasonToSelect.languages.includes('VOSTFR') ? 'VOSTFR' : 
+                                    seasonToSelect.languages[0] || 'VF';
+              
+              setSelectedLanguage(defaultLanguage as 'VF' | 'VOSTFR');
+              
+              // Charger directement avec la langue par défaut
+              await loadSeasonEpisodesDirectly(animeData.data, seasonToSelect, true, defaultLanguage);
             }
           }
         }
