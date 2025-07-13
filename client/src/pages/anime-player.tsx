@@ -648,7 +648,7 @@ const AnimePlayerPage: React.FC = () => {
     await downloadVideoAutomatic(quality);
   };
 
-  // Système de blocage des publicités
+  // Système de blocage des publicités renforcé
   const adBlockerPatterns = [
     // Domaines de publicité communs
     'googleads', 'googlesyndication', 'doubleclick', 'adsystem',
@@ -659,7 +659,14 @@ const AnimePlayerPage: React.FC = () => {
     'promo', 'marketing', 'tracking', 'analytics',
     // Extensions d'annonces
     '.ads.', '-ads-', '/ads/', 'ads.js', 'ads.css',
-    'adblock', 'advert', 'commercial', 'promotion'
+    'adblock', 'advert', 'commercial', 'promotion',
+    // Nouveaux domaines publicitaires détectés
+    'adserver.adreactor.com', 'adreactor', 'p2yn.com',
+    'servlet/view/window', 'partitial', 'zid=', 'pid=',
+    'var=', 'ab2r=', 'prfrev=', 'rhd=', 'os_version=',
+    // Patterns de popups et redirections
+    'popunder', 'pop-up', 'pop_up', 'interstitial',
+    'redirect', 'monetize', 'affiliate', 'clickfunnels'
   ];
 
   const blockAds = () => {
@@ -843,7 +850,36 @@ const AnimePlayerPage: React.FC = () => {
       
       if (iframeDoc && iframeWindow) {
         // Bloquer window.open complètement
-        iframeWindow.open = function() { return null; };
+        const originalOpen = iframeWindow.open;
+        iframeWindow.open = function(url?: string) { 
+          // Bloquer les URLs publicitaires spécifiques
+          if (url && adBlockerPatterns.some(pattern => url.includes(pattern))) {
+            return null;
+          }
+          return null; // Bloquer toutes les fenêtres pour plus de sécurité
+        };
+
+        // Bloquer window.location redirections
+        const originalLocation = iframeWindow.location;
+        Object.defineProperty(iframeWindow, 'location', {
+          get: () => originalLocation,
+          set: (value) => {
+            if (typeof value === 'string' && adBlockerPatterns.some(pattern => value.includes(pattern))) {
+              return; // Bloquer la redirection
+            }
+            originalLocation.href = value;
+          }
+        });
+
+        // Intercepter et bloquer les requêtes fetch/XMLHttpRequest suspectes
+        const originalFetch = iframeWindow.fetch;
+        iframeWindow.fetch = function(input: RequestInfo, init?: RequestInit) {
+          const url = typeof input === 'string' ? input : input.url;
+          if (adBlockerPatterns.some(pattern => url.includes(pattern))) {
+            return Promise.reject(new Error('Blocked ad request'));
+          }
+          return originalFetch.call(this, input, init);
+        };
         
         // Bloquer les événements suspects sur les éléments
         const interceptEvents = (element: Element) => {
@@ -852,15 +888,22 @@ const AnimePlayerPage: React.FC = () => {
               const target = e.target as Element;
               
               // Vérifier si c'est un élément suspect
-              if (target && (
-                target.getAttribute('href')?.includes('ads') ||
-                target.getAttribute('onclick')?.includes('window.open') ||
-                target.classList.toString().includes('ad')
-              )) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                return false;
+              if (target) {
+                const href = target.getAttribute('href') || '';
+                const onclick = target.getAttribute('onclick') || '';
+                const dataUrl = target.getAttribute('data-url') || '';
+                
+                // Bloquer les URLs publicitaires connues
+                if (adBlockerPatterns.some(pattern => 
+                  href.includes(pattern) || 
+                  onclick.includes(pattern) || 
+                  dataUrl.includes(pattern)
+                )) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  e.stopImmediatePropagation();
+                  return false;
+                }
               }
             }, true);
           });
@@ -929,9 +972,25 @@ const AnimePlayerPage: React.FC = () => {
             display: none !important;
           }
           
-          /* Empêcher les clics suspects */
-          a[href*="ads"], a[href*="popup"], a[onclick*="window.open"] {
+          /* Empêcher les clics suspects et redirections publicitaires */
+          a[href*="ads"], a[href*="popup"], a[onclick*="window.open"],
+          a[href*="adserver"], a[href*="adreactor"], a[href*="p2yn"],
+          a[href*="servlet"], a[href*="partitial"], a[href*="zid="],
+          a[href*="var="], a[href*="ab2r="], a[href*="redirect"] {
             pointer-events: none !important;
+            display: none !important;
+            visibility: hidden !important;
+          }
+          
+          /* Bloquer les iframes avec des sources publicitaires */
+          iframe[src*="adserver"], iframe[src*="adreactor"], 
+          iframe[src*="p2yn"], iframe[src*="servlet"] {
+            display: none !important;
+          }
+          
+          /* Empêcher les scripts de redirection */
+          script[src*="adserver"], script[src*="adreactor"],
+          script[src*="p2yn"], script[src*="tracking"] {
             display: none !important;
           }
         `;
