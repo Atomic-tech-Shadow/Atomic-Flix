@@ -1006,6 +1006,166 @@ const AnimePlayerPage: React.FC = () => {
     }
   };
 
+  // Bloquer les publicités intégrées dans le stream vidéo
+  const injectVideoAdBlocker = () => {
+    if (!iframeRef.current) return;
+
+    try {
+      const iframe = iframeRef.current;
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      const iframeWindow = iframe.contentWindow;
+      
+      if (iframeDoc && iframeWindow) {
+        // Intercepter et modifier les URLs de stream pour enlever les pubs
+        const cleanStreamUrl = (url: string) => {
+          // Patterns pour nettoyer les URLs avec publicités intégrées
+          const adParams = [
+            'ads=1', 'advertisement=', 'ad_url=', 'preroll=',
+            'midroll=', 'postroll=', 'ad_tag=', 'vast=',
+            'adserver=', 'ad_break=', 'commercial=', 'sponsor='
+          ];
+          
+          let cleanUrl = url;
+          adParams.forEach(param => {
+            cleanUrl = cleanUrl.replace(new RegExp(`[&?]${param}[^&]*`, 'gi'), '');
+          });
+          
+          return cleanUrl;
+        };
+
+        // Intercepter les requêtes de stream vidéo et filtrer les pubs
+        const originalFetch = iframeWindow.fetch;
+        iframeWindow.fetch = function(input: RequestInfo, init?: RequestInit) {
+          let url = typeof input === 'string' ? input : input.url;
+          
+          // Si c'est un stream vidéo
+          if (url.includes('.m3u8') || url.includes('.mp4') || url.includes('stream')) {
+            url = cleanStreamUrl(url);
+            input = typeof input === 'string' ? url : { ...input, url };
+            
+            // Pour les fichiers m3u8, filtrer le contenu
+            if (url.includes('.m3u8')) {
+              return originalFetch.call(this, input, init).then(response => {
+                if (response.ok && response.headers.get('content-type')?.includes('application/vnd.apple.mpegurl')) {
+                  return response.text().then(text => {
+                    // Filtrer les segments publicitaires du manifest m3u8
+                    const filteredM3u8 = text
+                      .split('\n')
+                      .filter(line => {
+                        // Supprimer les lignes contenant des références aux pubs
+                        const adPatterns = [
+                          'ad-', 'ads-', 'advertisement', 'commercial',
+                          'preroll', 'midroll', 'postroll', 'sponsor',
+                          'adserver', 'adreactor', 'p2yn'
+                        ];
+                        return !adPatterns.some(pattern => 
+                          line.toLowerCase().includes(pattern)
+                        );
+                      })
+                      .join('\n');
+                    
+                    // Créer une nouvelle réponse avec le contenu filtré
+                    return new Response(filteredM3u8, {
+                      status: response.status,
+                      statusText: response.statusText,
+                      headers: response.headers
+                    });
+                  });
+                }
+                return response;
+              });
+            }
+          }
+          
+          return originalFetch.call(this, input, init);
+        };
+
+        // Intercepter les éléments vidéo et ajouter l'auto-skip des pubs
+        const processVideoElements = () => {
+          const videos = iframeDoc.querySelectorAll('video');
+          videos.forEach(video => {
+            if (video.src) {
+              video.src = cleanStreamUrl(video.src);
+            }
+            
+            // Auto-skip des segments publicitaires détectés
+            if (!video.hasAttribute('data-adblock-processed')) {
+              video.setAttribute('data-adblock-processed', 'true');
+              
+              // Détecter et skipper automatiquement les pubs
+              video.addEventListener('timeupdate', () => {
+                const currentTime = video.currentTime;
+                const duration = video.duration;
+                
+                // Si la vidéo commence par une pub (souvent les 30 premières secondes)
+                if (currentTime < 30 && duration > 120) {
+                  // Chercher le premier segment de contenu réel
+                  video.currentTime = 30;
+                }
+                
+                // Skipper les segments publicitaires au milieu (midroll)
+                // Détecter les pauses inhabituelles ou changements de qualité
+                if (video.networkState === 2 && video.readyState === 4) {
+                  const buffered = video.buffered;
+                  if (buffered.length > 0) {
+                    const bufferedEnd = buffered.end(buffered.length - 1);
+                    // Si on est dans un segment bufferisé suspect, accélérer
+                    if (bufferedEnd - currentTime > 60) {
+                      video.playbackRate = 16; // Accélérer les pubs
+                      setTimeout(() => {
+                        video.playbackRate = 1; // Remettre la vitesse normale
+                      }, 1000);
+                    }
+                  }
+                }
+              });
+
+              // Restaurer la vitesse normale quand la pub est finie
+              video.addEventListener('ratechange', () => {
+                if (video.playbackRate > 1) {
+                  setTimeout(() => {
+                    video.playbackRate = 1;
+                  }, 2000);
+                }
+              });
+            }
+            
+            // Intercepter les changements de source
+            const originalSetAttribute = video.setAttribute;
+            video.setAttribute = function(name: string, value: string) {
+              if (name === 'src') {
+                value = cleanStreamUrl(value);
+              }
+              return originalSetAttribute.call(this, name, value);
+            };
+          });
+
+          // Traiter les sources dans les éléments source
+          const sources = iframeDoc.querySelectorAll('source');
+          sources.forEach(source => {
+            if (source.src) {
+              source.src = cleanStreamUrl(source.src);
+            }
+          });
+        };
+
+        // Surveiller les nouveaux éléments vidéo
+        const videoObserver = new MutationObserver(() => {
+          processVideoElements();
+        });
+
+        videoObserver.observe(iframeDoc.body, {
+          childList: true,
+          subtree: true
+        });
+
+        processVideoElements(); // Traitement initial
+      }
+    } catch (error) {
+      // Erreur silencieuse
+    }
+  };
+
   // Effet pour activer le bloqueur de pub automatiquement et silencieusement
   useEffect(() => {
     if (iframeRef.current) {
@@ -1013,6 +1173,7 @@ const AnimePlayerPage: React.FC = () => {
       
       const enableSilentAdBlocker = () => {
         injectPopupBlocker(); // Bloquer les popups JavaScript en premier
+        injectVideoAdBlocker(); // Bloquer les pubs dans les streams vidéo
         injectAdBlockCSS(); // Injecter le CSS ensuite
         setTimeout(blockAds, 500); // Premier passage rapide
         setTimeout(blockAds, 1500); // Deuxième passage
@@ -1024,6 +1185,7 @@ const AnimePlayerPage: React.FC = () => {
         // Protection continue contre les popups sur les clics
         setTimeout(() => {
           injectPopupBlocker(); // Re-appliquer la protection popup
+          injectVideoAdBlocker(); // Re-appliquer la protection stream
         }, 15000);
       };
 
