@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { ChevronLeft, ChevronRight, ChevronDown, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Download, Shield, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MainLayout from '@/components/layout/main-layout';
 import { SectionLoading } from '@/components/ui/loading-spinner';
@@ -82,6 +82,9 @@ const AnimePlayerPage: React.FC = () => {
   const [episodeLoading, setEpisodeLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [adBlockerEnabled, setAdBlockerEnabled] = useState(true);
+  const [blockedAdsCount, setBlockedAdsCount] = useState(0);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Fonction pour les requêtes API externes uniquement
   const apiRequest = async (endpoint: string) => {
@@ -647,6 +650,139 @@ const AnimePlayerPage: React.FC = () => {
     await downloadVideoAutomatic(quality);
   };
 
+  // Système de blocage des publicités
+  const adBlockerPatterns = [
+    // Domaines de publicité communs
+    'googleads', 'googlesyndication', 'doubleclick', 'adsystem',
+    'amazon-adsystem', 'googletag', 'adsense', 'adnxs', 'adsystem',
+    'facebook.com/tr', 'google-analytics', 'googletagmanager',
+    // Patterns spécifiques aux sites de streaming
+    'ads', 'advertisement', 'popup', 'banner', 'sponsor',
+    'promo', 'marketing', 'tracking', 'analytics',
+    // Extensions d'annonces
+    '.ads.', '-ads-', '/ads/', 'ads.js', 'ads.css',
+    'adblock', 'advert', 'commercial', 'promotion'
+  ];
+
+  const blockAds = () => {
+    if (!iframeRef.current || !adBlockerEnabled) return;
+
+    try {
+      const iframe = iframeRef.current;
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      
+      if (iframeDoc) {
+        let blockedCount = 0;
+
+        // Bloquer les scripts de publicité
+        const scripts = iframeDoc.querySelectorAll('script');
+        scripts.forEach(script => {
+          const src = script.src || script.innerHTML;
+          if (adBlockerPatterns.some(pattern => src.toLowerCase().includes(pattern))) {
+            script.remove();
+            blockedCount++;
+          }
+        });
+
+        // Bloquer les iframes de publicité
+        const iframes = iframeDoc.querySelectorAll('iframe');
+        iframes.forEach(frame => {
+          const src = frame.src;
+          if (adBlockerPatterns.some(pattern => src.toLowerCase().includes(pattern))) {
+            frame.remove();
+            blockedCount++;
+          }
+        });
+
+        // Bloquer les éléments avec des classes/IDs suspects
+        const suspiciousSelectors = [
+          '[class*="ad"]', '[id*="ad"]', '[class*="advertisement"]',
+          '[id*="advertisement"]', '[class*="sponsor"]', '[id*="sponsor"]',
+          '[class*="popup"]', '[id*="popup"]', '[class*="banner"]',
+          '[id*="banner"]', '.promo', '#promo'
+        ];
+
+        suspiciousSelectors.forEach(selector => {
+          const elements = iframeDoc.querySelectorAll(selector);
+          elements.forEach(element => {
+            // Vérifier si l'élément semble être une publicité
+            const rect = element.getBoundingClientRect();
+            const hasAdKeywords = adBlockerPatterns.some(pattern => 
+              element.className.toLowerCase().includes(pattern) ||
+              element.id.toLowerCase().includes(pattern)
+            );
+            
+            if (hasAdKeywords || (rect.width > 200 && rect.height > 100)) {
+              element.style.display = 'none';
+              blockedCount++;
+            }
+          });
+        });
+
+        // Bloquer les requêtes réseau suspectes
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+              mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                  const element = node as Element;
+                  if (element.tagName === 'SCRIPT' || element.tagName === 'IFRAME') {
+                    const src = element.getAttribute('src') || '';
+                    if (adBlockerPatterns.some(pattern => src.toLowerCase().includes(pattern))) {
+                      element.remove();
+                      setBlockedAdsCount(prev => prev + 1);
+                    }
+                  }
+                }
+              });
+            }
+          });
+        });
+
+        observer.observe(iframeDoc.body, {
+          childList: true,
+          subtree: true
+        });
+
+        if (blockedCount > 0) {
+          setBlockedAdsCount(prev => prev + blockedCount);
+        }
+      }
+    } catch (error) {
+      // Erreur silencieuse pour éviter les problèmes CORS
+      console.log('Ad blocker: Accès iframe limité par CORS');
+    }
+  };
+
+  // Effet pour activer le bloqueur de pub
+  useEffect(() => {
+    if (adBlockerEnabled && iframeRef.current) {
+      const iframe = iframeRef.current;
+      
+      const enableAdBlocker = () => {
+        setTimeout(blockAds, 1000); // Attendre que l'iframe se charge
+        setTimeout(blockAds, 3000); // Deuxième passage pour les ads tardives
+        setTimeout(blockAds, 5000); // Troisième passage pour les ads dynamiques
+      };
+
+      iframe.addEventListener('load', enableAdBlocker);
+      enableAdBlocker(); // Premier passage immédiat
+
+      return () => {
+        iframe.removeEventListener('load', enableAdBlocker);
+      };
+    }
+  }, [episodeDetails, selectedPlayer, adBlockerEnabled]);
+
+  // Toggle ad blocker
+  const toggleAdBlocker = () => {
+    setAdBlockerEnabled(!adBlockerEnabled);
+    if (!adBlockerEnabled) {
+      // Reset counter when enabling
+      setBlockedAdsCount(0);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -795,6 +931,7 @@ const AnimePlayerPage: React.FC = () => {
           >
             <div className="aspect-video relative">
               <iframe
+                ref={iframeRef}
                 key={`player-${selectedPlayer}-${selectedEpisode?.id}`}
                 src={episodeDetails.sources[selectedPlayer]?.url}
                 className="w-full h-full"
@@ -814,6 +951,92 @@ const AnimePlayerPage: React.FC = () => {
                 <div className="text-gray-300 text-xs">
                   Épisode {episodeDetails.episodeNumber} • {episodeDetails.sources[selectedPlayer]?.server} • {episodeDetails.sources[selectedPlayer]?.quality}
                 </div>
+              </div>
+
+              {/* Ad Blocker Control - Top Right */}
+              <div className="absolute top-4 right-4">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={toggleAdBlocker}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg font-bold text-xs transition-all ${
+                    adBlockerEnabled 
+                      ? 'bg-green-600/90 text-white border-2 border-green-400' 
+                      : 'bg-red-600/90 text-white border-2 border-red-400'
+                  }`}
+                >
+                  {adBlockerEnabled ? (
+                    <ShieldCheck size={16} className="text-green-200" />
+                  ) : (
+                    <Shield size={16} className="text-red-200" />
+                  )}
+                  <span className="hidden sm:inline">
+                    {adBlockerEnabled ? 'AD BLOCKER ON' : 'AD BLOCKER OFF'}
+                  </span>
+                  <span className="sm:hidden">
+                    {adBlockerEnabled ? 'ON' : 'OFF'}
+                  </span>
+                </motion.button>
+              </div>
+
+              {/* Ad Blocker Stats - Bottom Right */}
+              {adBlockerEnabled && blockedAdsCount > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="absolute bottom-4 right-4 bg-green-600/90 rounded-lg px-3 py-2 border-2 border-green-400"
+                >
+                  <div className="text-white text-xs font-bold flex items-center gap-2">
+                    <ShieldCheck size={14} />
+                    <span>{blockedAdsCount} pubs bloquées</span>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Ad Blocker Control Panel */}
+            <div className="bg-gray-800 px-4 py-3 border-t border-gray-700">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={toggleAdBlocker}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg font-bold text-sm transition-all ${
+                      adBlockerEnabled 
+                        ? 'bg-green-600 text-white hover:bg-green-700' 
+                        : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                    }`}
+                  >
+                    {adBlockerEnabled ? (
+                      <ShieldCheck size={18} className="text-green-200" />
+                    ) : (
+                      <Shield size={18} className="text-gray-400" />
+                    )}
+                    <span>Bloqueur de Pub</span>
+                    <div className={`w-2 h-2 rounded-full ${adBlockerEnabled ? 'bg-green-400' : 'bg-gray-500'}`}></div>
+                  </motion.button>
+
+                  {adBlockerEnabled && (
+                    <div className="text-gray-300 text-sm">
+                      <span className="font-semibold text-green-400">{blockedAdsCount}</span> publicités bloquées
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-xs text-gray-400">
+                  Protection anti-pub intégrée ATOMIC FLIX
+                </div>
+              </div>
+
+              {/* Status Bar */}
+              <div className="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: adBlockerEnabled ? '100%' : '0%' }}
+                  transition={{ duration: 0.5 }}
+                  className={`h-full ${adBlockerEnabled ? 'bg-green-500' : 'bg-gray-500'}`}
+                />
               </div>
             </div>
           </motion.div>
