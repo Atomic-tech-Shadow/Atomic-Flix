@@ -33,9 +33,9 @@
     "expo-linear-gradient": "~14.1.5",
     "expo-status-bar": "~2.2.3",
     "hoist-non-react-statics": "^3.3.2",
-    "react": "19.0.0",
+    "react": "18.3.1",
     "react-freeze": "^1.0.4",
-    "react-native": "0.79.5",
+    "react-native": "0.76.9",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
@@ -51,6 +51,7 @@
     "metro-resolver": "^0.82.0",
     "typescript": "~5.8.3"
   },
+
   "expo": {
     "doctor": {
       "reactNativeDirectoryCheck": {
