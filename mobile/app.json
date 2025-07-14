@@ -26,9 +26,7 @@
         "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
-      ],
-      "compileSdkVersion": 34,
-      "targetSdkVersion": 34
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -39,8 +37,10 @@
         "expo-build-properties",
         {
           "android": {
+            "minSdkVersion": 24,
             "compileSdkVersion": 34,
-            "targetSdkVersion": 34
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
           }
         }
       ]
