@@ -20,14 +20,17 @@
     "clean": "expo r -c"
   },
   "dependencies": {
+    "@babel/core": "^7.20.0",
     "@babel/runtime": "^7.27.6",
     "@egjs/hammerjs": "^2.0.17",
     "@react-navigation/native": "^6.0.0",
     "@react-navigation/stack": "^6.0.0",
     "@tanstack/react-query": "^5.82.0",
     "@types/hammerjs": "^2.0.46",
+    "babel-preset-expo": "~13.0.0",
     "expo": "~53.0.19",
-    "expo-build-properties": "^0.14.8",
+    "expo-build-properties": "~0.14.8",
+    "expo-linear-gradient": "~14.1.5",
     "expo-status-bar": "~2.2.3",
     "hoist-non-react-statics": "^3.3.2",
     "react": "18.3.1",
@@ -36,17 +39,17 @@
     "react-native-gesture-handler": "~2.24.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "^4.11.1",
-    "expo-linear-gradient": "~14.1.5",
-    "babel-preset-expo": "~13.0.0",
-    "@babel/core": "^7.20.0"
+    "react-native-screens": "^4.11.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.0",
     "@babel/preset-react": "^7.20.0",
+    "@expo/cli": "^0.24.20",
     "@types/react": "~18.3.12",
-    "typescript": "~5.8.3",
-    "@expo/cli": "^0.24.20"
+    "metro": "^0.82.0",
+    "metro-config": "^0.82.0",
+    "metro-resolver": "^0.82.0",
+    "typescript": "~5.8.3"
   },
   "overrides": {
     "@types/react": "~18.3.12"
