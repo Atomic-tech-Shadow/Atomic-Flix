@@ -51,9 +51,7 @@
     "metro-resolver": "^0.82.0",
     "typescript": "~5.8.3"
   },
-  "overrides": {
-    "@types/react": "~18.3.12"
-  },
+
   "expo": {
     "doctor": {
       "reactNativeDirectoryCheck": {
