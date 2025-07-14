@@ -21,7 +21,7 @@
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease --no-daemon",
-        "credentialsSource": "remote"
+        "credentialsSource": "local"
       },
       "env": {
         "NODE_ENV": "production",
@@ -37,7 +37,7 @@
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease",
-        "credentialsSource": "remote"
+        "credentialsSource": "local"
       },
       "env": {
         "NODE_ENV": "production",
