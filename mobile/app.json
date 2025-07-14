@@ -39,26 +39,8 @@
         "expo-build-properties",
         {
           "android": {
-            "newArchEnabled": false,
-            "enableProguardInReleaseBuilds": false,
-            "minSdkVersion": 24,
-            "targetSdkVersion": 34,
             "compileSdkVersion": 34,
-            "buildToolsVersion": "34.0.0",
-            "usesCleartextTraffic": true,
-            "proguardVersion": "6.2.2",
-            "packagingOptions": {
-              "pickFirst": [
-                "**/libc++_shared.so",
-                "**/libjsc.so",
-                "**/libjscexecutor.so",
-                "**/libturbomodulejsijni.so",
-                "**/libhermes.so"
-              ]
-            }
-          },
-          "ios": {
-            "newArchEnabled": false
+            "targetSdkVersion": 34
           }
         }
       ]
