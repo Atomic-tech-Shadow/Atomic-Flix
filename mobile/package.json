@@ -46,9 +46,9 @@
     "@babel/preset-react": "^7.20.0",
     "@expo/cli": "^0.24.20",
     "@types/react": "~18.3.12",
-    "metro": "^0.82.0",
-    "metro-config": "^0.82.0",
-    "metro-resolver": "^0.82.0",
+    "metro": "0.82.0",
+    "metro-config": "0.82.0",
+    "metro-resolver": "0.82.0",
     "typescript": "~5.8.3"
   },
   "expo": {

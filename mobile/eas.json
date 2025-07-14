@@ -26,6 +26,7 @@
       "env": {
         "NODE_ENV": "production",
         "EXPO_USE_HERMES": "false",
+        "EXPO_USE_METRO_REQUIRE": "1",
         "JAVA_HOME": "$JAVA_HOME_17_X64",
         "GRADLE_OPTS": "-Xmx4096m -XX:MaxMetaspaceSize=512m"
       },
