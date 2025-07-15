@@ -17,6 +17,7 @@
     "termux:build": "./termux-build-apk.sh",
     "build:android": "eas build --platform android",
     "build:production": "eas build --platform android --profile production",
+    "build:fix": "./build-android-fix.sh",
     "clean": "expo r -c"
   },
   "dependencies": {

@@ -27,7 +27,7 @@
         "NODE_ENV": "production",
         "EXPO_USE_HERMES": "false",
         "EXPO_USE_METRO_REQUIRE": "1",
-        "JAVA_HOME": "$JAVA_HOME_17_X64",
+        "JAVA_HOME": "/usr/lib/jvm/java-17-openjdk",
         "GRADLE_OPTS": "-Xmx4096m -XX:MaxMetaspaceSize=512m"
       },
       "cache": {
@@ -46,7 +46,8 @@
         "ANDROID_BUILD_TOOLS": "33.0.0",
         "ANDROID_MIN_SDK": "24",
         "ANDROID_TARGET_SDK": "33",
-        "EXPO_USE_HERMES": "false"
+        "EXPO_USE_HERMES": "false",
+        "JAVA_HOME": "/usr/lib/jvm/java-17-openjdk"
       }
     }
   }
