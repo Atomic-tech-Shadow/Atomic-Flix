@@ -4,11 +4,11 @@ export const API_CONFIG = {
   EXTERNAL_API: 'https://anime-sama-scraper.vercel.app/api',
   
   // Timeout par défaut
-  TIMEOUT: 15000,
+  TIMEOUT: 30000,
   
   // Retry configuration
-  MAX_RETRIES: 2,
-  RETRY_DELAY: 1000
+  MAX_RETRIES: 3,
+  RETRY_DELAY: 2000
 };
 
 // Fonction utilitaire pour les requêtes API directes
@@ -27,11 +27,13 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Referer': 'https://atomic-flix.vercel.app/',
+          'Origin': 'https://atomic-flix.vercel.app',
+          ...options.headers
         },
+        mode: 'cors',
         cache: 'no-cache',
         signal: controller.signal,
         ...options
@@ -46,11 +48,17 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
       return await response.json();
     } catch (error) {
       attempt++;
-      console.error(`Tentative ${attempt}/${MAX_RETRIES} échouée:`, error);
+      console.error(`Tentative ${attempt}/${MAX_RETRIES} échouée pour ${endpoint}:`, error);
       
       if (attempt >= MAX_RETRIES) {
         console.error('Erreur API après', MAX_RETRIES, 'tentatives:', error);
-        throw error;
+        
+        // Retourner une erreur structurée plutôt que de throw
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Erreur API inconnue',
+          results: []
+        };
       }
       
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * attempt));

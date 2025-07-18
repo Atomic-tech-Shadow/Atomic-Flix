@@ -50,18 +50,24 @@ const AnimeSamaPage: React.FC = () => {
   // Charger tout le contenu trending depuis l'API
   const loadTrendingAnimes = async () => {
     try {
+      console.log('Début du chargement des animes trending...');
       const response = await animeAPI.getTrending();
       
-      if (response && response.success && response.results) {
+      console.log('Réponse API reçue:', response);
+      
+      if (response && response.success && response.results && response.results.length > 0) {
         // Afficher tous les types de contenu de l'API : animes, mangas, films
-        setTrendingAnimes(response.results.slice(0, 24)); // Augmenter le nombre d'éléments affichés
-        console.log('Contenu trending chargé:', response.results.length, 'éléments');
+        setTrendingAnimes(response.results.slice(0, 24));
+        console.log('Contenu trending chargé avec succès:', response.results.length, 'éléments');
+        setError(null);
       } else {
         console.warn('Réponse API trending échouée:', response);
         setTrendingAnimes([]);
+        setError(response?.error || 'Impossible de charger le contenu trending');
       }
     } catch (error) {
       console.error('Erreur chargement trending:', error);
+      setError('Erreur de connexion à l\'API. Veuillez réessayer.');
       setTrendingAnimes([]);
     }
   };
