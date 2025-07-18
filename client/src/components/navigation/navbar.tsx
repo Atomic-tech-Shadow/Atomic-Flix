@@ -42,7 +42,7 @@ export function Navbar() {
               className="h-10 w-10 atomic-logo-round with-border flex-shrink-0"
             />
             <span className="text-xl font-bold atomic-gradient-text whitespace-nowrap">
-              ATOMIC FLIX 🇹🇬
+              ATOMIC FLIX <span className="text-2xl emoji-flag">🇹🇬</span>
             </span>
           </Link>
 
