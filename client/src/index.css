@@ -20,14 +20,7 @@ html {
   aspect-ratio: 1;
 }
 
-/* Emoji rendering optimization */
-.emoji-flag {
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", "EmojiSymbols";
-  font-feature-settings: "liga" 1, "clig" 1, "kern" 1;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+
 
 .atomic-logo-round.with-border {
   border: 2px solid rgba(0, 240, 255, 0.3);

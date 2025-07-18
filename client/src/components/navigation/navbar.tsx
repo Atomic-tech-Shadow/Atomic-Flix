@@ -41,8 +41,8 @@ export function Navbar() {
               alt="ATOMIC FLIX Logo" 
               className="h-10 w-10 atomic-logo-round with-border flex-shrink-0"
             />
-            <span className="text-xl font-bold atomic-gradient-text whitespace-nowrap">
-              ATOMIC FLIX <span className="text-2xl emoji-flag">🇹🇬</span>
+            <span className="text-xl font-bold whitespace-nowrap">
+              <span className="atomic-gradient-text">ATOMIC FLIX</span> <span className="text-2xl">🇹🇬</span>
             </span>
           </Link>
 
