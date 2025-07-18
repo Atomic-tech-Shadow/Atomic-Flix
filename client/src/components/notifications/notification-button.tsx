@@ -34,7 +34,7 @@ export function NotificationButton() {
   const getButtonColor = () => {
     switch (permissionStatus) {
       case 'granted':
-        return 'text-green-400 hover:text-green-300';
+        return 'text-cyan-400 hover:text-cyan-300';
       case 'denied':
         return 'text-red-400 hover:text-red-300';
       default:

@@ -86,7 +86,7 @@ export function SimpleNotificationButton() {
       
       {/* Glow effect when enabled */}
       {isEnabled && (
-        <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg opacity-100 transition-opacity duration-300 -z-10" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-lg opacity-100 transition-opacity duration-300 -z-10" />
       )}
     </Button>
   );
