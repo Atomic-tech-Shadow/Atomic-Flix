@@ -36,15 +36,13 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center">
-              <img 
-                src="/assets/atomic-logo-round.png" 
-                alt="ATOMIC FLIX Logo" 
-                className="h-10 w-10 atomic-logo-round with-border"
-              />
-            </div>
-            <span className="hidden sm:block text-xl font-bold atomic-gradient-text">
-              ATOMIC FLIX
+            <img 
+              src="/assets/atomic-logo-round.png" 
+              alt="ATOMIC FLIX Logo" 
+              className="h-10 w-10 atomic-logo-round with-border"
+            />
+            <span className="text-xl font-bold atomic-gradient-text">
+              ATOMIC FLIX 🇹🇬
             </span>
           </Link>
 
