@@ -1,7 +1,7 @@
 // Configuration API pour ATOMIC FLIX - API externe directe
 export const API_CONFIG = {
-  // API externe pour les données anime/manga
-  EXTERNAL_API: 'https://anime-sama-scraper.vercel.app/api',
+  // API externe pour les données anime/manga - Jikan API (MyAnimeList)
+  EXTERNAL_API: 'https://api.jikan.moe/v4',
   
   // Timeout par défaut
   TIMEOUT: 15000,
@@ -58,16 +58,16 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
   }
 };
 
-// Fonctions API spécialisées pour ATOMIC FLIX
+// Fonctions API spécialisées pour ATOMIC FLIX utilisant Jikan API
 export const animeAPI = {
-  // Récupérer les animes tendance
+  // Récupérer les animes tendance (top animes)
   getTrending: async () => {
-    return await apiRequest('/trending');
+    return await apiRequest('/top/anime?limit=20');
   },
   
   // Rechercher des animes
   search: async (query: string) => {
-    return await apiRequest(`/search?query=${encodeURIComponent(query)}`);
+    return await apiRequest(`/anime?q=${encodeURIComponent(query)}&limit=20`);
   },
   
   // Détails d'un anime
@@ -75,23 +75,31 @@ export const animeAPI = {
     return await apiRequest(`/anime/${id}`);
   },
   
-  // Épisodes d'une saison
+  // Épisodes d'une saison (utilise les données de l'anime)
   getEpisodes: async (animeId: string, season: string, language: string) => {
-    return await apiRequest(`/episodes/${animeId}?season=${season}&language=${language}`);
+    return await apiRequest(`/anime/${animeId}/episodes`);
   },
   
-  // Sources de streaming
+  // Sources de streaming (simulé pour compatibilité)
   getEmbedSources: async (episodeUrl: string) => {
-    return await apiRequest(`/embed?url=${encodeURIComponent(episodeUrl)}`);
+    // Jikan n'a pas de sources de streaming, on retourne un format compatible
+    return {
+      sources: [
+        { url: episodeUrl, quality: '720p', server: 'Original' }
+      ]
+    };
   },
   
   // Chapitres de manga
   getMangaChapters: async (mangaId: string) => {
-    return await apiRequest(`/manga/${mangaId}/chapters`);
+    return await apiRequest(`/manga/${mangaId}`);
   },
   
-  // Pages d'un chapitre de manga
+  // Pages d'un chapitre de manga (simulé)
   getChapterPages: async (chapterId: string) => {
-    return await apiRequest(`/manga/chapter/${chapterId}`);
+    return {
+      pages: [],
+      message: 'Lecture manga non disponible avec cette API'
+    };
   }
 };
