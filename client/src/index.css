@@ -13,6 +13,23 @@ html {
   user-select: none;
 }
 
+/* Logo rond ATOMIC FLIX */
+.atomic-logo-round {
+  border-radius: 50%;
+  object-fit: cover;
+  aspect-ratio: 1;
+}
+
+.atomic-logo-round.with-border {
+  border: 2px solid rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.atomic-logo-round.with-glow {
+  border: 3px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(240, 10%, 3.9%);

@@ -40,7 +40,7 @@ export function Navbar() {
               <img 
                 src="/assets/atomic-logo-round.png" 
                 alt="ATOMIC FLIX Logo" 
-                className="h-10 w-10 object-contain rounded-lg"
+                className="h-10 w-10 atomic-logo-round with-border"
               />
             </div>
             <span className="hidden sm:block text-xl font-bold atomic-gradient-text">
