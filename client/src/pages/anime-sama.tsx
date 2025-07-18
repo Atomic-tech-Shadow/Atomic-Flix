@@ -201,8 +201,7 @@ const AnimeSamaPage: React.FC = () => {
                     className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = 'https://via.placeholder.com/300x400/1a1a1a/ffffff?text=Image+Non+Disponible';
-                      target.onerror = null;
+                      target.style.display = 'none';
                     }}
                   />
                   {/* Badge type de contenu */}
@@ -325,8 +324,7 @@ const AnimeSamaPage: React.FC = () => {
                         className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = 'https://via.placeholder.com/300x400/1a1a1a/ffffff?text=Image+Non+Disponible';
-                          target.onerror = null;
+                          target.style.display = 'none';
                         }}
                       />
                       {/* Badge type de contenu */}

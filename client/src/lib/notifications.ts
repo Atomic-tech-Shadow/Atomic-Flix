@@ -190,7 +190,7 @@ export class NotificationManager {
 
     // Vérifier les nouveaux contenus toutes les heures
     try {
-      // Periodic sync is not yet widely supported, using fallback
+      // Periodic sync is not yet widely supported
       // await this.registration.periodicSync.register('content-check', {
       //   minInterval: 60 * 60 * 1000 // 1 heure
       // });

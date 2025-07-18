@@ -225,7 +225,7 @@ const AnimePage: React.FC = () => {
           className="w-full h-56 sm:h-64 md:h-72 object-cover transition-transform duration-700 hover:scale-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = 'https://via.placeholder.com/800x400/1a1a1a/ffffff?text=Image+Non+Disponible';
+            target.style.display = 'none';
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />

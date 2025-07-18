@@ -53,12 +53,8 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
       if (attempt >= MAX_RETRIES) {
         console.error('Erreur API après', MAX_RETRIES, 'tentatives:', error);
         
-        // Retourner une erreur structurée plutôt que de throw
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : 'Erreur API inconnue',
-          results: []
-        };
+        // Propagate error without fallback
+        throw error;
       }
       
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * attempt));

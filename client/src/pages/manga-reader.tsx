@@ -453,8 +453,7 @@ const MangaReaderPage: React.FC = () => {
                   onClick={nextPage}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = 'https://via.placeholder.com/800x1200/1a1a1a/ffffff?text=Page+Non+Disponible';
-                    target.onerror = () => {};
+                    target.style.display = 'none';
                   }}
                   draggable={false}
                 />
@@ -465,10 +464,9 @@ const MangaReaderPage: React.FC = () => {
               <Book size={48} className="text-gray-600 mb-4" />
               <h3 className="text-lg sm:text-xl font-bold text-white mb-2">{selectedChapter.title}</h3>
               <p className="text-gray-400 mb-4">Chapitre {selectedChapter.number}</p>
-              <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-3 sm:p-4 max-w-sm sm:max-w-md">
-                <p className="text-yellow-400 text-sm">
-                  Les pages de ce chapitre seront bientôt disponibles. 
-                  L'API des images de manga est en cours de développement.
+              <div className="bg-red-900/20 border border-red-700 rounded-lg p-3 sm:p-4 max-w-sm sm:max-w-md">
+                <p className="text-red-400 text-sm">
+                  Pages non disponibles pour ce chapitre.
                 </p>
               </div>
               {selectedChapter.url && (
