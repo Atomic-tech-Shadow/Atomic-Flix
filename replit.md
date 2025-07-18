@@ -110,6 +110,7 @@ ATOMIC FLIX is a modern anime streaming platform built with React, TypeScript, a
 - **Static Assets**: Express serves built frontend assets in production
 
 ## Changelog
+- July 18, 2025. Migration from Replit Agent to Replit environment completed: Successfully cleaned project by removing all mobile-specific dependencies (React Native, Expo, mobile screenshots, keystores), deleted mobile/ directory, and streamlined to web-only architecture. Application now runs cleanly on Vite dev server with proper client/server separation.
 - July 01, 2025. Initial setup
 - July 01, 2025. Migration from Replit Agent: Removed all local API configurations and fallback data, now using only external API (anime-sama-scraper.vercel.app) for data integrity and security
 - July 01, 2025. Fixed critical JSX syntax errors in anime.tsx: removed extra closing div tags, added missing component imports (FloatingBackButton, BreadcrumbNav), corrected component structure. App now runs successfully with full functionality.
