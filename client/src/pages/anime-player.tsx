@@ -1201,7 +1201,7 @@ const AnimePlayerPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+        <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full"></div>
       </div>
     );
   }
@@ -1262,7 +1262,7 @@ const AnimePlayerPage: React.FC = () => {
                 {/* Drapeau de fond */}
                 {lang === 'VF' ? (
                   <div className="absolute inset-0 flex">
-                    <div className="w-1/3 bg-blue-600"></div>
+                    <div className="w-1/3 bg-cyan-600"></div>
                     <div className="w-1/3 bg-white"></div>
                     <div className="w-1/3 bg-red-600"></div>
                   </div>
@@ -1299,7 +1299,7 @@ const AnimePlayerPage: React.FC = () => {
                     loadEpisodeSources(episode);
                   }
                 }}
-                className="w-full bg-gray-800 text-white px-4 py-3 rounded-lg appearance-none cursor-pointer border-2 border-blue-500 font-bold uppercase text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full bg-gray-800 text-white px-4 py-3 rounded-lg appearance-none cursor-pointer border-2 border-cyan-500 font-bold uppercase text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
               >
                 {episodes.map((episode) => (
                   <option key={episode.id} value={episode.id}>
@@ -1316,7 +1316,7 @@ const AnimePlayerPage: React.FC = () => {
                 <select
                   value={selectedPlayer}
                   onChange={(e) => setSelectedPlayer(parseInt(e.target.value))}
-                  className="w-full bg-gray-800 text-white px-4 py-3 rounded-lg appearance-none cursor-pointer border-2 border-blue-500 font-bold uppercase text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="w-full bg-gray-800 text-white px-4 py-3 rounded-lg appearance-none cursor-pointer border-2 border-cyan-500 font-bold uppercase text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 >
                   {episodeDetails.sources.map((source, index) => (
                     <option key={`server-${index}-${source.server}`} value={index}>
@@ -1383,7 +1383,7 @@ const AnimePlayerPage: React.FC = () => {
               whileTap={{ scale: 0.9 }}
               onClick={() => navigateEpisode('prev')}
               disabled={!selectedEpisode || episodes.findIndex(ep => ep.id === selectedEpisode.id) === 0}
-              className="p-3 bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-3 bg-cyan-600 rounded-lg hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft size={24} className="text-white" />
             </motion.button>
@@ -1393,7 +1393,7 @@ const AnimePlayerPage: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowDownloadMenu(!showDownloadMenu)}
-                className="p-3 bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+                className="p-3 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
               >
                 <Download size={24} className="text-white" />
               </motion.button>
@@ -1416,7 +1416,7 @@ const AnimePlayerPage: React.FC = () => {
                         onClick={() => downloadVideo('faible')}
                         className="w-full text-left px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors flex items-center gap-2"
                       >
-                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                         <span>Qualité Faible (360p)</span>
                       </motion.button>
                       <motion.button
@@ -1424,7 +1424,7 @@ const AnimePlayerPage: React.FC = () => {
                         onClick={() => downloadVideo('moyenne')}
                         className="w-full text-left px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors flex items-center gap-2"
                       >
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
                         <span>Qualité Moyenne (720p)</span>
                       </motion.button>
                       <motion.button
@@ -1432,7 +1432,7 @@ const AnimePlayerPage: React.FC = () => {
                         onClick={() => downloadVideo('HD')}
                         className="w-full text-left px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors flex items-center gap-2"
                       >
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
                         <span>Qualité HD (1080p)</span>
                       </motion.button>
                     </div>
@@ -1446,7 +1446,7 @@ const AnimePlayerPage: React.FC = () => {
               whileTap={{ scale: 0.9 }}
               onClick={() => navigateEpisode('next')}
               disabled={!selectedEpisode || episodes.findIndex(ep => ep.id === selectedEpisode.id) === episodes.length - 1}
-              className="p-3 bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-3 bg-cyan-600 rounded-lg hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronRight size={24} className="text-white" />
             </motion.button>
