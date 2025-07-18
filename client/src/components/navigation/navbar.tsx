@@ -85,10 +85,10 @@ export function Navbar() {
               <Search className="h-5 w-5" />
               <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300 -z-10" />
             </Button>
-            
+
             {/* Notification Button */}
             <SimpleNotificationButton />
-            
+
             {/* Menu Button */}
             <Button
               variant="ghost"
@@ -124,13 +124,13 @@ export function Navbar() {
                   </Link>
                 );
               })}
-              
+
 
             </div>
 
           </div>
         )}
-        
+
         {/* Mobile Search Bar */}
         {isSearchOpen && (
           <div className="md:hidden border-t bg-background/95 backdrop-blur atomic-fade-in">
