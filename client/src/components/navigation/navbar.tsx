@@ -39,9 +39,9 @@ export function Navbar() {
             <img 
               src="/assets/atomic-logo-round.png" 
               alt="ATOMIC FLIX Logo" 
-              className="h-10 w-10 atomic-logo-round with-border"
+              className="h-10 w-10 atomic-logo-round with-border flex-shrink-0"
             />
-            <span className="text-xl font-bold atomic-gradient-text">
+            <span className="text-xl font-bold atomic-gradient-text whitespace-nowrap">
               ATOMIC FLIX 🇹🇬
             </span>
           </Link>
