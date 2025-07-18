@@ -38,7 +38,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center space-x-3">
             <div className="flex h-10 w-10 items-center justify-center">
               <img 
-                src="/assets/atomic-logo-new.png" 
+                src="/assets/atomic-logo-round.png" 
                 alt="ATOMIC FLIX Logo" 
                 className="h-10 w-10 object-contain rounded-lg"
               />

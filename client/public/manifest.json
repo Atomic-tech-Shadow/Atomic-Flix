@@ -28,25 +28,25 @@
   ],
   "icons": [
     {
-      "src": "/assets/atomic-logo-new.png",
+      "src": "/assets/atomic-logo-round.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/atomic-logo-new.png",
+      "src": "/assets/atomic-logo-round.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/assets/atomic-logo-new.png",
+      "src": "/assets/atomic-logo-round.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/atomic-logo-new.png",
+      "src": "/assets/atomic-logo-round.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -55,14 +55,14 @@
   "categories": ["entertainment", "video"],
   "screenshots": [
     {
-      "src": "/assets/atomic-logo-new.png",
+      "src": "/assets/atomic-logo-round.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Interface principale ATOMIC FLIX"
     },
     {
-      "src": "/assets/atomic-logo-new.png",
+      "src": "/assets/atomic-logo-round.png",
       "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow",
@@ -110,7 +110,7 @@
       "type": "application/json",
       "screenshots": [
         {
-          "src": "/assets/atomic-logo-new.png",
+          "src": "/assets/atomic-logo-round.png",
           "sizes": "256x256",
           "label": "Widget de recherche ATOMIC FLIX"
         }
@@ -123,7 +123,7 @@
       "short_name": "Recherche",
       "description": "Rechercher et découvrir de nouveaux animes",
       "url": "/",
-      "icons": [{ "src": "/assets/atomic-logo-new.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/assets/atomic-logo-round.png", "sizes": "96x96" }]
     }
   ]
 }

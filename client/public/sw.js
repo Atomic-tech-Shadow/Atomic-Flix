@@ -2,7 +2,7 @@ const CACHE_NAME = 'atomic-flix-v' + Date.now();
 const urlsToCache = [
   '/',
   '/index.html',
-  '/assets/atomic-logo-new.png',
+  '/assets/atomic-logo-round.png',
   '/manifest.json'
 ];
 
@@ -85,8 +85,8 @@ self.addEventListener('push', event => {
     title: 'ATOMIC FLIX',
     body: 'Nouveau contenu disponible!',
     type: 'general',
-    icon: '/assets/atomic-logo-new.png',
-    badge: '/assets/atomic-logo-new.png'
+    icon: '/assets/atomic-logo-round.png',
+    badge: '/assets/atomic-logo-round.png'
   };
 
   // Parser les données de la notification
