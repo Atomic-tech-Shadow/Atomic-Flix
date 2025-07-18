@@ -240,9 +240,9 @@ const AnimePage: React.FC = () => {
                 {animeData.seasons.length} saisons
               </span>
             </div>
-            <div className="flex items-center space-x-2 bg-blue-500/20 backdrop-blur-sm rounded-full px-3 py-1">
-              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-              <span className="text-blue-300 text-xs font-medium">{animeData.year}</span>
+            <div className="flex items-center space-x-2 bg-purple-500/20 backdrop-blur-sm rounded-full px-3 py-1">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span className="text-purple-300 text-xs font-medium">{animeData.year}</span>
             </div>
           </div>
           
@@ -293,7 +293,7 @@ const AnimePage: React.FC = () => {
                              season.name.toLowerCase().includes('tome') ||
                              season.name.toLowerCase().includes('chapitre');
               
-              const borderColor = isManga ? 'border-orange-400 hover:border-orange-300 hover:shadow-orange-500/25' : 'border-cyan-400 hover:border-cyan-300 hover:shadow-cyan-500/25';
+              const borderColor = isManga ? 'border-purple-400 hover:border-purple-300 hover:shadow-purple-500/25' : 'border-cyan-400 hover:border-cyan-300 hover:shadow-cyan-500/25';
               
               return (
                 <motion.button
@@ -320,7 +320,7 @@ const AnimePage: React.FC = () => {
                         {season.name}
                       </div>
                       {isManga && (
-                        <div className="mt-1 text-orange-300 text-xs font-medium">
+                        <div className="mt-1 text-purple-300 text-xs font-medium">
                           📖 MANGA
                         </div>
                       )}

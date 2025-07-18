@@ -30,9 +30,9 @@ export default function TermsOfService() {
         <div className="grid grid-cols-1 gap-8">
           
           {/* Acceptance */}
-          <Card className="atomic-card border-blue-500/20 bg-black/40 backdrop-blur-md">
+          <Card className="atomic-card border-cyan-500/20 bg-black/40 backdrop-blur-md">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-400">
+              <CardTitle className="flex items-center gap-2 text-cyan-400">
                 <Scale className="w-6 h-6" />
                 Acceptation des Conditions
               </CardTitle>
@@ -43,8 +43,8 @@ export default function TermsOfService() {
                 Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre application.
               </p>
               
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                <h4 className="font-semibold text-blue-400 mb-2">Définitions</h4>
+              <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-4">
+                <h4 className="font-semibold text-cyan-400 mb-2">Définitions</h4>
                 <ul className="list-disc list-inside text-gray-300 space-y-1">
                   <li><strong>"Application"</strong> : ATOMIC FLIX et tous ses services</li>
                   <li><strong>"Utilisateur"</strong> : Toute personne utilisant l'application</li>
@@ -83,16 +83,16 @@ export default function TermsOfService() {
           </Card>
 
           {/* Content Disclaimer */}
-          <Card className="atomic-card border-orange-500/20 bg-black/40 backdrop-blur-md">
+          <Card className="atomic-card border-purple-500/20 bg-black/40 backdrop-blur-md">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-orange-400">
+              <CardTitle className="flex items-center gap-2 text-purple-400">
                 <AlertTriangle className="w-6 h-6" />
                 Avertissement Important sur le Contenu
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4">
-                <h4 className="font-semibold text-orange-400 mb-2">Hébergement de Contenu</h4>
+              <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
+                <h4 className="font-semibold text-purple-400 mb-2">Hébergement de Contenu</h4>
                 <p className="text-gray-300">
                   <strong>ATOMIC FLIX n'héberge aucune vidéo sur ses serveurs.</strong> Toutes les vidéos 
                   sont hébergées par des plateformes tierces externes. L'application sert uniquement 

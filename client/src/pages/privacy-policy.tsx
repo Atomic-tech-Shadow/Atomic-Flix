@@ -30,9 +30,9 @@ export default function PrivacyPolicy() {
         <div className="grid grid-cols-1 gap-8">
           
           {/* No Data Collection */}
-          <Card className="atomic-card border-green-500/20 bg-black/40 backdrop-blur-md">
+          <Card className="atomic-card border-cyan-500/20 bg-black/40 backdrop-blur-md">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-400">
+              <CardTitle className="flex items-center gap-2 text-cyan-400">
                 <Eye className="w-6 h-6" />
                 Aucune Collecte de Données
               </CardTitle>
@@ -41,8 +41,8 @@ export default function PrivacyPolicy() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-                <h4 className="font-semibold text-green-400 mb-2">Engagement Principal</h4>
+              <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-4">
+                <h4 className="font-semibold text-cyan-400 mb-2">Engagement Principal</h4>
                 <p className="text-gray-300">
                   <strong>ATOMIC FLIX ne collecte, ne stocke et ne partage AUCUNE donnée personnelle.</strong> 
                   Nous n'utilisons pas de cookies de suivi, d'analyses comportementales, ou de systèmes de tracking.
@@ -75,8 +75,8 @@ export default function PrivacyPolicy() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                <h4 className="font-semibold text-blue-400 mb-2">Architecture Frontend-Only</h4>
+              <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-4">
+                <h4 className="font-semibold text-cyan-400 mb-2">Architecture Frontend-Only</h4>
                 <p className="text-gray-300">
                   ATOMIC FLIX est une application 100% frontend qui fonctionne directement dans votre navigateur. 
                   Nous n'avons pas de serveur backend qui pourrait collecter vos données.
@@ -105,8 +105,8 @@ export default function PrivacyPolicy() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-                <h4 className="font-semibold text-yellow-400 mb-2">Stockage Local du Navigateur</h4>
+              <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
+                <h4 className="font-semibold text-purple-400 mb-2">Stockage Local du Navigateur</h4>
                 <p className="text-gray-300">
                   Seules les données suivantes peuvent être stockées localement dans votre navigateur :
                 </p>

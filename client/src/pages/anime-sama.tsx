@@ -235,9 +235,9 @@ const AnimeSamaPage: React.FC = () => {
                   />
                   {/* Badge type de contenu */}
                   <div className={`absolute top-2 left-2 text-white text-xs px-3 py-1 rounded-full font-bold backdrop-blur-sm border transition-all duration-300 ${
-                    anime.type === 'manga' ? 'bg-orange-500/80 border-orange-400 hover:bg-orange-500' :
-                    anime.type === 'film' ? 'bg-purple-500/80 border-purple-400 hover:bg-purple-500' :
-                    anime.type === 'movie' ? 'bg-purple-500/80 border-purple-400 hover:bg-purple-500' :
+                    anime.type === 'manga' ? 'bg-purple-500/80 border-purple-400 hover:bg-purple-500' :
+                    anime.type === 'film' ? 'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500' :
+                    anime.type === 'movie' ? 'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500' :
                     'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500'
                   }`}>
                     {anime.type === 'manga' ? 'MANGA' :
