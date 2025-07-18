@@ -28,7 +28,11 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
         },
+        cache: 'no-cache',
         signal: controller.signal,
         ...options
       });

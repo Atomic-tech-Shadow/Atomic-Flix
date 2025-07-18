@@ -38,11 +38,43 @@ const removeLoadingScreen = () => {
   }
 };
 
-// Force reload on first visit to ensure latest version
+// Force cache bust for iOS Safari and all browsers
+const forceCacheBust = () => {
+  // Clear localStorage cache keys
+  const keys = Object.keys(localStorage);
+  keys.forEach(key => {
+    if (key.startsWith('atomic-flix-cache-') || key.startsWith('vite-')) {
+      localStorage.removeItem(key);
+    }
+  });
+  
+  // Clear sessionStorage except for visit tracking
+  const sessionKeys = Object.keys(sessionStorage);
+  sessionKeys.forEach(key => {
+    if (key !== 'visitedBefore') {
+      sessionStorage.removeItem(key);
+    }
+  });
+  
+  // Force reload with timestamp for all visits
+  const hasTimestamp = window.location.search.includes('v=');
+  if (!hasTimestamp) {
+    const separator = window.location.search ? '&' : '?';
+    window.location.href = window.location.href + separator + 'v=' + Date.now();
+  }
+};
+
+// Apply cache bust on every visit
 if (!sessionStorage.getItem('visitedBefore')) {
   sessionStorage.setItem('visitedBefore', 'true');
-  if (window.location.pathname === '/' && !window.location.search) {
-    window.location.href = window.location.origin + '/?v=' + Date.now();
+  forceCacheBust();
+} else {
+  // Even for returning visitors, apply cache bust every 5 minutes
+  const lastCacheBust = localStorage.getItem('lastCacheBust');
+  const now = Date.now();
+  if (!lastCacheBust || (now - parseInt(lastCacheBust)) > 300000) {
+    localStorage.setItem('lastCacheBust', now.toString());
+    forceCacheBust();
   }
 }
 

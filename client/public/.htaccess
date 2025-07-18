@@ -1,0 +1,39 @@
+# Disable caching for all files
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 0 seconds"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 0 seconds"
+  ExpiresByType application/javascript "access plus 0 seconds"
+  ExpiresByType application/json "access plus 0 seconds"
+  ExpiresByType image/png "access plus 0 seconds"
+  ExpiresByType image/jpg "access plus 0 seconds"
+  ExpiresByType image/jpeg "access plus 0 seconds"
+  ExpiresByType image/gif "access plus 0 seconds"
+  ExpiresByType image/svg+xml "access plus 0 seconds"
+</IfModule>
+
+# Cache Control Headers
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+  Header set Pragma "no-cache"
+  Header set Expires "0"
+  
+  # iOS Safari specific headers
+  Header set X-UA-Compatible "IE=edge"
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  
+  # Force refresh on iOS
+  Header set Last-Modified "Mon, 01 Jan 2024 00:00:00 GMT"
+  Header set ETag ""
+</IfModule>
+
+# Remove ETags
+<IfModule mod_headers.c>
+  Header unset ETag
+</IfModule>
+FileETag None
+
+# Disable server signature
+ServerSignature Off

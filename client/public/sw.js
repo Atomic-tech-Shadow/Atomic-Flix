@@ -1,4 +1,4 @@
-const CACHE_NAME = 'atomic-flix-v3';
+const CACHE_NAME = 'atomic-flix-v' + Date.now();
 const urlsToCache = [
   '/',
   '/index.html',
@@ -36,22 +36,36 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Gestion des requêtes fetch
+// Gestion des requêtes fetch - Force le rechargement réseau
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
+    // Toujours essayer le réseau en premier
+    fetch(event.request)
       .then(response => {
-        if (response) {
-          return response;
+        // Cloner la réponse pour pouvoir la mettre en cache
+        const responseClone = response.clone();
+        
+        // Mettre en cache uniquement les ressources statiques importantes
+        if (event.request.url.includes('/assets/') || event.request.url.includes('.png') || event.request.url.includes('.jpg')) {
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
         }
-        return fetch(event.request).catch(() => {
+        
+        return response;
+      })
+      .catch(() => {
+        // Fallback cache seulement si le réseau échoue
+        return caches.match(event.request).then(response => {
+          if (response) {
+            return response;
+          }
           // Fallback pour les pages offline
           if (event.request.destination === 'document') {
             return caches.match('/');
           }
         });
-      }
-    )
+      })
   );
 });
 

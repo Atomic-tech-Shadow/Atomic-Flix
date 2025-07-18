@@ -4,8 +4,9 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchInterval: false,
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: true, // Always refetch on focus
+      staleTime: 0, // Always consider data stale
+      gcTime: 0, // Don't cache data
       retry: 2,
     },
     mutations: {
