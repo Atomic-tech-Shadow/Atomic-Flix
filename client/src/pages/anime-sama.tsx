@@ -5,7 +5,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import MainLayout from '@/components/layout/main-layout';
 import { SectionLoading } from '@/components/ui/loading-spinner';
 import { animeAPI } from '@/lib/api';
-import { SearchResult, JikanResponse } from '@shared/schema';
+
+interface SearchResult {
+  id: string;
+  title: string;
+  url: string;
+  type: string;
+  status: string;
+  image: string;
+}
+
+// Interface pour les réponses API
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  timestamp: string;
+  meta?: ApiResponse<any>;
+}
 
 const AnimeSamaPage: React.FC = () => {
   const [, navigate] = useLocation();
@@ -31,31 +47,15 @@ const AnimeSamaPage: React.FC = () => {
     }
   }, [window.location.search]);
 
-  // Charger tout le contenu trending depuis l'API Jikan
+  // Charger tout le contenu trending depuis l'API
   const loadTrendingAnimes = async () => {
     try {
-      const response: JikanResponse<SearchResult[]> = await animeAPI.getTrending();
+      const response = await animeAPI.getTrending();
       
-      if (response && response.data) {
-        // Adapter les données Jikan au format SearchResult
-        const adaptedResults: SearchResult[] = response.data.map(anime => ({
-          mal_id: anime.mal_id,
-          title: anime.title,
-          title_english: anime.title_english,
-          title_japanese: anime.title_japanese,
-          url: anime.url,
-          type: anime.type,
-          status: anime.status,
-          images: anime.images,
-          score: anime.score,
-          episodes: anime.episodes,
-          year: anime.year,
-          genres: anime.genres,
-          synopsis: anime.synopsis
-        }));
-        
-        setTrendingAnimes(adaptedResults.slice(0, 24));
-        console.log('Contenu trending chargé:', adaptedResults.length, 'éléments');
+      if (response && response.success && response.results) {
+        // Afficher tous les types de contenu de l'API : animes, mangas, films
+        setTrendingAnimes(response.results.slice(0, 24)); // Augmenter le nombre d'éléments affichés
+        console.log('Contenu trending chargé:', response.results.length, 'éléments');
       } else {
         console.warn('Réponse API trending échouée:', response);
         setTrendingAnimes([]);
@@ -68,7 +68,7 @@ const AnimeSamaPage: React.FC = () => {
 
 
 
-  // Recherche d'animes avec l'API Jikan
+  // Recherche d'animes
   const searchAnimes = async (query: string) => {
     if (query.trim().length < 2) {
       setSearchResults([]);
@@ -79,36 +79,31 @@ const AnimeSamaPage: React.FC = () => {
     setError(null);
     
     try {
-      const response: JikanResponse<SearchResult[]> = await animeAPI.search(query);
+      const response = await animeAPI.search(query);
       
-      if (response && response.data) {
-        // Adapter les données Jikan au format SearchResult
-        const adaptedResults: SearchResult[] = response.data.map(anime => ({
-          mal_id: anime.mal_id,
-          title: anime.title,
-          title_english: anime.title_english,
-          title_japanese: anime.title_japanese,
-          url: anime.url,
-          type: anime.type,
-          status: anime.status,
-          images: anime.images,
-          score: anime.score,
-          episodes: anime.episodes,
-          year: anime.year,
-          genres: anime.genres,
-          synopsis: anime.synopsis
-        }));
-        
-        setSearchResults(adaptedResults);
-        console.log('Résultats de recherche:', adaptedResults.length, 'éléments');
+      if (response && response.success) {
+        const results = response.results || [];
+        if (Array.isArray(results)) {
+          // Afficher tout le contenu de l'API : animes, mangas, films, etc.
+          setSearchResults(results);
+        } else {
+          console.warn('Pas de résultats dans la réponse:', response);
+          setSearchResults([]);
+        }
       } else {
-        setError('Aucun résultat trouvé');
-        setSearchResults([]);
+        throw new Error('Réponse API invalide');
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur de recherche';
       console.error('Erreur recherche:', errorMessage);
-      setError('Erreur lors de la recherche. Veuillez réessayer.');
+      
+      if (errorMessage.includes('504') || errorMessage.includes('timeout')) {
+        setError('Le serveur anime-sama-scraper.vercel.app ne répond pas actuellement. Veuillez réessayer plus tard.');
+      } else if (errorMessage.includes('500')) {
+        setError('Erreur temporaire du serveur. Veuillez réessayer dans quelques instants.');
+      } else {
+        setError('Impossible de rechercher les animes. Vérifiez votre connexion internet.');
+      }
       setSearchResults([]);
     } finally {
       setLoading(false);
@@ -187,15 +182,15 @@ const AnimeSamaPage: React.FC = () => {
             >
               {searchResults.map((anime, index) => (
                 <motion.div
-                  key={`search-${anime.mal_id}-${index}`}
+                  key={`search-${anime.id}-${index}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
-                  onClick={() => loadAnimeDetails(anime.mal_id.toString(), anime.type)}
+                  onClick={() => loadAnimeDetails(anime.id, anime.type)}
                   className="cursor-pointer group overflow-hidden atomic-hover-scale h-56 sm:h-64 md:h-72 rounded-lg relative"
                 >
                   <img
-                    src={anime.images?.jpg?.image_url || anime.images?.jpg?.large_image_url || '/placeholder-anime.jpg'}
+                    src={anime.image}
                     alt={anime.title}
                     className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
                     onError={(e) => {
@@ -206,27 +201,21 @@ const AnimeSamaPage: React.FC = () => {
                   />
                   {/* Badge type de contenu */}
                   <div className={`absolute top-2 left-2 text-white text-xs px-3 py-1 rounded-full font-bold backdrop-blur-sm border transition-all duration-300 ${
-                    anime.type === 'Manga' ? 'bg-purple-500/80 border-purple-400 hover:bg-purple-500' :
-                    anime.type === 'Movie' ? 'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500' :
-                    anime.type === 'TV' ? 'bg-blue-500/80 border-blue-400 hover:bg-blue-500' :
+                    anime.type === 'manga' ? 'bg-purple-500/80 border-purple-400 hover:bg-purple-500' :
+                    anime.type === 'film' ? 'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500' :
+                    anime.type === 'movie' ? 'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500' :
                     'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500'
                   }`}>
-                    {anime.type === 'Manga' ? 'MANGA' :
-                     anime.type === 'Movie' ? 'FILM' :
-                     anime.type === 'TV' ? 'ANIME' :
-                     anime.type || 'ANIME'}
+                    {anime.type === 'manga' ? 'MANGA' :
+                     anime.type === 'film' || anime.type === 'movie' ? 'FILM' :
+                     'ANIME'}
                   </div>
                   
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-4 pb-3">
                     <h3 className="text-white font-semibold text-sm leading-tight mb-2 group-hover:text-cyan-400 transition-all duration-300">{anime.title}</h3>
                     <div className="flex justify-between items-center">
                       <p className="text-gray-300 text-xs uppercase tracking-wide">{anime.status}</p>
-                      <div className="flex items-center gap-1">
-                        {anime.score && (
-                          <span className="text-yellow-400 text-xs font-medium">⭐{anime.score}</span>
-                        )}
-                        <p className="text-cyan-400/80 text-xs font-medium">{anime.type || 'anime'}</p>
-                      </div>
+                      <p className="text-cyan-400/80 text-xs font-medium">{anime.type || 'anime'}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -260,7 +249,7 @@ const AnimeSamaPage: React.FC = () => {
                     }}
                   >
                     <img
-                      src={anime.images?.jpg?.image_url || anime.images?.jpg?.large_image_url || '/placeholder-anime.jpg'}
+                      src={anime.image}
                       alt={anime.title}
                       className="w-full h-full object-cover brightness-90 hover:brightness-100 transition-all duration-300"
                       onError={(e) => {
@@ -317,15 +306,15 @@ const AnimeSamaPage: React.FC = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                   {trendingAnimes.map((anime, index) => (
                     <motion.div
-                      key={`trending-${anime.mal_id}-${index}`}
+                      key={`trending-${anime.id}-${index}`}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.1, duration: 0.3 }}
-                      onClick={() => loadAnimeDetails(anime.mal_id.toString(), anime.type)}
+                      onClick={() => loadAnimeDetails(anime.id, anime.type)}
                       className="cursor-pointer group overflow-hidden atomic-hover-scale h-56 sm:h-64 md:h-72 rounded-lg relative"
                     >
                       <img
-                        src={anime.images?.jpg?.image_url || anime.images?.jpg?.large_image_url || '/placeholder-anime.jpg'}
+                        src={anime.image}
                         alt={anime.title}
                         className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
                         onError={(e) => {
@@ -334,26 +323,17 @@ const AnimeSamaPage: React.FC = () => {
                           target.onerror = null;
                         }}
                       />
-                      {/* Badge type de contenu avec note */}
+                      {/* Badge type de contenu */}
                       <div className={`absolute top-2 left-2 text-white text-xs px-2 py-1 rounded-full font-semibold ${
-                        anime.type === 'Manga' ? 'bg-orange-500' :
-                        anime.type === 'Movie' ? 'bg-purple-500' :
-                        anime.type === 'TV' ? 'bg-blue-500' :
+                        anime.type === 'manga' ? 'bg-orange-500' :
+                        anime.type === 'film' ? 'bg-purple-500' :
+                        anime.type === 'movie' ? 'bg-purple-500' :
                         'bg-blue-500'
                       }`}>
-                        {anime.type === 'Manga' ? 'MANGA' :
-                         anime.type === 'Movie' ? 'FILM' :
-                         anime.type === 'TV' ? 'ANIME' :
-                         anime.type || 'ANIME'}
+                        {anime.type === 'manga' ? 'MANGA' :
+                         anime.type === 'film' || anime.type === 'movie' ? 'FILM' :
+                         'ANIME'}
                       </div>
-                      
-                      {/* Badge score */}
-                      {anime.score && (
-                        <div className="absolute top-2 right-2 bg-yellow-500/90 text-white text-xs px-2 py-1 rounded-full font-bold">
-                          ⭐{anime.score}
-                        </div>
-                      )}
-                      
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                       
                       {/* Titre superposé sur l'image */}

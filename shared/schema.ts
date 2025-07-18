@@ -1,54 +1,20 @@
-// Schema simplifié pour ATOMIC FLIX - utilisation API Jikan (MyAnimeList)
+// Schema simplifié pour ATOMIC FLIX - utilisation API externe uniquement
 // Plus de base de données locale nécessaire
 
-export interface JikanResponse<T> {
+export interface ApiResponse<T> {
+  success: boolean;
   data: T;
-  pagination?: {
-    last_visible_page: number;
-    has_next_page: boolean;
-    current_page: number;
-    items: {
-      count: number;
-      total: number;
-      per_page: number;
-    };
-  };
-}
-
-export interface JikanImage {
-  jpg: {
-    image_url: string;
-    small_image_url: string;
-    large_image_url: string;
-  };
-  webp: {
-    image_url: string;
-    small_image_url: string;
-    large_image_url: string;
-  };
-}
-
-export interface JikanGenre {
-  mal_id: number;
-  type: string;
-  name: string;
-  url: string;
+  timestamp: string;
+  meta?: any;
 }
 
 export interface SearchResult {
-  mal_id: number;
+  id: string;
   title: string;
-  title_english?: string;
-  title_japanese?: string;
   url: string;
   type: string;
   status: string;
-  images: JikanImage;
-  score?: number;
-  episodes?: number;
-  year?: number;
-  genres: JikanGenre[];
-  synopsis?: string;
+  image: string;
 }
 
 export interface Episode {
@@ -81,33 +47,15 @@ export interface Season {
 }
 
 export interface AnimeData {
-  mal_id: number;
+  id: string;
   title: string;
-  title_english?: string;
-  title_japanese?: string;
   synopsis: string;
-  images: JikanImage;
-  genres: JikanGenre[];
+  image: string;
+  genres: string[];
   status: string;
-  year?: number;
-  episodes?: number;
-  score?: number;
-  scored_by?: number;
-  rank?: number;
-  popularity?: number;
-  members?: number;
-  favorites?: number;
-  type: string;
-  source: string;
-  rating?: string;
-  duration?: string;
+  year: string;
+  seasons: Season[];
   url: string;
-  trailer?: {
-    youtube_id: string;
-    url: string;
-    embed_url: string;
-  };
-  seasons?: Season[];
 }
 
 export interface EpisodeDetails {
