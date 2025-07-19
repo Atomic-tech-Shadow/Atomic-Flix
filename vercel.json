@@ -1,35 +1,9 @@
 {
-  "version": 2,
   "buildCommand": "cd client && npm run build",
   "outputDirectory": "client/dist",
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/about",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/anime/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/manga/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/privacy-policy",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/terms-of-service",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ],
   "headers": [
     {
