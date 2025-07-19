@@ -181,6 +181,8 @@ ATOMIC FLIX is a modern anime streaming platform built with React, TypeScript, a
 - July 18, 2025. Fallback removal: Completely removed all fallback data, placeholder images, and mock content from the application. Eliminated placeholder image URLs (via.placeholder.com) in all pages (anime-sama.tsx, anime.tsx, manga-reader.tsx), removed fallback error responses in API layer, and simplified error handling to use only external API data. Application now relies exclusively on anime-sama-scraper.vercel.app API without any synthetic data or fallback mechanisms.
 
 
+- July 19, 2025. Vercel routing fixes: Fixed 404 errors for direct URL access (e.g., /about, /anime/*, /manga/*) by implementing comprehensive Vercel routing configuration. Updated vercel.json with specific rewrites for all SPA routes, added fallback _redirects file, and created secondary vercel.json in public directory for robust routing. All pages now accessible via direct URLs on production.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
