@@ -184,6 +184,7 @@ ATOMIC FLIX is a modern anime streaming platform built with React, TypeScript, a
 - July 19, 2025. Vercel routing fixes: Fixed 404 errors for direct URL access (e.g., /about, /anime/*, /manga/*) by implementing comprehensive Vercel routing configuration. Updated vercel.json with specific rewrites for all SPA routes, added fallback _redirects file, and created secondary vercel.json in public directory for robust routing. All pages now accessible via direct URLs on production.
 
 - July 19, 2025. Vercel routing fixes: Fixed persistent 404 errors for direct URL access on Vercel deployment. Simplified vercel.json configuration to use basic routes pattern with filesystem handling and fallback to index.html. Removed complex rewrites and cleaned up conflicting configuration files. Applied minimal but effective SPA routing solution for production deployment.
+- July 23, 2025. Migration from Replit Agent to Replit environment: Successfully completed migration with comprehensive privacy policy update. Updated privacy policy page with detailed content from mobile application including Telegram integration details, legal disclaimers, DMCA information, data collection policies, and technical architecture explanations. Application now runs cleanly in standard Replit environment with proper frontend-only architecture and security best practices.
 
 ## User Preferences
 
