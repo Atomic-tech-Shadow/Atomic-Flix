@@ -270,10 +270,18 @@ export default function PrivacyPolicy() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-300">
+              <p className="text-gray-300 mb-4">
                 Pour toute question concernant cette politique de confidentialité, 
-                vous pouvez contacter le développeur via les canaux de support de l'application.
+                vous pouvez nous contacter :
               </p>
+              
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/20">
+                <Mail className="w-5 h-5 text-cyan-400" />
+                <div>
+                  <p className="font-medium text-cyan-300">Email</p>
+                  <p className="text-gray-300">atomictech228@gmail.com</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
