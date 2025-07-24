@@ -50,6 +50,7 @@
           <img src="/assets/atomic-logo-round.png" alt="ATOMIC FLIX" style="width: 120px; height: 120px; margin-bottom: 20px; opacity: 0.9; border-radius: 50%; object-fit: cover; border: 3px solid rgba(0, 240, 255, 0.3);">
           <h1 style="color: #00F0FF; font-size: 32px; font-weight: 700; margin: 0; text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);">ATOMIC FLIX</h1>
           <p style="color: rgba(255, 255, 255, 0.7); margin: 10px 0 0 0; font-size: 16px;">Chargement en cours...</p>
+          <p style="color: rgba(255, 255, 255, 0.5); margin: 10px 0 0 0; font-size: 12px;" id="browser-info"></p>
           <div style="width: 200px; height: 3px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; margin: 20px auto; overflow: hidden;">
             <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #00F0FF, #A855F7); border-radius: 2px; animation: loading 2s ease-in-out infinite;"></div>
           </div>
@@ -63,7 +64,24 @@
       </style>
     </div>
     
-
+    <script>
+      // Détecter le navigateur et l'afficher pendant le chargement
+      const browserInfo = document.getElementById('browser-info');
+      if (browserInfo) {
+        const ua = navigator.userAgent;
+        let browser = 'Navigateur détecté';
+        
+        if (ua.includes('Firefox')) {
+          browser = 'Firefox iOS - Optimisé';
+        } else if (ua.includes('Chrome')) {
+          browser = 'Chrome iOS';
+        } else if (ua.includes('Safari')) {
+          browser = 'Safari iOS';
+        }
+        
+        browserInfo.textContent = browser;
+      }
+    </script>
     
     <script type="module" src="/src/main.tsx"></script>
   </body>

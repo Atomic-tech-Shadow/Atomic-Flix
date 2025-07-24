@@ -38,7 +38,7 @@ const removeLoadingScreen = () => {
   }
 };
 
-// iOS Safari loading timeout handler
+// iOS loading timeout handler - shorter for Firefox compatibility
 const handleIOSLoadingTimeout = () => {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   if (isIOS) {
@@ -48,48 +48,29 @@ const handleIOSLoadingTimeout = () => {
         console.log('iOS detected - removing loading screen');
         removeLoadingScreen();
       }
-    }, 3000);
+    }, 2000); // Reduced timeout for better mobile experience
   }
 };
 
-// Force cache bust for iOS Safari and all browsers
-const forceCacheBust = () => {
-  // Clear localStorage cache keys
-  const keys = Object.keys(localStorage);
-  keys.forEach(key => {
-    if (key.startsWith('atomic-flix-cache-') || key.startsWith('vite-')) {
-      localStorage.removeItem(key);
-    }
-  });
-  
-  // Clear sessionStorage except for visit tracking
-  const sessionKeys = Object.keys(sessionStorage);
-  sessionKeys.forEach(key => {
-    if (key !== 'visitedBefore') {
-      sessionStorage.removeItem(key);
-    }
-  });
-  
-  // Force reload with timestamp for all visits
-  const hasTimestamp = window.location.search.includes('v=');
-  if (!hasTimestamp) {
-    const separator = window.location.search ? '&' : '?';
-    window.location.href = window.location.href + separator + 'v=' + Date.now();
+// Simple cache cleanup without forced redirects
+const cleanupCache = () => {
+  try {
+    // Clear old cache keys only
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith('atomic-flix-cache-') || key.startsWith('vite-old-')) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch (error) {
+    console.log('Cache cleanup failed:', error);
   }
 };
 
-// Apply cache bust on every visit
+// Clean cache on first visit only
 if (!sessionStorage.getItem('visitedBefore')) {
   sessionStorage.setItem('visitedBefore', 'true');
-  forceCacheBust();
-} else {
-  // Even for returning visitors, apply cache bust every 5 minutes
-  const lastCacheBust = localStorage.getItem('lastCacheBust');
-  const now = Date.now();
-  if (!lastCacheBust || (now - parseInt(lastCacheBust)) > 300000) {
-    localStorage.setItem('lastCacheBust', now.toString());
-    forceCacheBust();
-  }
+  cleanupCache();
 }
 
 // Initialize iOS loading timeout handler
@@ -99,5 +80,14 @@ handleIOSLoadingTimeout();
 const root = createRoot(document.getElementById("root")!);
 root.render(<App />);
 
-// Remove loading screen after a short delay to ensure app is mounted
-setTimeout(removeLoadingScreen, 1000);
+// Remove loading screen after app mounts - ensure React is ready
+setTimeout(() => {
+  // Double check that the app has rendered
+  const appElement = document.querySelector('[data-app-loaded]');
+  if (appElement) {
+    removeLoadingScreen();
+  } else {
+    // Fallback - force remove after additional delay
+    setTimeout(removeLoadingScreen, 2000);
+  }
+}, 1500);
