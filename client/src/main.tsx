@@ -3,6 +3,17 @@ import App from "./App";
 import "./index.css";
 import { notificationManager } from "./lib/notifications";
 
+// Détection Firefox iOS
+const isFirefoxIOS = () => {
+  const ua = navigator.userAgent;
+  return ua.includes('Firefox') && (ua.includes('iPhone') || ua.includes('iPad'));
+};
+
+// Logging spécial pour Firefox iOS
+const firefoxLog = (message: string, data?: any) => {
+  console.log(`[Firefox iOS Debug] ${message}`, data || '');
+};
+
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
@@ -73,21 +84,41 @@ if (!sessionStorage.getItem('visitedBefore')) {
   cleanupCache();
 }
 
-// Initialize iOS loading timeout handler
-handleIOSLoadingTimeout();
-
-// Render app and remove loading screen
-const root = createRoot(document.getElementById("root")!);
-root.render(<App />);
-
-// Remove loading screen after app mounts - ensure React is ready
-setTimeout(() => {
-  // Double check that the app has rendered
-  const appElement = document.querySelector('[data-app-loaded]');
-  if (appElement) {
+// Firefox iOS: Logique spéciale de chargement
+if (isFirefoxIOS()) {
+  firefoxLog('Firefox iOS détecté - initialisation spéciale');
+  
+  // Supprimer l'écran de chargement immédiatement pour Firefox
+  setTimeout(() => {
     removeLoadingScreen();
-  } else {
-    // Fallback - force remove after additional delay
-    setTimeout(removeLoadingScreen, 2000);
+    firefoxLog('Loading screen supprimé pour Firefox iOS');
+  }, 500);
+  
+  // Rendre l'app sans attendre
+  try {
+    const root = createRoot(document.getElementById("root")!);
+    root.render(<App />);
+    firefoxLog('App rendue avec succès');
+  } catch (error) {
+    firefoxLog('Erreur lors du rendu:', error);
+    // Fallback: essayer de recharger la page
+    setTimeout(() => {
+      window.location.href = window.location.pathname;
+    }, 1000);
   }
-}, 1500);
+} else {
+  // Logique normale pour autres navigateurs
+  handleIOSLoadingTimeout();
+  
+  const root = createRoot(document.getElementById("root")!);
+  root.render(<App />);
+  
+  setTimeout(() => {
+    const appElement = document.querySelector('[data-app-loaded]');
+    if (appElement) {
+      removeLoadingScreen();
+    } else {
+      setTimeout(removeLoadingScreen, 2000);
+    }
+  }, 1500);
+}

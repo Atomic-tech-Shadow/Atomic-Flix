@@ -13,6 +13,7 @@ import MangaReaderPage from "@/pages/manga-reader";
 import AboutPage from "@/pages/about";
 import PrivacyPolicyPage from "@/pages/privacy-policy";
 import TermsOfServicePage from "@/pages/terms-of-service";
+import FirefoxDebugPage from "@/pages/firefox-debug";
 import { Component, ErrorInfo, ReactNode } from "react";
 
 // Error Boundary pour capturer les erreurs sur Firefox iPhone
@@ -35,6 +36,26 @@ class ErrorBoundary extends Component<
 
   render() {
     if (this.state.hasError) {
+      // Détection Firefox iOS
+      const isFirefoxIOS = navigator.userAgent.includes('Firefox') && 
+                          (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad'));
+      
+      // Rechargement automatique pour Firefox iOS - avec compteur d'erreurs
+      if (isFirefoxIOS) {
+        const errorCount = parseInt(localStorage.getItem('firefox-error-count') || '0') + 1;
+        localStorage.setItem('firefox-error-count', errorCount.toString());
+        
+        if (errorCount >= 3) {
+          // Après 3 erreurs, rediriger vers la page de debug
+          localStorage.removeItem('firefox-error-count');
+          window.location.href = '/firefox-debug';
+        } else {
+          setTimeout(() => {
+            window.location.href = window.location.pathname;
+          }, 2000);
+        }
+      }
+      
       return (
         <div style={{
           position: 'fixed',
@@ -52,21 +73,58 @@ class ErrorBoundary extends Component<
           padding: '20px'
         }}>
           <div>
+            <img src="/assets/atomic-logo-round.png" alt="ATOMIC FLIX" style={{
+              width: '80px', 
+              height: '80px', 
+              marginBottom: '20px',
+              borderRadius: '50%',
+              objectFit: 'cover'
+            }} />
             <h1 style={{ fontSize: '24px', marginBottom: '20px' }}>ATOMIC FLIX</h1>
-            <p style={{ marginBottom: '20px' }}>Erreur de chargement détectée</p>
-            <button
-              onClick={() => window.location.reload()}
-              style={{
-                background: 'linear-gradient(90deg, #00F0FF, #A855F7)',
-                color: 'white',
-                padding: '10px 20px',
-                border: 'none',
-                borderRadius: '20px',
-                cursor: 'pointer'
-              }}
-            >
-              Recharger la page
-            </button>
+            <p style={{ marginBottom: '20px' }}>
+              {isFirefoxIOS ? 'Rechargement automatique...' : 'Erreur de chargement détectée'}
+            </p>
+            {!isFirefoxIOS && (
+              <button
+                onClick={() => window.location.href = window.location.pathname}
+                style={{
+                  background: 'linear-gradient(90deg, #00F0FF, #A855F7)',
+                  color: 'white',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '20px',
+                  cursor: 'pointer'
+                }}
+              >
+                Recharger la page
+              </button>
+            )}
+            {isFirefoxIOS && (
+              <>
+                <div style={{
+                  width: '150px',
+                  height: '3px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '2px',
+                  margin: '20px auto',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #00F0FF, #A855F7)',
+                    borderRadius: '2px',
+                    animation: 'loadingBar 2s linear infinite'
+                  }}></div>
+                </div>
+                <style>{`
+                  @keyframes loadingBar {
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(100%); }
+                  }
+                `}</style>
+              </>
+            )}
           </div>
         </div>
       );
@@ -87,6 +145,7 @@ function Router() {
       <Route path="/about" component={AboutPage} />
       <Route path="/privacy-policy" component={PrivacyPolicyPage} />
       <Route path="/terms-of-service" component={TermsOfServicePage} />
+      <Route path="/firefox-debug" component={FirefoxDebugPage} />
       <Route component={NotFound} />
     </Switch>
   );
