@@ -38,22 +38,17 @@ const removeLoadingScreen = () => {
   }
 };
 
-// iOS Browser compatibility handler (Safari & Firefox)
+// iOS Safari loading timeout handler
 const handleIOSLoadingTimeout = () => {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-  
   if (isIOS) {
-    // Firefox sur iOS charge généralement plus rapidement
-    const timeout = isFirefox ? 2000 : 3000;
-    
     setTimeout(() => {
       const loadingElement = document.getElementById('initial-loading');
       if (loadingElement) {
-        console.log(`iOS ${isFirefox ? 'Firefox' : 'Safari'} detected - removing loading screen`);
+        console.log('iOS detected - removing loading screen');
         removeLoadingScreen();
       }
-    }, timeout);
+    }, 3000);
   }
 };
 
