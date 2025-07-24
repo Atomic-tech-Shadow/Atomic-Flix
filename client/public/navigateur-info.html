@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="MobileOptimized" content="width">
+    <meta name="HandheldFriendly" content="true">
+    <title>ATOMIC FLIX - Guide Navigateur</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0A0A0A 0%, #1A1A2E 50%, #16213E 100%);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 20px auto;
+            border-radius: 50%;
+            border: 3px solid rgba(0, 240, 255, 0.3);
+        }
+        h1 {
+            color: #00F0FF;
+            font-size: 28px;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+        .browser-option {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+        .recommended {
+            border-color: #00F0FF;
+            background: rgba(0, 240, 255, 0.1);
+        }
+        .btn {
+            background: linear-gradient(90deg, #00F0FF, #A855F7);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .status {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        .device-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="/assets/atomic-logo-round.png" alt="ATOMIC FLIX" class="logo">
+        <h1>ATOMIC FLIX</h1>
+        <h2>Guide de Compatibilité Navigateur</h2>
+        
+        <div class="device-info" id="device-info">
+            <strong>Appareil détecté :</strong> <span id="device-name">Chargement...</span><br>
+            <strong>Navigateur :</strong> <span id="browser-name">Chargement...</span>
+        </div>
+
+        <div class="browser-option recommended">
+            <h3>🦊 Firefox (Recommandé)</h3>
+            <p>Meilleure compatibilité avec les anciens iPhone. Cache moins agressif et meilleur support des anciennes versions iOS.</p>
+            <a href="https://apps.apple.com/app/firefox-private-safe-browser/id989804926" class="btn">Télécharger Firefox</a>
+            <div class="status">✅ Compatible iPhone 5S/5SE/6 et plus récents</div>
+        </div>
+
+        <div class="browser-option">
+            <h3>🌐 Safari</h3>
+            <p>Navigateur par défaut d'Apple. Peut avoir des problèmes de cache sur les anciens appareils.</p>
+            <div class="status">⚠️ Problèmes possibles sur iPhone 5S/5SE</div>
+        </div>
+
+        <div class="browser-option">
+            <h3>🌟 Chrome</h3>
+            <p>Alternative solide avec bonne performance sur iOS moderne.</p>
+            <a href="https://apps.apple.com/app/google-chrome/id535886823" class="btn">Télécharger Chrome</a>
+            <div class="status">✅ Compatible iPhone 6 et plus récents</div>
+        </div>
+
+        <a href="/" class="btn">Continuer vers ATOMIC FLIX</a>
+    </div>
+
+    <script>
+        // Détecter l'appareil et le navigateur
+        const detectDevice = () => {
+            const ua = navigator.userAgent;
+            let device = 'iPhone inconnu';
+            let browser = 'Navigateur inconnu';
+
+            // Détecter le modèle d'iPhone
+            if (ua.includes('iPhone')) {
+                if (ua.includes('iPhone OS 9') || ua.includes('iPhone OS 10')) {
+                    device = 'iPhone 5S/5SE/6';
+                } else if (ua.includes('iPhone OS 11') || ua.includes('iPhone OS 12')) {
+                    device = 'iPhone 6S/7/8';
+                } else {
+                    device = 'iPhone moderne';
+                }
+            }
+
+            // Détecter le navigateur
+            if (ua.includes('Firefox')) {
+                browser = 'Firefox Mobile';
+            } else if (ua.includes('Chrome') && !ua.includes('Safari')) {
+                browser = 'Chrome Mobile';
+            } else if (ua.includes('Safari')) {
+                browser = 'Safari Mobile';
+            }
+
+            document.getElementById('device-name').textContent = device;
+            document.getElementById('browser-name').textContent = browser;
+
+            // Afficher une recommandation spécifique
+            if (ua.includes('iPhone OS 9') || ua.includes('iPhone OS 10') || ua.includes('iPhone OS 11')) {
+                const warning = document.createElement('div');
+                warning.style.cssText = 'background: rgba(255, 165, 0, 0.2); padding: 15px; border-radius: 10px; margin: 20px 0; border-left: 4px solid orange;';
+                warning.innerHTML = '<strong>⚠️ Ancien iOS détecté</strong><br>Nous recommandons fortement Firefox pour une meilleure expérience sur votre appareil.';
+                document.querySelector('.container').insertBefore(warning, document.querySelector('.browser-option'));
+            }
+        };
+
+        detectDevice();
+
+        // Auto-redirect vers l'app après 30 secondes
+        setTimeout(() => {
+            if (confirm('Voulez-vous continuer vers ATOMIC FLIX maintenant ?')) {
+                window.location.href = '/';
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
