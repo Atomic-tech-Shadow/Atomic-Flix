@@ -10,7 +10,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
+          "value": "no-cache, no-store, must-revalidate, max-age=0, post-check=0, pre-check=0"
         },
         {
           "key": "Pragma",
@@ -18,7 +18,20 @@
         },
         {
           "key": "Expires",
-          "value": "0"
+          "value": "Thu, 01 Jan 1970 00:00:00 GMT"
+        },
+        {
+          "key": "Last-Modified",
+          "value": "Thu, 01 Jan 1970 00:00:00 GMT"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(js|css|ts|tsx))",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
         }
       ]
     },

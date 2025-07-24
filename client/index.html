@@ -4,20 +4,41 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
     
-    <!-- Cache Control Meta Tags -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+    <!-- Aggressive Cache Control Meta Tags -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0, post-check=0, pre-check=0">
     <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Expires" content="Thu, 01 Jan 1970 00:00:00 GMT">
+    <meta http-equiv="Last-Modified" content="Thu, 01 Jan 1970 00:00:00 GMT">
+    <meta http-equiv="If-Modified-Since" content="Thu, 01 Jan 1970 00:00:00 GMT">
     
-    <!-- Safari-specific cache control -->
+    <!-- iOS Safari Specific Cache Busting -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-touch-fullscreen" content="yes">
     <meta name="format-detection" content="telephone=no">
-    
-    <!-- iOS Safari cache bust -->
     <meta name="msapplication-tap-highlight" content="no">
     <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Force iOS Safari refresh -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-title" content="ATOMIC FLIX">
+    <script>
+      // iOS Safari cache busting - Force page reload if cached
+      if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
+        window.location.reload();
+      }
+      
+      // Detect iOS Safari and force reload if stuck
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        setTimeout(() => {
+          if (document.getElementById('initial-loading')) {
+            console.log('iOS Safari loading timeout - forcing reload');
+            window.location.reload(true);
+          }
+        }, 10000);
+      }
+    </script>
     <title>ATOMIC FLIX - Streaming d'Anime</title>
     <meta name="description" content="ATOMIC FLIX - Plateforme de streaming d'anime avec une vaste collection d'animes populaires en VOSTFR et VF">
     

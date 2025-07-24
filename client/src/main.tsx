@@ -38,6 +38,29 @@ const removeLoadingScreen = () => {
   }
 };
 
+// iOS Safari specific loading timeout handler
+const handleIOSLoadingTimeout = () => {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (isIOS) {
+    // Set a 15 second timeout for iOS Safari
+    setTimeout(() => {
+      const loadingElement = document.getElementById('initial-loading');
+      if (loadingElement) {
+        console.log('iOS Safari detected - forcing app initialization');
+        // Force remove loading screen and initialize app
+        removeLoadingScreen();
+        // If still stuck, try to reinitialize
+        setTimeout(() => {
+          if (!document.querySelector('[data-app-loaded]')) {
+            console.log('App not loaded - forcing page reload');
+            window.location.reload();
+          }
+        }, 2000);
+      }
+    }, 15000);
+  }
+};
+
 // Force cache bust for iOS Safari and all browsers
 const forceCacheBust = () => {
   // Clear localStorage cache keys
@@ -77,6 +100,9 @@ if (!sessionStorage.getItem('visitedBefore')) {
     forceCacheBust();
   }
 }
+
+// Initialize iOS loading timeout handler
+handleIOSLoadingTimeout();
 
 // Render app and remove loading screen
 const root = createRoot(document.getElementById("root")!);

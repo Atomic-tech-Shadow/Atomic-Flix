@@ -1,4 +1,4 @@
-const CACHE_NAME = 'atomic-flix-v' + Date.now();
+const CACHE_NAME = 'atomic-flix-v4-' + Date.now();
 const urlsToCache = [
   '/',
   '/index.html',

@@ -33,12 +33,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-        <NotificationWelcome />
-        <Analytics />
-      </TooltipProvider>
+      <div data-app-loaded="true">
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+          <NotificationWelcome />
+          <Analytics />
+        </TooltipProvider>
+      </div>
     </QueryClientProvider>
   );
 }
