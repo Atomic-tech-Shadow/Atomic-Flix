@@ -23,21 +23,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-title" content="ATOMIC FLIX">
     <script>
-      // iOS Safari cache busting - Force page reload if cached
-      if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
-        window.location.reload();
+      // iPhone 5SE / Old iOS Safari Cache Busting (Très Agressif)
+      const isOldIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const hasTimeParam = window.location.search.includes('t=') || window.location.search.includes('v=');
+      
+      // Force reload avec timestamp si pas déjà fait (méthode la plus fiable pour iPhone 5SE)
+      if (isOldIOS && !hasTimeParam) {
+        const separator = window.location.search ? '&' : '?';
+        const timestamp = Date.now();
+        window.location.href = window.location.href + separator + 't=' + timestamp + '&v=' + timestamp;
       }
       
-      // Detect iOS Safari and force reload if stuck
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      if (isIOS) {
+      // Backup: timeout pour forcer reload si bloqué sur loading
+      if (isOldIOS) {
         setTimeout(() => {
-          if (document.getElementById('initial-loading')) {
-            console.log('iOS Safari loading timeout - forcing reload');
-            window.location.reload(true);
+          const loadingElement = document.getElementById('initial-loading');
+          if (loadingElement) {
+            console.log('iPhone 5SE detected - forcing emergency reload');
+            window.location.href = window.location.pathname + '?emergency=' + Date.now();
           }
-        }, 10000);
+        }, 8000); // Plus court pour iPhone 5SE
       }
+      
+      // Désactiver le cache BF pour Safari ancien
+      window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+          window.location.reload();
+        }
+      });
     </script>
     <title>ATOMIC FLIX - Streaming d'Anime</title>
     <meta name="description" content="ATOMIC FLIX - Plateforme de streaming d'anime avec une vaste collection d'animes populaires en VOSTFR et VF">
@@ -87,6 +100,10 @@
         }
       </style>
     </div>
+    
+    <!-- Iframe vide pour désactiver BFCache sur iPhone 5SE -->
+    <iframe src="about:blank" style="display:none; width:0; height:0; border:none;"></iframe>
+    
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>

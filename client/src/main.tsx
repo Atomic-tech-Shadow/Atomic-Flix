@@ -38,26 +38,28 @@ const removeLoadingScreen = () => {
   }
 };
 
-// iOS Safari specific loading timeout handler
+// iPhone 5SE / Old iOS Safari specific loading timeout handler
 const handleIOSLoadingTimeout = () => {
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  if (isIOS) {
-    // Set a 15 second timeout for iOS Safari
+  const isOldIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (isOldIOS) {
+    // Timeout plus court pour iPhone 5SE (5 secondes)
     setTimeout(() => {
       const loadingElement = document.getElementById('initial-loading');
       if (loadingElement) {
-        console.log('iOS Safari detected - forcing app initialization');
-        // Force remove loading screen and initialize app
+        console.log('iPhone 5SE detected - forcing app initialization');
+        // Force remove loading screen immédiatement
         removeLoadingScreen();
-        // If still stuck, try to reinitialize
-        setTimeout(() => {
-          if (!document.querySelector('[data-app-loaded]')) {
-            console.log('App not loaded - forcing page reload');
-            window.location.reload();
-          }
-        }, 2000);
       }
-    }, 15000);
+    }, 5000);
+    
+    // Backup emergency reload pour iPhone 5SE si toujours bloqué
+    setTimeout(() => {
+      if (document.getElementById('initial-loading')) {
+        console.log('iPhone 5SE emergency reload - cache trop agressif');
+        const timestamp = Date.now();
+        window.location.href = window.location.pathname + '?force=' + timestamp + '&cache=false';
+      }
+    }, 10000);
   }
 };
 
