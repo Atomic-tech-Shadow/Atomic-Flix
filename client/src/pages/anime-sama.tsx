@@ -251,7 +251,7 @@ const AnimeSamaPage: React.FC = () => {
 
         {!searchQuery && !searchResults.length && (
           <div>
-            {/* Section Héro - Nouvelle Saison */}
+            {/* Section Héro - Classiques Incontournables */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -262,25 +262,26 @@ const AnimeSamaPage: React.FC = () => {
                 border: '1px solid rgba(0, 240, 255, 0.2)'
               }}
             >
-              {/* Images d'animes en mosaïque visible en haut */}
-              {recentEpisodes.length > 0 && (
+              {/* Images d'animes classiques en mosaïque visible en haut */}
+              {popularAnimes?.categories?.classiques?.anime?.length > 0 && (
                 <div className="flex h-24 md:h-32">
-                  {recentEpisodes.slice(0, 8).map((episode, index) => (
+                  {popularAnimes.categories.classiques.anime.slice(0, 8).map((anime: any, index: number) => (
                     <div
                       key={`hero-mosaic-${index}`}
-                      className="flex-1 overflow-hidden"
+                      className="flex-1 overflow-hidden cursor-pointer"
                       style={{
                         transform: `skew(${index % 2 === 0 ? '3deg' : '-3deg'})`,
                         marginLeft: index > 0 ? '-2px' : '0'
                       }}
+                      onClick={() => loadAnimeDetails(anime.id)}
                     >
                       <img
-                        src={episode.image}
-                        alt={episode.animeTitle}
-                        className="w-full h-full object-cover brightness-90 hover:brightness-100 transition-all duration-300"
+                        src={anime.image}
+                        alt={anime.title}
+                        className="w-full h-full object-cover brightness-90 hover:brightness-110 transition-all duration-300"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${episode.animeId}.jpg`;
+                          target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
                         }}
                       />
                     </div>
@@ -299,8 +300,8 @@ const AnimeSamaPage: React.FC = () => {
                     ATOMIC FLIX
                   </h1>
                   <p className="text-xl md:text-2xl text-gray-200 mb-4 font-light tracking-wide">
-                    Plongez dans l'univers infini<br />
-                    des animes !
+                    Découvrez les classiques<br />
+                    incontournables de l'animation !
                   </p>
                 </motion.div>
               </div>
