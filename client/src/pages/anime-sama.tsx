@@ -289,10 +289,10 @@ const AnimeSamaPage: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.6 }}
                 >
-                  <h1 className="text-3xl md:text-5xl font-bold mb-2 atomic-gradient-text">
+                  <h1 className="text-4xl md:text-6xl font-black mb-4 atomic-gradient-text drop-shadow-[0_0_20px_rgba(0,240,255,0.6)] tracking-wider">
                     ATOMIC FLIX
                   </h1>
-                  <p className="text-lg md:text-xl text-gray-200 mb-4 font-light">
+                  <p className="text-xl md:text-2xl text-gray-200 mb-4 font-light tracking-wide">
                     Plongez dans l'univers infini<br />
                     des animes !
                   </p>
@@ -319,10 +319,12 @@ const AnimeSamaPage: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 className="mb-8"
               >
-                <div className="mb-4">
-                  <h2 className="atomic-gradient-text text-2xl font-bold flex items-center gap-2">
-                    📺 Épisodes Récents
+                <div className="mb-6">
+                  <h2 className="atomic-gradient-text text-3xl md:text-4xl font-extrabold flex items-center gap-3 drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
+                    <span className="text-4xl md:text-5xl">📺</span>
+                    <span className="tracking-tight">Épisodes Récents</span>
                   </h2>
+                  <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-transparent mt-3 rounded-full"></div>
                 </div>
                 <div className="overflow-x-auto pb-4 scrollbar-hide">
                   <div className="flex gap-4 w-max animate-scroll-left">
@@ -384,10 +386,12 @@ const AnimeSamaPage: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 className="mb-8"
               >
-                <div className="mb-4">
-                  <h2 className="atomic-gradient-text text-2xl font-bold flex items-center gap-2">
-                    🏆 Classiques Incontournables
+                <div className="mb-6">
+                  <h2 className="atomic-gradient-text text-3xl md:text-4xl font-extrabold flex items-center gap-3 drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
+                    <span className="text-4xl md:text-5xl">🏆</span>
+                    <span className="tracking-tight">Classiques Incontournables</span>
                   </h2>
+                  <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-transparent mt-3 rounded-full"></div>
                 </div>
                 <div className="overflow-x-auto pb-4 scrollbar-hide">
                   <div className="flex gap-4 w-max">
@@ -430,10 +434,12 @@ const AnimeSamaPage: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 className="mb-8"
               >
-                <div className="mb-4">
-                  <h2 className="atomic-gradient-text text-2xl font-bold flex items-center gap-2">
-                    💎 Pépites à Découvrir
+                <div className="mb-6">
+                  <h2 className="atomic-gradient-text text-3xl md:text-4xl font-extrabold flex items-center gap-3 drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
+                    <span className="text-4xl md:text-5xl">💎</span>
+                    <span className="tracking-tight">Pépites à Découvrir</span>
                   </h2>
+                  <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-transparent mt-3 rounded-full"></div>
                 </div>
                 <div className="overflow-x-auto pb-4 scrollbar-hide">
                   <div className="flex gap-4 w-max">
@@ -476,10 +482,12 @@ const AnimeSamaPage: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 className="mb-8"
               >
-                <div className="mb-4">
-                  <h2 className="atomic-gradient-text text-2xl font-bold flex items-center gap-2">
-                    ✨ Découvertes pour vous
+                <div className="mb-6">
+                  <h2 className="atomic-gradient-text text-3xl md:text-4xl font-extrabold flex items-center gap-3 drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
+                    <span className="text-4xl md:text-5xl">✨</span>
+                    <span className="tracking-tight">Découvertes pour vous</span>
                   </h2>
+                  <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-transparent mt-3 rounded-full"></div>
                 </div>
                 <div className="overflow-x-auto pb-4 scrollbar-hide">
                   <div className="flex gap-4 w-max">
@@ -522,10 +530,12 @@ const AnimeSamaPage: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 className="mb-8"
               >
-                <div className="mb-4">
-                  <h2 className="atomic-gradient-text text-2xl font-bold flex items-center gap-2">
-                    📅 Planning du Jour ({planning.day})
+                <div className="mb-6">
+                  <h2 className="atomic-gradient-text text-3xl md:text-4xl font-extrabold flex items-center gap-3 drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
+                    <span className="text-4xl md:text-5xl">📅</span>
+                    <span className="tracking-tight">Planning du Jour ({planning.day})</span>
                   </h2>
+                  <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-transparent mt-3 rounded-full"></div>
                 </div>
                 <div className="overflow-x-auto pb-4 scrollbar-hide">
                   <div className="flex gap-4 w-max">

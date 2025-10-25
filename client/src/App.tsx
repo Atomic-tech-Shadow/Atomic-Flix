@@ -9,9 +9,6 @@ import NotFound from "@/pages/not-found";
 import AnimeSamaPage from "@/pages/anime-sama";
 import AnimePage from "@/pages/anime";
 import AnimePlayerPage from "@/pages/anime-player";
-import AboutPage from "@/pages/about";
-import PrivacyPolicyPage from "@/pages/privacy-policy";
-import TermsOfServicePage from "@/pages/terms-of-service";
 import FirefoxDebugPage from "@/pages/firefox-debug";
 import { Component, ErrorInfo, ReactNode } from "react";
 
@@ -140,9 +137,6 @@ function Router() {
       <Route path="/anime-sama" component={AnimeSamaPage} />
       <Route path="/anime/:id" component={AnimePage} />
       <Route path="/anime/:id/player" component={AnimePlayerPage} />
-      <Route path="/about" component={AboutPage} />
-      <Route path="/privacy-policy" component={PrivacyPolicyPage} />
-      <Route path="/terms-of-service" component={TermsOfServicePage} />
       <Route path="/firefox-debug" component={FirefoxDebugPage} />
       <Route component={NotFound} />
     </Switch>
