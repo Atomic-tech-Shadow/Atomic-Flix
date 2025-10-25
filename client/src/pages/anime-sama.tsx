@@ -140,7 +140,7 @@ const AnimeSamaPage: React.FC = () => {
   };
 
   // Naviguer vers la page dédiée anime
-  const loadAnimeDetails = async (animeId: string, contentType?: string) => {
+  const loadAnimeDetails = async (animeId: string) => {
     navigate(`/anime/${animeId}`);
   };
 
@@ -210,7 +210,7 @@ const AnimeSamaPage: React.FC = () => {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
-                  onClick={() => loadAnimeDetails(anime.id, anime.type)}
+                  onClick={() => loadAnimeDetails(anime.id)}
                   className="cursor-pointer group overflow-hidden atomic-hover-scale h-56 sm:h-64 md:h-72 rounded-lg relative"
                 >
                   <img
