@@ -15,25 +15,25 @@ interface SearchResult {
   image: string;
 }
 
-// Interface pour les réponses API
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp: string;
-  meta?: ApiResponse<any>;
-}
-
 const AnimeSamaPage: React.FC = () => {
   const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [trendingAnimes, setTrendingAnimes] = useState<SearchResult[]>([]);
+  
+  // Nouvelles sections
+  const [popularAnimes, setPopularAnimes] = useState<any>(null);
+  const [recentEpisodes, setRecentEpisodes] = useState<any[]>([]);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [planning, setPlanning] = useState<any>(null);
 
-  // Charger les animes trending au démarrage
+  // Charger toutes les sections au démarrage
   useEffect(() => {
-    loadTrendingAnimes();
+    loadPopularAnimes();
+    loadRecentEpisodes();
+    loadRecommendations();
+    loadPlanning();
   }, []);
 
   // Écouter les changements d'URL pour les paramètres de recherche
@@ -47,28 +47,51 @@ const AnimeSamaPage: React.FC = () => {
     }
   }, [window.location.search]);
 
-  // Charger tout le contenu trending depuis l'API
-  const loadTrendingAnimes = async () => {
+  // Charger les animes populaires (Classiques + Pépites)
+  const loadPopularAnimes = async () => {
     try {
-      console.log('Début du chargement des animes trending...');
-      const response = await animeAPI.getTrending();
-      
-      console.log('Réponse API reçue:', response);
-      
-      if (response && response.success && response.results && response.results.length > 0) {
-        // Afficher tous les types de contenu de l'API : animes, mangas, films
-        setTrendingAnimes(response.results.slice(0, 24));
-        console.log('Contenu trending chargé avec succès:', response.results.length, 'éléments');
-        setError(null);
-      } else {
-        console.warn('Réponse API trending échouée:', response);
-        setTrendingAnimes([]);
-        setError(response?.error || 'Impossible de charger le contenu trending');
+      const response = await animeAPI.getPopular();
+      if (response && response.success) {
+        setPopularAnimes(response);
       }
     } catch (error) {
-      console.error('Erreur chargement trending:', error);
-      setError('Erreur de connexion à l\'API. Veuillez réessayer.');
-      setTrendingAnimes([]);
+      console.error('Erreur chargement populaires:', error);
+    }
+  };
+
+  // Charger les épisodes récents
+  const loadRecentEpisodes = async () => {
+    try {
+      const response = await animeAPI.getRecent();
+      if (response && response.success && response.recentEpisodes) {
+        setRecentEpisodes(response.recentEpisodes.slice(0, 20));
+      }
+    } catch (error) {
+      console.error('Erreur chargement épisodes récents:', error);
+    }
+  };
+
+  // Charger les recommandations
+  const loadRecommendations = async () => {
+    try {
+      const response = await animeAPI.getRecommendations(1, 30);
+      if (response && response.success && response.data) {
+        setRecommendations(response.data);
+      }
+    } catch (error) {
+      console.error('Erreur chargement recommandations:', error);
+    }
+  };
+
+  // Charger le planning du jour
+  const loadPlanning = async () => {
+    try {
+      const response = await animeAPI.getPlanning();
+      if (response && response.success) {
+        setPlanning(response);
+      }
+    } catch (error) {
+      console.error('Erreur chargement planning:', error);
     }
   };
 
@@ -243,28 +266,30 @@ const AnimeSamaPage: React.FC = () => {
               }}
             >
               {/* Images d'animes en mosaïque visible en haut */}
-              <div className="flex h-24 md:h-32">
-                {trendingAnimes.slice(0, 8).map((anime, index) => (
-                  <div
-                    key={`hero-mosaic-${index}`}
-                    className="flex-1 overflow-hidden"
-                    style={{
-                      transform: `skew(${index % 2 === 0 ? '3deg' : '-3deg'})`,
-                      marginLeft: index > 0 ? '-2px' : '0'
-                    }}
-                  >
-                    <img
-                      src={anime.image}
-                      alt={anime.title}
-                      className="w-full h-full object-cover brightness-90 hover:brightness-100 transition-all duration-300"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
+              {recentEpisodes.length > 0 && (
+                <div className="flex h-24 md:h-32">
+                  {recentEpisodes.slice(0, 8).map((episode, index) => (
+                    <div
+                      key={`hero-mosaic-${index}`}
+                      className="flex-1 overflow-hidden"
+                      style={{
+                        transform: `skew(${index % 2 === 0 ? '3deg' : '-3deg'})`,
+                        marginLeft: index > 0 ? '-2px' : '0'
                       }}
-                    />
-                  </div>
-                ))}
-              </div>
+                    >
+                      <img
+                        src={episode.image}
+                        alt={episode.animeTitle}
+                        className="w-full h-full object-cover brightness-90 hover:brightness-100 transition-all duration-300"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${episode.animeId}.jpg`;
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Contenu principal */}
               <div className="px-6 py-8 md:px-12 md:py-12 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
@@ -295,63 +320,262 @@ const AnimeSamaPage: React.FC = () => {
 
             </motion.div>
 
-            {/* Section Animes Trending */}
-            {trendingAnimes.length > 0 && (
+            {/* Section Épisodes Récents */}
+            {recentEpisodes.length > 0 && (
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="mb-4"
+                className="mb-8"
               >
                 <div className="mb-4">
-                  <h2 className="atomic-gradient-text text-xl font-bold flex items-center gap-2">
-                    📢 Nouveaux épisodes ajoutés
+                  <h2 className="atomic-gradient-text text-2xl font-bold flex items-center gap-2">
+                    📺 Épisodes Récents
                   </h2>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                  {trendingAnimes.map((anime, index) => (
-                    <motion.div
-                      key={`trending-${anime.id}-${index}`}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.1, duration: 0.3 }}
-                      onClick={() => loadAnimeDetails(anime.id, anime.type)}
-                      className="cursor-pointer group overflow-hidden atomic-hover-scale h-56 sm:h-64 md:h-72 rounded-lg relative"
-                    >
-                      <img
-                        src={anime.image}
-                        alt={anime.title}
-                        className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                        }}
-                      />
-                      {/* Badge type de contenu */}
-                      <div className={`absolute top-2 left-2 text-white text-xs px-2 py-1 rounded-full font-semibold ${
-                        anime.type === 'manga' ? 'bg-orange-500' :
-                        anime.type === 'film' ? 'bg-purple-500' :
-                        anime.type === 'movie' ? 'bg-purple-500' :
-                        'bg-blue-500'
-                      }`}>
-                        {anime.type === 'manga' ? 'MANGA' :
-                         anime.type === 'film' || anime.type === 'movie' ? 'FILM' :
-                         'ANIME'}
-                      </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      
-                      {/* Titre superposé sur l'image */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-4 pb-3">
-                        <h3 className="text-white font-semibold text-sm leading-tight mb-2 group-hover:text-cyan-400 transition-colors">
-                          {anime.title}
-                        </h3>
-                        <div className="flex justify-between items-center">
-                          <p className="text-gray-300 text-xs">{anime.status}</p>
-                          <div className="text-cyan-400 text-xs font-medium">#{index + 1}</div>
+                <div className="overflow-x-auto pb-4 scrollbar-hide">
+                  <div className="flex gap-4 w-max animate-scroll-left">
+                    {recentEpisodes.map((episode, index) => (
+                      <motion.div
+                        key={`recent-${episode.animeId}-${episode.episode}-${index}`}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05, duration: 0.3 }}
+                        onClick={() => loadAnimeDetails(episode.animeId)}
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
+                        data-testid={`card-recent-${episode.animeId}`}
+                      >
+                        <img
+                          src={episode.image}
+                          alt={episode.animeTitle}
+                          className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${episode.animeId}.jpg`;
+                          }}
+                        />
+                        {/* Badges */}
+                        <div className="absolute top-2 left-2 right-2 flex flex-wrap gap-1">
+                          <div className={`text-white text-xs px-2 py-1 rounded-full font-semibold backdrop-blur-sm ${
+                            episode.language === 'VF' ? 'bg-green-500/90' :
+                            episode.language === 'VOSTFR' ? 'bg-blue-500/90' :
+                            'bg-purple-500/90'
+                          }`}>
+                            {episode.language}
+                          </div>
+                          {episode.isFinale && (
+                            <div className="bg-red-500/90 text-white text-xs px-2 py-1 rounded-full font-semibold backdrop-blur-sm">
+                              FINALE
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                        
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
+                          <h3 className="text-white font-semibold text-sm leading-tight mb-1 group-hover:text-cyan-400 transition-colors line-clamp-2">
+                            {episode.animeTitle}
+                          </h3>
+                          <p className="text-cyan-400 text-xs font-medium">
+                            S{episode.season} Ép{episode.episode}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Section Animes Populaires - Classiques */}
+            {popularAnimes?.categories?.classiques?.anime?.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8"
+              >
+                <div className="mb-4">
+                  <h2 className="atomic-gradient-text text-2xl font-bold flex items-center gap-2">
+                    🏆 Classiques Incontournables
+                  </h2>
+                </div>
+                <div className="overflow-x-auto pb-4 scrollbar-hide">
+                  <div className="flex gap-4 w-max">
+                    {popularAnimes.categories.classiques.anime.map((anime: any, index: number) => (
+                      <motion.div
+                        key={`classique-${anime.id}-${index}`}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05, duration: 0.3 }}
+                        onClick={() => loadAnimeDetails(anime.id)}
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
+                        data-testid={`card-classique-${anime.id}`}
+                      >
+                        <img
+                          src={anime.image}
+                          alt={anime.title}
+                          className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                          }}
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
+                          <h3 className="text-white font-semibold text-sm leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2">
+                            {anime.title}
+                          </h3>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Section Animes Populaires - Pépites */}
+            {popularAnimes?.categories?.pepites?.anime?.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8"
+              >
+                <div className="mb-4">
+                  <h2 className="atomic-gradient-text text-2xl font-bold flex items-center gap-2">
+                    💎 Pépites à Découvrir
+                  </h2>
+                </div>
+                <div className="overflow-x-auto pb-4 scrollbar-hide">
+                  <div className="flex gap-4 w-max">
+                    {popularAnimes.categories.pepites.anime.map((anime: any, index: number) => (
+                      <motion.div
+                        key={`pepite-${anime.id}-${index}`}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05, duration: 0.3 }}
+                        onClick={() => loadAnimeDetails(anime.id)}
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
+                        data-testid={`card-pepite-${anime.id}`}
+                      >
+                        <img
+                          src={anime.image}
+                          alt={anime.title}
+                          className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                          }}
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
+                          <h3 className="text-white font-semibold text-sm leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2">
+                            {anime.title}
+                          </h3>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Section Recommandations */}
+            {recommendations.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8"
+              >
+                <div className="mb-4">
+                  <h2 className="atomic-gradient-text text-2xl font-bold flex items-center gap-2">
+                    ✨ Découvertes pour vous
+                  </h2>
+                </div>
+                <div className="overflow-x-auto pb-4 scrollbar-hide">
+                  <div className="flex gap-4 w-max">
+                    {recommendations.slice(0, 20).map((anime: any, index: number) => (
+                      <motion.div
+                        key={`rec-${anime.id}-${index}`}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05, duration: 0.3 }}
+                        onClick={() => loadAnimeDetails(anime.id)}
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
+                        data-testid={`card-recommendation-${anime.id}`}
+                      >
+                        <img
+                          src={anime.image}
+                          alt={anime.title}
+                          className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                          }}
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
+                          <h3 className="text-white font-semibold text-sm leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2">
+                            {anime.title}
+                          </h3>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Section Planning du jour */}
+            {planning?.items?.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8"
+              >
+                <div className="mb-4">
+                  <h2 className="atomic-gradient-text text-2xl font-bold flex items-center gap-2">
+                    📅 Planning du Jour ({planning.day})
+                  </h2>
+                </div>
+                <div className="overflow-x-auto pb-4 scrollbar-hide">
+                  <div className="flex gap-4 w-max">
+                    {planning.items.map((item: any, index: number) => (
+                      <motion.div
+                        key={`planning-${item.animeId}-${index}`}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05, duration: 0.3 }}
+                        onClick={() => loadAnimeDetails(item.animeId)}
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
+                        data-testid={`card-planning-${item.animeId}`}
+                      >
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${item.animeId}.jpg`;
+                          }}
+                        />
+                        {/* Badge heure */}
+                        <div className="absolute top-2 left-2 bg-cyan-500/90 text-white text-xs px-2 py-1 rounded-full font-semibold backdrop-blur-sm">
+                          {item.releaseTime}
+                        </div>
+                        {item.isReported && (
+                          <div className="absolute top-2 right-2 bg-orange-500/90 text-white text-xs px-2 py-1 rounded-full font-semibold backdrop-blur-sm">
+                            REPORTÉ
+                          </div>
+                        )}
+                        
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
+                          <h3 className="text-white font-semibold text-sm leading-tight mb-1 group-hover:text-cyan-400 transition-colors line-clamp-2">
+                            {item.title}
+                          </h3>
+                          <p className="text-gray-300 text-xs">{item.language}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -371,24 +595,11 @@ const AnimeSamaPage: React.FC = () => {
                 <button 
                   onClick={() => {
                     setError(null);
-                    loadTrendingAnimes();
+                    loadRecentEpisodes();
                   }}
                   className="mt-2 text-cyan-400 hover:text-cyan-300 transition-colors"
                 >
                   Réessayer
-                </button>
-              </div>
-            )}
-
-            {/* Message vide si pas de contenu trending et pas de chargement */}
-            {!loading && !error && trendingAnimes.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-gray-400">Aucun contenu trending trouvé</p>
-                <button 
-                  onClick={() => loadTrendingAnimes()}
-                  className="mt-2 text-cyan-400 hover:text-cyan-300 transition-colors"
-                >
-                  Charger le contenu trending
                 </button>
               </div>
             )}

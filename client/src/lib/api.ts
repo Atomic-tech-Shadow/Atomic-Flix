@@ -64,9 +64,30 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
 
 // Fonctions API spécialisées pour ATOMIC FLIX
 export const animeAPI = {
-  // Récupérer les animes tendance
-  getTrending: async () => {
-    return await apiRequest('/trending');
+  // Récupérer les animes populaires (Classiques + Pépites)
+  getPopular: async () => {
+    return await apiRequest('/popular');
+  },
+  
+  // Système de recommandations intelligent v2.0 (1500-2000 animes avec rotation)
+  getRecommendations: async (page = 1, limit = 50) => {
+    return await apiRequest(`/recommendations?page=${page}&limit=${limit}`);
+  },
+  
+  // Planning hebdomadaire des sorties (avec détection timezone automatique)
+  getPlanning: async (day?: string, filter?: string, timezone?: string) => {
+    let queryParams = [];
+    if (day) queryParams.push(`day=${encodeURIComponent(day)}`);
+    if (filter) queryParams.push(`filter=${encodeURIComponent(filter)}`);
+    if (timezone) queryParams.push(`timezone=${encodeURIComponent(timezone)}`);
+    
+    const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+    return await apiRequest(`/planning${queryString}`);
+  },
+  
+  // Épisodes récents (avec détection langue améliorée)
+  getRecent: async () => {
+    return await apiRequest('/recent');
   },
   
   // Rechercher des animes
@@ -79,12 +100,22 @@ export const animeAPI = {
     return await apiRequest(`/anime/${id}`);
   },
   
+  // Saisons d'un anime (avec synopsis complet)
+  getSeasons: async (animeId: string) => {
+    return await apiRequest(`/seasons/${animeId}`);
+  },
+  
   // Épisodes d'une saison
   getEpisodes: async (animeId: string, season: string, language: string) => {
     return await apiRequest(`/episodes/${animeId}?season=${season}&language=${language}`);
   },
   
-  // Sources de streaming
+  // Sources de streaming par ID d'épisode
+  getEpisodeById: async (episodeId: string) => {
+    return await apiRequest(`/episode-by-id?id=${encodeURIComponent(episodeId)}`);
+  },
+  
+  // Sources de streaming (méthode alternative)
   getEmbedSources: async (episodeUrl: string) => {
     return await apiRequest(`/embed?url=${encodeURIComponent(episodeUrl)}`);
   },
