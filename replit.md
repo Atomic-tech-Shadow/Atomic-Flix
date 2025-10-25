@@ -6,6 +6,13 @@ ATOMIC FLIX is a modern anime streaming platform built with React, TypeScript, a
 
 ## Recent Changes (October 25, 2025)
 
+### Navigation & UI Improvements
+- **Simplified Navigation**: Removed unnecessary pages from navigation menu (About, Privacy Policy, Terms of Service)
+- **Enhanced Homepage Styling**: Upgraded section titles with larger fonts, drop shadows, and decorative underlines
+- **Cleaner Menu**: Mobile and desktop menus now only show Accueil and Animes for a streamlined experience
+- **Improved Typography**: Main title increased from 3xl to 6xl on desktop with enhanced drop shadow effects
+- **Section Headers**: All section titles now feature 3xl-4xl fonts with emoji icons, gradient text, and cyan underlines
+
 ### API Integration Fixes
 - **Schema Alignment**: Updated `shared/schema.ts` to match exactly the API response structures
 - **Direct Data Access**: Fixed API response handling - the API returns data at the root level, not in a `data` field
@@ -18,6 +25,7 @@ ATOMIC FLIX is a modern anime streaming platform built with React, TypeScript, a
 3. ✅ Added missing interfaces: `PopularResponse`, `RecommendationsResponse`, `PlanningResponse`, `RecentEpisodesResponse`, etc.
 4. ✅ Corrected anime details loading to use API data directly without `.data` wrapper
 5. ✅ Enhanced season data with synopsis, languages, and episode count from `/seasons` endpoint
+6. ✅ Removed unused navigation pages and cleaned up imports
 
 ## User Preferences
 
