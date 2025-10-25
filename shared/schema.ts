@@ -67,37 +67,3 @@ export interface EpisodeDetails {
   availableServers: string[];
   url: string;
 }
-
-export interface MangaChapter {
-  id: string;
-  title: string;
-  number: number;
-  url: string;
-  pages: string[];
-  available: boolean;
-  language: string;
-}
-
-export interface MangaSeason {
-  number: number;
-  name: string;
-  value: string;
-  type: string;
-  languages: string[];
-  available: boolean;
-  contentType: string;
-  url: string;
-  fullUrl: string;
-}
-
-export interface MangaData {
-  id: string;
-  title: string;
-  synopsis: string;
-  image: string;
-  genres: string[];
-  status: string;
-  year: string;
-  seasons: MangaSeason[];
-  url: string;
-}

@@ -1,6 +1,6 @@
 // Configuration API pour ATOMIC FLIX - API externe directe
 export const API_CONFIG = {
-  // API externe pour les données anime/manga
+  // API externe pour les données anime
   EXTERNAL_API: 'https://anime-sama-scraper.vercel.app/api',
   
   // Timeout par défaut
@@ -118,15 +118,5 @@ export const animeAPI = {
   // Sources de streaming (méthode alternative)
   getEmbedSources: async (episodeUrl: string) => {
     return await apiRequest(`/embed?url=${encodeURIComponent(episodeUrl)}`);
-  },
-  
-  // Chapitres de manga
-  getMangaChapters: async (mangaId: string) => {
-    return await apiRequest(`/manga/${mangaId}/chapters`);
-  },
-  
-  // Pages d'un chapitre de manga
-  getChapterPages: async (chapterId: string) => {
-    return await apiRequest(`/manga/chapter/${chapterId}`);
   }
 };
