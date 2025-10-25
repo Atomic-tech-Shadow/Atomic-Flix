@@ -113,7 +113,7 @@ const AnimeSamaPage: React.FC = () => {
       if (response && response.success) {
         const results = response.results || [];
         if (Array.isArray(results)) {
-          // Afficher tout le contenu de l'API : animes, mangas, films, etc.
+          // Afficher tout le contenu de l'API : animes, films, etc.
           setSearchResults(results);
         } else {
           console.warn('Pas de résultats dans la réponse:', response);
@@ -139,14 +139,9 @@ const AnimeSamaPage: React.FC = () => {
     }
   };
 
-  // Naviguer vers la page dédiée (anime ou manga)
+  // Naviguer vers la page dédiée anime
   const loadAnimeDetails = async (animeId: string, contentType?: string) => {
-    // Détecter si c'est un manga pour rediriger vers le lecteur approprié
-    if (contentType === 'manga') {
-      navigate(`/manga/${animeId}/reader`);
-    } else {
-      navigate(`/anime/${animeId}`);
-    }
+    navigate(`/anime/${animeId}`);
   };
 
 
@@ -229,14 +224,10 @@ const AnimeSamaPage: React.FC = () => {
                   />
                   {/* Badge type de contenu */}
                   <div className={`absolute top-2 left-2 text-white text-xs px-3 py-1 rounded-full font-bold backdrop-blur-sm border transition-all duration-300 ${
-                    anime.type === 'manga' ? 'bg-purple-500/80 border-purple-400 hover:bg-purple-500' :
-                    anime.type === 'film' ? 'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500' :
-                    anime.type === 'movie' ? 'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500' :
+                    anime.type === 'film' || anime.type === 'movie' ? 'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500' :
                     'bg-cyan-500/80 border-cyan-400 hover:bg-cyan-500'
                   }`}>
-                    {anime.type === 'manga' ? 'MANGA' :
-                     anime.type === 'film' || anime.type === 'movie' ? 'FILM' :
-                     'ANIME'}
+                    {anime.type === 'film' || anime.type === 'movie' ? 'FILM' : 'ANIME'}
                   </div>
                   
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-4 pb-3">
@@ -303,7 +294,7 @@ const AnimeSamaPage: React.FC = () => {
                   </h1>
                   <p className="text-lg md:text-xl text-gray-200 mb-4 font-light">
                     Plongez dans l'univers infini<br />
-                    des animes et mangas !
+                    des animes !
                   </p>
                 </motion.div>
               </div>
