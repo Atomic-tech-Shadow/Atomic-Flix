@@ -144,6 +144,12 @@ const AnimeSamaPage: React.FC = () => {
     navigate(`/anime/${animeId}`);
   };
 
+  // Naviguer directement vers le lecteur avec les informations d'épisode
+  const playEpisode = (episode: any) => {
+    const lang = episode.language?.toLowerCase() || 'vostfr';
+    navigate(`/anime/${episode.animeId}/player?season=${episode.season}&episode=${episode.episode}&lang=${lang}`);
+  };
+
 
 
 
@@ -334,7 +340,7 @@ const AnimeSamaPage: React.FC = () => {
                         initial={{ opacity: 0, x: 50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
-                        onClick={() => loadAnimeDetails(episode.animeId)}
+                        onClick={() => playEpisode(episode)}
                         className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-recent-${episode.animeId}`}
                       >

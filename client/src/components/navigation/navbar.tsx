@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Home, Film, Menu, X } from "lucide-react";
+import { Search, Home, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { SimpleNotificationButton } from "@/components/notifications/simple-notification-button";
@@ -15,7 +15,6 @@ export function Navbar() {
 
   const navigation = [
     { name: "Accueil", href: "/", icon: Home },
-    { name: "Animes", href: "/anime-sama", icon: Film },
   ];
 
   const handleSearch = (e: React.FormEvent) => {

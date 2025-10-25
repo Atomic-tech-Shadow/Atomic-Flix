@@ -173,18 +173,36 @@ const AnimePlayerPage: React.FC = () => {
             setSelectedSeason(seasonToSelect);
             console.log('Début chargement épisodes pour saison:', seasonToSelect?.name);
             
-            // Charger les épisodes via l'API automatiquement avec la langue par défaut
+            // Charger les épisodes via l'API automatiquement avec la langue demandée ou par défaut
             if (seasonToSelect) {
               console.log('Chargement épisodes via API...');
-              // S'assurer qu'une langue est sélectionnée par défaut
-              const defaultLanguage = seasonToSelect.languages.includes('VF') ? 'VF' : 
-                                    seasonToSelect.languages.includes('VOSTFR') ? 'VOSTFR' : 
-                                    seasonToSelect.languages[0] || 'VF';
               
-              setSelectedLanguage(defaultLanguage as 'VF' | 'VOSTFR');
+              // Utiliser la langue depuis l'URL si disponible ET supportée par la saison
+              let languageToUse: 'VF' | 'VOSTFR';
+              if (targetLang) {
+                const requestedLang = targetLang.toUpperCase() === 'VF' ? 'VF' : 'VOSTFR';
+                // Vérifier que la langue demandée est disponible dans cette saison
+                if (seasonToSelect.languages.includes(requestedLang)) {
+                  languageToUse = requestedLang;
+                  console.log('Langue demandée disponible:', languageToUse);
+                } else {
+                  // Fallback vers une langue disponible
+                  languageToUse = seasonToSelect.languages.includes('VF') ? 'VF' : 
+                                        seasonToSelect.languages.includes('VOSTFR') ? 'VOSTFR' : 
+                                        (seasonToSelect.languages[0] || 'VF') as 'VF' | 'VOSTFR';
+                  console.log('Langue demandée non disponible, fallback vers:', languageToUse);
+                }
+              } else {
+                // S'assurer qu'une langue est sélectionnée par défaut
+                languageToUse = seasonToSelect.languages.includes('VF') ? 'VF' : 
+                                      seasonToSelect.languages.includes('VOSTFR') ? 'VOSTFR' : 
+                                      (seasonToSelect.languages[0] || 'VF') as 'VF' | 'VOSTFR';
+              }
               
-              // Charger directement avec la langue par défaut
-              await loadSeasonEpisodesDirectly(animeData.data, seasonToSelect, true, defaultLanguage);
+              setSelectedLanguage(languageToUse);
+              
+              // Charger directement avec la langue sélectionnée
+              await loadSeasonEpisodesDirectly(animeData.data, seasonToSelect, true, languageToUse);
             }
           }
         }
