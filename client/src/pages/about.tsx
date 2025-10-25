@@ -68,7 +68,7 @@ export default function About() {
                   <li>Recherche avancée d'anime</li>
                   <li>Streaming haute qualité</li>
                   <li>Interface moderne et responsive</li>
-                  <li>Lecture de manga intégrée</li>
+                  <li>Plusieurs serveurs de streaming</li>
                   <li>Application PWA installable</li>
                   <li>Support mobile complet</li>
                 </ul>

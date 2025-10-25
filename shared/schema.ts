@@ -1,16 +1,5 @@
-// Schema complet pour ATOMIC FLIX - Correspondant exactement aux réponses de l'API
+// Schema EXACT pour ATOMIC FLIX - Basé sur les tests réels de l'API
 // Base URL: https://anime-sama-scraper.vercel.app/api
-
-// ============================================
-// INTERFACES GÉNÉRIQUES
-// ============================================
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp?: string;
-  meta?: any;
-}
 
 // ============================================
 // POPULAR ANIMES (/popular)
@@ -21,6 +10,8 @@ export interface PopularAnime {
   title: string;
   image: string;
   url: string;
+  category?: string;
+  extractedFrom?: string;
 }
 
 export interface PopularCategory {
@@ -48,6 +39,9 @@ export interface Recommendation {
   url: string;
   contentType: string;
   genres: string[];
+  languages?: string[];
+  category?: string;
+  extractedFrom?: string;
 }
 
 export interface RecommendationsResponse {
@@ -68,6 +62,9 @@ export interface PlanningItem {
   originalTime?: string;
   language: string;
   type: string;
+  day?: string;
+  isReported?: boolean;
+  status?: string;
 }
 
 export interface PlanningResponse {
@@ -105,53 +102,65 @@ export interface RecentEpisodesResponse {
 }
 
 // ============================================
-// SEARCH (/search)
+// SEARCH (/search) - ATTENTION: retourne "animes" pas "results"!
 // ============================================
 
-export interface SearchResult {
+export interface SearchAnime {
   id: string;
   title: string;
   url: string;
   image: string;
-  synopsis: string;
-  type: string;
-  genres: string[];
-  status: string;
-  score: string;
-  year: string;
 }
 
 export interface SearchResponse {
   success: boolean;
-  results: SearchResult[];
+  query: string;
+  count: number;
+  animes: SearchAnime[];  // ⚠️ C'est "animes" pas "results"!
 }
 
 // ============================================
-// ANIME DETAILS (/anime/{id})
+// ANIME DETAILS (/anime/{id}) - ATTENTION: retourne "data"!
 // ============================================
 
 export interface AnimeSeason {
-  seasonNumber: number;
-  title: string;
-  episodes: number;
+  number: number;
+  name: string;
+  value: string;
+  type: string;  // "Saison", "Film", "Scan"
+  url: string;
+  fullUrl: string;
+  languages: string[];
+  available: boolean;
+  contentType: string;  // "anime" ou "manga"
+  apiIndex?: number;
 }
 
-export interface AnimeDetails {
-  success: boolean;
+export interface AnimeDetailsData {
   id: string;
   title: string;
-  url: string;
-  image: string;
-  banner?: string;
+  alternativeTitles: string | null;
   synopsis: string;
-  type: string;
+  image: string;
   genres: string[];
   status: string;
-  score: string;
+  progressInfo?: string;
+  correspondence?: string;
   year: string;
-  studio?: string;
+  type: string;
   seasons: AnimeSeason[];
-  languages: string[];
+  totalSeasons: number;
+  availableLanguages: string[];
+  hasFilms: boolean;
+  hasOAV: boolean;
+  hasSpecials: boolean;
+  url: string;
+  lastUpdated: string;
+}
+
+export interface AnimeDetailsResponse {
+  success: boolean;
+  data: AnimeDetailsData;  // ⚠️ Les données sont dans "data"!
 }
 
 // ============================================
@@ -159,16 +168,27 @@ export interface AnimeDetails {
 // ============================================
 
 export interface Season {
-  seasonNumber: number;
-  title: string;
-  synopsis: string;
-  episodes: number;
+  number: number;
+  name: string;
+  value: string;
+  type: string;  // "Saison", "Film", "Scan"
   languages: string[];
-  animeId: string;
+  available: boolean;
+  contentType: string;  // "anime" ou "manga"
+  url: string;
+  fullUrl: string;
 }
 
 export interface SeasonsResponse {
   success: boolean;
+  animeId: string;
+  title: string;
+  synopsis: string;
+  image: string;
+  genres: string[];
+  status: string;
+  year: string;
+  count: number;
   seasons: Season[];
 }
 
@@ -223,7 +243,7 @@ export interface EmbedSourcesResponse {
 }
 
 // ============================================
-// TYPES D'USAGE COURANT (Backward Compatibility)
+// TYPES D'USAGE COURANT
 // ============================================
 
 export interface VideoSource {
@@ -233,23 +253,6 @@ export interface VideoSource {
   language: string;
   type: string;
   serverNumber: number;
-}
-
-export interface AnimeData {
-  id: string;
-  title: string;
-  synopsis: string;
-  image: string;
-  banner?: string;
-  genres: string[];
-  status: string;
-  year: string;
-  score: string;
-  studio?: string;
-  seasons: Season[];
-  url: string;
-  languages: string[];
-  type: string;
 }
 
 export interface EpisodeDetails {

@@ -111,10 +111,10 @@ const AnimeSamaPage: React.FC = () => {
       const response = await animeAPI.search(query);
       
       if (response && response.success) {
-        const results = response.results || [];
-        if (Array.isArray(results)) {
-          // Afficher tout le contenu de l'API : animes, films, etc.
-          setSearchResults(results);
+        // ⚠️ L'API retourne "animes" pas "results"
+        const animes = response.animes || [];
+        if (Array.isArray(animes)) {
+          setSearchResults(animes);
         } else {
           console.warn('Pas de résultats dans la réponse:', response);
           setSearchResults([]);

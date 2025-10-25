@@ -10,38 +10,34 @@ import { PageLoading } from '@/components/ui/loading-spinner';
 // import { BreadcrumbNav } from '@/components/navigation/breadcrumb-nav';
 import { animeAPI } from '@/lib/api';
 
-// Interfaces locales (utiliser celles de shared/schema.ts serait mieux)
+// Interfaces locales basées sur la vraie structure API
 interface Season {
-  seasonNumber: number;
-  title: string;
-  synopsis?: string;
-  episodes: number;
+  number: number;
+  name: string;
+  value: string;
+  type: string;
+  url: string;
+  fullUrl?: string;
   languages: string[];
-  animeId?: string;
-  // Propriétés utilisées dans le code legacy
-  name?: string;
-  value?: string;
-  episodeCount?: number;
-  url?: string;
-  available?: boolean;
+  available: boolean;
+  contentType: string;  // "anime" ou "manga"
+  apiIndex?: number;
 }
 
 interface AnimeData {
-  success: boolean;
   id: string;
   title: string;
   synopsis: string;
   image: string;
-  banner?: string;
   genres: string[];
   status: string;
   year: string;
-  score: string;
-  studio?: string;
-  seasons: Season[];
-  url: string;
-  languages: string[];
   type: string;
+  seasons: Season[];
+  totalSeasons: number;
+  availableLanguages: string[];
+  hasFilms: boolean;
+  url: string;
 }
 
 const AnimePage: React.FC = () => {
@@ -102,39 +98,22 @@ const AnimePage: React.FC = () => {
         const apiResponse = await animeAPI.getDetails(id);
         
         if (!apiResponse || !apiResponse.success) {
-          const errorMsg = apiResponse?.error || apiResponse?.message || 'Anime non trouvé dans la base de données';
+          const errorMsg = apiResponse?.error || apiResponse?.message || 'Anime non trouvé';
           throw new Error(errorMsg);
         }
         
-        // Charger les saisons détaillées avec synopsis et langues
-        const seasonsResponse = await animeAPI.getSeasons(id);
+        // ⚠️ IMPORTANT: /anime/{id} retourne les données dans "data"
+        const animeDetails = apiResponse.data;
         
-        // L'API retourne les données directement au niveau racine, pas dans un champ "data"
-        // Enrichir avec les données des saisons
-        const enrichedData = {
-          ...apiResponse,
-          seasons: seasonsResponse.success && seasonsResponse.seasons ? 
-            seasonsResponse.seasons.map((s: any) => ({
-              ...s,
-              // Ajouter les propriétés legacy pour compatibilité
-              name: s.title,
-              value: String(s.seasonNumber),
-              episodeCount: s.episodes,
-              url: `https://anime-sama.fr/catalogue/${id}/saison${s.seasonNumber}`,
-              available: true
-            })) : 
-            apiResponse.seasons.map((s: any) => ({
-              ...s,
-              name: s.title,
-              value: String(s.seasonNumber),
-              episodeCount: s.episodes,
-              languages: ['VOSTFR', 'VF'],
-              url: `https://anime-sama.fr/catalogue/${id}/saison${s.seasonNumber}`,
-              available: true
-            }))
-        };
+        // Filtrer les saisons pour n'afficher que les animes (pas les scans/mangas)
+        const animeSeasons = animeDetails.seasons.filter(
+          (s: Season) => s.contentType === 'anime'
+        );
         
-        setAnimeData(enrichedData);
+        setAnimeData({
+          ...animeDetails,
+          seasons: animeSeasons
+        });
         
       } catch (err) {
         console.error('Erreur chargement anime:', err);
@@ -157,25 +136,11 @@ const AnimePage: React.FC = () => {
     loadAnimeData();
   }, [id]);
 
-  // Navigation vers la page de lecteur appropriée
+  // Navigation vers la page de lecteur
   const goToPlayer = (season: Season) => {
     if (!id) return;
-    
-    // Vérifier si c'est un manga/scan basé sur le nom de la saison
-    const seasonName = season.name || season.title || '';
-    const seasonValue = season.value || String(season.seasonNumber);
-    const isManga = seasonName.toLowerCase().includes('scan') || 
-                   seasonName.toLowerCase().includes('manga') ||
-                   seasonName.toLowerCase().includes('tome') ||
-                   seasonName.toLowerCase().includes('chapitre');
-    
-    if (isManga) {
-      // Rediriger vers le lecteur de manga
-      navigate(`/manga/${id}/reader?season=${seasonValue}`);
-    } else {
-      // Rediriger vers le lecteur vidéo
-      navigate(`/anime/${id}/player?season=${seasonValue}&episode=1&lang=vostfr`);
-    }
+    // On n'affiche que les saisons anime, donc toujours rediriger vers le lecteur vidéo
+    navigate(`/anime/${id}/player?season=${season.value}&episode=1&lang=vostfr`);
   };
 
 
@@ -293,17 +258,12 @@ const AnimePage: React.FC = () => {
           </h3>
           <div className="grid grid-cols-2 gap-4">
             {animeData.seasons.map((season, index) => {
-              const seasonName = season.name || season.title || `Saison ${season.seasonNumber}`;
-              const isManga = seasonName.toLowerCase().includes('scan') || 
-                             seasonName.toLowerCase().includes('manga') ||
-                             seasonName.toLowerCase().includes('tome') ||
-                             seasonName.toLowerCase().includes('chapitre');
-              
-              const borderColor = isManga ? 'border-purple-400 hover:border-purple-300 hover:shadow-purple-500/25' : 'border-cyan-400 hover:border-cyan-300 hover:shadow-cyan-500/25';
+              const isFilm = season.type === 'Film';
+              const borderColor = isFilm ? 'border-purple-400 hover:border-purple-300 hover:shadow-purple-500/25' : 'border-cyan-400 hover:border-cyan-300 hover:shadow-cyan-500/25';
               
               return (
                 <motion.button
-                  key={`season-${index}-${seasonName}`}
+                  key={`season-${index}-${season.value}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
@@ -323,18 +283,11 @@ const AnimePage: React.FC = () => {
                   <div className="absolute inset-0 flex items-center justify-center p-4">
                     <div className="text-center">
                       <div className="text-white font-bold text-sm sm:text-base leading-tight drop-shadow-lg group-hover:scale-105 transition-transform duration-300">
-                        {seasonName}
+                        {season.name}
                       </div>
-                      {isManga && (
-                        <div className="mt-1 text-purple-300 text-xs font-medium">
-                          📖 MANGA
-                        </div>
-                      )}
-                      {!isManga && (
-                        <div className="mt-1 text-cyan-300 text-xs font-medium">
-                          🎥 ANIME
-                        </div>
-                      )}
+                      <div className={`mt-1 text-xs font-medium ${isFilm ? 'text-purple-300' : 'text-cyan-300'}`}>
+                        {isFilm ? '🎬 FILM' : '📺 SÉRIE'}
+                      </div>
                     </div>
                   </div>
                 </motion.button>
