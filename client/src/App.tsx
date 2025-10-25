@@ -10,7 +10,6 @@ import AnimeSamaPage from "@/pages/anime-sama";
 import AnimePage from "@/pages/anime";
 import AnimePlayerPage from "@/pages/anime-player";
 import FirefoxDebugPage from "@/pages/firefox-debug";
-import LanguageTestPage from "@/pages/language-test";
 import { Component, ErrorInfo, ReactNode } from "react";
 
 // Error Boundary pour capturer les erreurs sur Firefox iPhone
@@ -136,7 +135,6 @@ function Router() {
     <Switch>
       <Route path="/" component={AnimeSamaPage} />
       <Route path="/anime-sama" component={AnimeSamaPage} />
-      <Route path="/language-test" component={LanguageTestPage} />
       <Route path="/anime/:id" component={AnimePage} />
       <Route path="/anime/:id/player" component={AnimePlayerPage} />
       <Route path="/firefox-debug" component={FirefoxDebugPage} />
