@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { ChevronLeft, ChevronRight, ChevronDown, Download, Shield, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MainLayout from '@/components/layout/main-layout';
 import { SectionLoading } from '@/components/ui/loading-spinner';
@@ -71,8 +71,8 @@ const AnimePlayerPage: React.FC = () => {
   // États pour les données
   const [animeData, setAnimeData] = useState<AnimeData | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<Season | null>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState<'VF' | 'VOSTFR'>(
-    targetLang === 'vf' ? 'VF' : 'VOSTFR'
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(
+    targetLang ? targetLang.toUpperCase() : 'VOSTFR'
   );
   const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<number>(0);
@@ -178,25 +178,22 @@ const AnimePlayerPage: React.FC = () => {
               console.log('Chargement épisodes via API...');
               
               // Utiliser la langue depuis l'URL si disponible ET supportée par la saison
-              let languageToUse: 'VF' | 'VOSTFR';
+              let languageToUse: string;
               if (targetLang) {
-                const requestedLang = targetLang.toUpperCase() === 'VF' ? 'VF' : 'VOSTFR';
+                const requestedLang = targetLang.toUpperCase();
                 // Vérifier que la langue demandée est disponible dans cette saison
                 if (seasonToSelect.languages.includes(requestedLang)) {
                   languageToUse = requestedLang;
                   console.log('Langue demandée disponible:', languageToUse);
                 } else {
                   // Fallback vers une langue disponible
-                  languageToUse = seasonToSelect.languages.includes('VF') ? 'VF' : 
-                                        seasonToSelect.languages.includes('VOSTFR') ? 'VOSTFR' : 
-                                        (seasonToSelect.languages[0] || 'VF') as 'VF' | 'VOSTFR';
+                  languageToUse = seasonToSelect.languages[0] || 'VOSTFR';
                   console.log('Langue demandée non disponible, fallback vers:', languageToUse);
                 }
               } else {
                 // S'assurer qu'une langue est sélectionnée par défaut
-                languageToUse = seasonToSelect.languages.includes('VF') ? 'VF' : 
-                                      seasonToSelect.languages.includes('VOSTFR') ? 'VOSTFR' : 
-                                      (seasonToSelect.languages[0] || 'VF') as 'VF' | 'VOSTFR';
+                languageToUse = seasonToSelect.languages.includes('VOSTFR') ? 'VOSTFR' : 
+                                seasonToSelect.languages[0] || 'VOSTFR';
               }
               
               setSelectedLanguage(languageToUse);
@@ -480,7 +477,7 @@ const AnimePlayerPage: React.FC = () => {
   };
 
   // Changer de langue
-  const changeLanguage = (newLanguage: 'VF' | 'VOSTFR') => {
+  const changeLanguage = (newLanguage: string) => {
     setSelectedLanguage(newLanguage);
     if (selectedSeason && animeData) {
       // Recharger les épisodes avec la nouvelle langue
@@ -1264,42 +1261,82 @@ const AnimePlayerPage: React.FC = () => {
 
         {/* Sélecteur de langue - Style anime-sama rectangulaire */}
         {selectedSeason && selectedSeason.languages.length > 1 && (
-          <div className="flex gap-2">
-            {selectedSeason.languages.map((lang) => (
-              <motion.button
-                key={lang}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => changeLanguage(lang as 'VF' | 'VOSTFR')}
-                className={`relative px-4 py-2 rounded-md font-bold text-sm border-2 transition-all overflow-hidden ${
-                  selectedLanguage === lang
-                    ? 'border-white text-white shadow-lg opacity-100'
-                    : 'border-gray-500 text-gray-300 hover:border-gray-300 opacity-50 hover:opacity-75'
-                }`}
-              >
-                {/* Drapeau de fond */}
-                {lang === 'VF' ? (
-                  <div className="absolute inset-0 flex">
-                    <div className="w-1/3 bg-cyan-600"></div>
-                    <div className="w-1/3 bg-white"></div>
-                    <div className="w-1/3 bg-red-600"></div>
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 bg-red-600 flex items-center justify-center">
-                    <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                      <div className="w-4 h-4 bg-red-600 rounded-full"></div>
-                    </div>
-                  </div>
-                )}
+          <div className="flex gap-2 flex-wrap">
+            {selectedSeason.languages.map((lang) => {
+              // Fonction pour générer le drapeau selon la langue
+              const renderFlag = () => {
+                const upperLang = lang.toUpperCase();
                 
-                {/* Texte de la langue */}
-                <span className="relative z-10 text-white font-bold text-shadow-strong" style={{
-                  textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)'
-                }}>
-                  {lang === 'VOSTFR' ? 'VO' : lang}
-                </span>
-              </motion.button>
-            ))}
+                // Drapeau français pour VF, VF1, VF2
+                if (upperLang.startsWith('VF')) {
+                  return (
+                    <div className="absolute inset-0 flex">
+                      <div className="w-1/3 bg-blue-600"></div>
+                      <div className="w-1/3 bg-white"></div>
+                      <div className="w-1/3 bg-red-600"></div>
+                    </div>
+                  );
+                }
+                
+                // Drapeau japonais pour VOSTFR
+                if (upperLang === 'VOSTFR') {
+                  return (
+                    <div className="absolute inset-0 bg-white flex items-center justify-center">
+                      <div className="w-6 h-6 bg-red-600 rounded-full"></div>
+                    </div>
+                  );
+                }
+                
+                // Drapeau américain pour VA (Version Anglaise)
+                if (upperLang === 'VA') {
+                  return (
+                    <div className="absolute inset-0 bg-blue-800 flex flex-col">
+                      <div className="h-1/2 bg-blue-800 flex items-center justify-center">
+                        <div className="grid grid-cols-3 gap-0.5">
+                          {[...Array(6)].map((_, i) => (
+                            <div key={i} className="w-1 h-1 bg-white rounded-full"></div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex-1 flex flex-col">
+                        {[...Array(7)].map((_, i) => (
+                          <div key={i} className={`flex-1 ${i % 2 === 0 ? 'bg-red-600' : 'bg-white'}`}></div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+                
+                // Drapeau par défaut (neutre)
+                return (
+                  <div className="absolute inset-0 bg-gray-700"></div>
+                );
+              };
+              
+              return (
+                <motion.button
+                  key={lang}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => changeLanguage(lang)}
+                  className={`relative px-4 py-2 rounded-md font-bold text-sm border-2 transition-all overflow-hidden ${
+                    selectedLanguage === lang
+                      ? 'border-white text-white shadow-lg opacity-100'
+                      : 'border-gray-500 text-gray-300 hover:border-gray-300 opacity-50 hover:opacity-75'
+                  }`}
+                  data-testid={`button-language-${lang.toLowerCase()}`}
+                >
+                  {renderFlag()}
+                  
+                  {/* Texte de la langue */}
+                  <span className="relative z-10 text-white font-bold text-shadow-strong" style={{
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)'
+                  }}>
+                    {lang === 'VOSTFR' ? 'VO' : lang}
+                  </span>
+                </motion.button>
+              );
+            })}
           </div>
         )}
 
