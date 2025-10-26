@@ -1420,7 +1420,7 @@ const AnimePlayerPage: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gray-900 rounded-lg overflow-hidden border-2 border-gray-700"
+            className="bg-gray-900 rounded-lg border-2 border-gray-700"
           >
             <div className="aspect-video relative">
               <iframe
