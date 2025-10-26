@@ -317,7 +317,7 @@ const AnimeSamaPage: React.FC = () => {
               )}
 
               {/* Contenu principal */}
-              <div className="px-4 py-6 sm:px-8 sm:py-10 md:px-12 md:py-12 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
+              <div className="px-4 py-4 sm:px-8 sm:py-6 md:px-12 md:py-8 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -335,14 +335,14 @@ const AnimeSamaPage: React.FC = () => {
                     </div>
                   </motion.div>
 
-                  <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 atomic-gradient-text drop-shadow-[0_0_30px_rgba(0,240,255,0.8)] tracking-tight leading-tight px-2">
+                  <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black mb-3 sm:mb-4 atomic-gradient-text drop-shadow-[0_0_30px_rgba(0,240,255,0.8)] tracking-tight leading-tight px-2">
                     ATOMIC FLIX<br />
                     <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
                       Ta dose d'anime 🔥
                     </span>
                   </h1>
                   
-                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 mb-5 sm:mb-6 font-medium max-w-2xl mx-auto leading-relaxed px-2">
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 mb-4 sm:mb-5 font-medium max-w-2xl mx-auto leading-relaxed px-2">
                     Plonge dans l'univers des <span className="text-cyan-400 font-bold">meilleurs animes</span> du moment.
                     <br className="hidden sm:inline" /><span className="sm:hidden"> </span>
                     Des <span className="text-purple-400 font-bold">classiques légendaires</span> aux <span className="text-pink-400 font-bold">nouveautés épiques</span> !
