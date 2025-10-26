@@ -281,10 +281,10 @@ const AnimePlayerPage: React.FC = () => {
               console.log('Sources embed reçues:', embedData);
               
               if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-                // Trier pour mettre serverNumber 1 en premier
+                // Trier pour mettre serverNumber 3 en premier
                 const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
-                  if (a.serverNumber === 1 && b.serverNumber !== 1) return -1;
-                  if (a.serverNumber !== 1 && b.serverNumber === 1) return 1;
+                  if (a.serverNumber === 3 && b.serverNumber !== 3) return -1;
+                  if (a.serverNumber !== 3 && b.serverNumber === 3) return 1;
                   return a.serverNumber - b.serverNumber;
                 });
                 
@@ -297,7 +297,7 @@ const AnimePlayerPage: React.FC = () => {
                   availableServers: sortedSources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                // Toujours le serveur numéro 1 en premier (index 0)
+                // Toujours le serveur numéro 3 en premier (index 0)
                 setSelectedPlayer(0);
                 console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
                 console.log('Lecteur par défaut:', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
@@ -390,10 +390,10 @@ const AnimePlayerPage: React.FC = () => {
               console.log('Sources embed reçues:', embedData);
               
               if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-                // Trier pour mettre serverNumber 1 en premier
+                // Trier pour mettre serverNumber 3 en premier
                 const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
-                  if (a.serverNumber === 1 && b.serverNumber !== 1) return -1;
-                  if (a.serverNumber !== 1 && b.serverNumber === 1) return 1;
+                  if (a.serverNumber === 3 && b.serverNumber !== 3) return -1;
+                  if (a.serverNumber !== 3 && b.serverNumber === 3) return 1;
                   return a.serverNumber - b.serverNumber;
                 });
                 
@@ -406,7 +406,7 @@ const AnimePlayerPage: React.FC = () => {
                   availableServers: sortedSources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                // Toujours le serveur numéro 1 en premier (index 0)
+                // Toujours le serveur numéro 3 en premier (index 0)
                 setSelectedPlayer(0);
                 console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
                 console.log('Lecteur par défaut:', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
@@ -457,10 +457,10 @@ const AnimePlayerPage: React.FC = () => {
       console.log('Sources streaming reçues de l\'API:', embedData);
       
       if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-        // Trier pour mettre serverNumber 1 en premier
+        // Trier pour mettre serverNumber 3 en premier
         const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
-          if (a.serverNumber === 1 && b.serverNumber !== 1) return -1;
-          if (a.serverNumber !== 1 && b.serverNumber === 1) return 1;
+          if (a.serverNumber === 3 && b.serverNumber !== 3) return -1;
+          if (a.serverNumber !== 3 && b.serverNumber === 3) return 1;
           return a.serverNumber - b.serverNumber;
         });
         
@@ -473,7 +473,7 @@ const AnimePlayerPage: React.FC = () => {
           availableServers: sortedSources.map((s: any) => s.server),
           url: episode.url
         });
-        // Toujours le serveur numéro 1 en premier (index 0)
+        // Toujours le serveur numéro 3 en premier (index 0)
         setSelectedPlayer(0);
         console.log('Sources streaming chargées:', sortedSources.length, 'serveurs disponibles');
         console.log('Lecteur par défaut:', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
