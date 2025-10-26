@@ -281,24 +281,28 @@ const AnimePlayerPage: React.FC = () => {
               console.log('Sources embed reçues:', embedData);
               
               if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-                // Sélectionner Sibnet (serverNumber: 1) par défaut si disponible
-                const sibnetIndex = embedData.sources.findIndex((s: any) => 
-                  s.server?.toLowerCase() === 'sibnet' && s.serverNumber === 1
-                );
-                const defaultPlayerIndex = sibnetIndex !== -1 ? sibnetIndex : 0;
+                // Trier les sources pour mettre Sibnet en premier
+                const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
+                  const isSibnetA = a.server?.toLowerCase() === 'sibnet' && a.serverNumber === 1;
+                  const isSibnetB = b.server?.toLowerCase() === 'sibnet' && b.serverNumber === 1;
+                  
+                  if (isSibnetA && !isSibnetB) return -1;
+                  if (!isSibnetA && isSibnetB) return 1;
+                  return 0;
+                });
                 
                 setEpisodeDetails({
                   id: episodeToSelect.id,
                   title: episodeToSelect.title,
                   animeTitle: animeDataObj.title,
                   episodeNumber: episodeToSelect.episodeNumber,
-                  sources: embedData.sources,
-                  availableServers: embedData.sources.map((s: any) => s.server),
+                  sources: sortedSources,
+                  availableServers: sortedSources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                setSelectedPlayer(defaultPlayerIndex);
-                console.log('Épisode chargé avec sources API embed:', embedData.sources.length, 'sources');
-                console.log('Lecteur par défaut sélectionné:', embedData.sources[defaultPlayerIndex]?.server, 'serverNumber:', embedData.sources[defaultPlayerIndex]?.serverNumber);
+                setSelectedPlayer(0); // Sibnet sera maintenant toujours à l'index 0
+                console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
+                console.log('Lecteur par défaut sélectionné:', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
               } else {
                 console.warn('Aucune source trouvée dans la réponse embed:', embedData);
                 setError('Aucune source de streaming trouvée pour cet épisode');
@@ -388,24 +392,28 @@ const AnimePlayerPage: React.FC = () => {
               console.log('Sources embed reçues:', embedData);
               
               if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-                // Sélectionner Sibnet (serverNumber: 1) par défaut si disponible
-                const sibnetIndex = embedData.sources.findIndex((s: any) => 
-                  s.server?.toLowerCase() === 'sibnet' && s.serverNumber === 1
-                );
-                const defaultPlayerIndex = sibnetIndex !== -1 ? sibnetIndex : 0;
+                // Trier les sources pour mettre Sibnet en premier
+                const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
+                  const isSibnetA = a.server?.toLowerCase() === 'sibnet' && a.serverNumber === 1;
+                  const isSibnetB = b.server?.toLowerCase() === 'sibnet' && b.serverNumber === 1;
+                  
+                  if (isSibnetA && !isSibnetB) return -1;
+                  if (!isSibnetA && isSibnetB) return 1;
+                  return 0;
+                });
                 
                 setEpisodeDetails({
                   id: episodeToSelect.id,
                   title: episodeToSelect.title,
                   animeTitle: animeData.title,
                   episodeNumber: episodeToSelect.episodeNumber,
-                  sources: embedData.sources,
-                  availableServers: embedData.sources.map((s: any) => s.server),
+                  sources: sortedSources,
+                  availableServers: sortedSources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                setSelectedPlayer(defaultPlayerIndex);
-                console.log('Épisode chargé avec sources API embed:', embedData.sources.length, 'sources');
-                console.log('Lecteur par défaut sélectionné:', embedData.sources[defaultPlayerIndex]?.server, 'serverNumber:', embedData.sources[defaultPlayerIndex]?.serverNumber);
+                setSelectedPlayer(0); // Sibnet sera maintenant toujours à l'index 0
+                console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
+                console.log('Lecteur par défaut sélectionné:', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
               } else {
                 console.warn('Aucune source trouvée dans la réponse embed:', embedData);
                 setError('Aucune source de streaming trouvée pour cet épisode');
@@ -453,25 +461,29 @@ const AnimePlayerPage: React.FC = () => {
       console.log('Sources streaming reçues de l\'API:', embedData);
       
       if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-        // Sélectionner Sibnet (serverNumber: 1) par défaut si disponible
-        const sibnetIndex = embedData.sources.findIndex((s: any) => 
-          s.server?.toLowerCase() === 'sibnet' && s.serverNumber === 1
-        );
-        const defaultPlayerIndex = sibnetIndex !== -1 ? sibnetIndex : 0;
+        // Trier les sources pour mettre Sibnet en premier
+        const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
+          const isSibnetA = a.server?.toLowerCase() === 'sibnet' && a.serverNumber === 1;
+          const isSibnetB = b.server?.toLowerCase() === 'sibnet' && b.serverNumber === 1;
+          
+          if (isSibnetA && !isSibnetB) return -1;
+          if (!isSibnetA && isSibnetB) return 1;
+          return 0;
+        });
         
-        // Utiliser uniquement les sources authentiques de l'API
+        // Utiliser uniquement les sources authentiques de l'API (triées)
         setEpisodeDetails({
           id: episode.id,
           title: episode.title,
           animeTitle: animeData.title,
           episodeNumber: episode.episodeNumber,
-          sources: embedData.sources,
-          availableServers: embedData.sources.map((s: any) => s.server),
+          sources: sortedSources,
+          availableServers: sortedSources.map((s: any) => s.server),
           url: episode.url
         });
-        setSelectedPlayer(defaultPlayerIndex);
-        console.log('Sources streaming chargées:', embedData.sources.length, 'serveurs disponibles');
-        console.log('Lecteur par défaut sélectionné:', embedData.sources[defaultPlayerIndex]?.server, 'serverNumber:', embedData.sources[defaultPlayerIndex]?.serverNumber);
+        setSelectedPlayer(0); // Sibnet sera maintenant toujours à l'index 0
+        console.log('Sources streaming chargées:', sortedSources.length, 'serveurs disponibles');
+        console.log('Lecteur par défaut sélectionné (Sibnet en priorité):', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
       } else {
         console.error('Aucune source trouvée dans la réponse API');
         setError('Aucune source de streaming disponible pour cet épisode');
