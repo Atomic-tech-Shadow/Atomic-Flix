@@ -1440,18 +1440,6 @@ const AnimePlayerPage: React.FC = () => {
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-top-navigation"
                 referrerPolicy="no-referrer-when-downgrade"
               />
-              
-              {/* Overlay avec informations de l'épisode */}
-              <div className="absolute top-4 left-4 right-4 bg-black/70 rounded-lg px-3 py-2 max-w-md">
-                <div className="text-white text-sm font-bold truncate">
-                  {episodeDetails.animeTitle}
-                </div>
-                <div className="text-gray-300 text-xs truncate">
-                  Épisode {episodeDetails.episodeNumber} • {episodeDetails.sources[selectedPlayer]?.server} • {episodeDetails.sources[selectedPlayer]?.quality}
-                </div>
-              </div>
-
-
             </div>
 
 
