@@ -11,7 +11,6 @@ import AnimePage from "@/pages/anime";
 import AnimePlayerPage from "@/pages/anime-player";
 import FirefoxDebugPage from "@/pages/firefox-debug";
 import AboutPage from "@/pages/about";
-import TestPlayers from "@/pages/test-players";
 import { Component, ErrorInfo, ReactNode } from "react";
 
 // Error Boundary pour capturer les erreurs sur Firefox iPhone
@@ -140,7 +139,6 @@ function Router() {
       <Route path="/anime/:id" component={AnimePage} />
       <Route path="/anime/:id/player" component={AnimePlayerPage} />
       <Route path="/about" component={AboutPage} />
-      <Route path="/test-players" component={TestPlayers} />
       <Route path="/firefox-debug" component={FirefoxDebugPage} />
       <Route component={NotFound} />
     </Switch>

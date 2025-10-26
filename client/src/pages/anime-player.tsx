@@ -281,14 +281,11 @@ const AnimePlayerPage: React.FC = () => {
               console.log('Sources embed reçues:', embedData);
               
               if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-                // Trier pour mettre Sibnet en premier
+                // Trier pour mettre serverNumber 1 en premier
                 const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
-                  const isSibnetA = a.server?.toLowerCase() === 'sibnet';
-                  const isSibnetB = b.server?.toLowerCase() === 'sibnet';
-                  
-                  if (isSibnetA && !isSibnetB) return -1;
-                  if (!isSibnetA && isSibnetB) return 1;
-                  return 0;
+                  if (a.serverNumber === 1 && b.serverNumber !== 1) return -1;
+                  if (a.serverNumber !== 1 && b.serverNumber === 1) return 1;
+                  return a.serverNumber - b.serverNumber;
                 });
                 
                 setEpisodeDetails({
@@ -300,10 +297,10 @@ const AnimePlayerPage: React.FC = () => {
                   availableServers: sortedSources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                // Toujours Sibnet en premier (index 0)
+                // Toujours le serveur numéro 1 en premier (index 0)
                 setSelectedPlayer(0);
                 console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
-                console.log('Lecteur par défaut (Sibnet):', sortedSources[0]?.server);
+                console.log('Lecteur par défaut:', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
               } else {
                 console.warn('Aucune source trouvée dans la réponse embed:', embedData);
                 setError('Aucune source de streaming trouvée pour cet épisode');
@@ -393,14 +390,11 @@ const AnimePlayerPage: React.FC = () => {
               console.log('Sources embed reçues:', embedData);
               
               if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-                // Trier pour mettre Sibnet en premier
+                // Trier pour mettre serverNumber 1 en premier
                 const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
-                  const isSibnetA = a.server?.toLowerCase() === 'sibnet';
-                  const isSibnetB = b.server?.toLowerCase() === 'sibnet';
-                  
-                  if (isSibnetA && !isSibnetB) return -1;
-                  if (!isSibnetA && isSibnetB) return 1;
-                  return 0;
+                  if (a.serverNumber === 1 && b.serverNumber !== 1) return -1;
+                  if (a.serverNumber !== 1 && b.serverNumber === 1) return 1;
+                  return a.serverNumber - b.serverNumber;
                 });
                 
                 setEpisodeDetails({
@@ -412,10 +406,10 @@ const AnimePlayerPage: React.FC = () => {
                   availableServers: sortedSources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                // Toujours Sibnet en premier (index 0)
+                // Toujours le serveur numéro 1 en premier (index 0)
                 setSelectedPlayer(0);
                 console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
-                console.log('Lecteur par défaut (Sibnet):', sortedSources[0]?.server);
+                console.log('Lecteur par défaut:', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
               } else {
                 console.warn('Aucune source trouvée dans la réponse embed:', embedData);
                 setError('Aucune source de streaming trouvée pour cet épisode');
@@ -463,14 +457,11 @@ const AnimePlayerPage: React.FC = () => {
       console.log('Sources streaming reçues de l\'API:', embedData);
       
       if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-        // Trier pour mettre Sibnet en premier
+        // Trier pour mettre serverNumber 1 en premier
         const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
-          const isSibnetA = a.server?.toLowerCase() === 'sibnet';
-          const isSibnetB = b.server?.toLowerCase() === 'sibnet';
-          
-          if (isSibnetA && !isSibnetB) return -1;
-          if (!isSibnetA && isSibnetB) return 1;
-          return 0;
+          if (a.serverNumber === 1 && b.serverNumber !== 1) return -1;
+          if (a.serverNumber !== 1 && b.serverNumber === 1) return 1;
+          return a.serverNumber - b.serverNumber;
         });
         
         setEpisodeDetails({
@@ -482,10 +473,10 @@ const AnimePlayerPage: React.FC = () => {
           availableServers: sortedSources.map((s: any) => s.server),
           url: episode.url
         });
-        // Toujours Sibnet en premier (index 0)
+        // Toujours le serveur numéro 1 en premier (index 0)
         setSelectedPlayer(0);
         console.log('Sources streaming chargées:', sortedSources.length, 'serveurs disponibles');
-        console.log('Lecteur par défaut (Sibnet):', sortedSources[0]?.server);
+        console.log('Lecteur par défaut:', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
       } else {
         console.error('Aucune source trouvée dans la réponse API');
         setError('Aucune source de streaming disponible pour cet épisode');
