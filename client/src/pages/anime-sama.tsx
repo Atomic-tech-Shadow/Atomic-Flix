@@ -264,33 +264,60 @@ const AnimeSamaPage: React.FC = () => {
             >
               {/* Images d'animes classiques en mosaïque visible en haut */}
               {popularAnimes?.categories?.classiques?.anime?.length > 0 && (
-                <div className="flex h-24 md:h-32">
-                  {popularAnimes.categories.classiques.anime.slice(0, 8).map((anime: any, index: number) => (
-                    <div
-                      key={`hero-mosaic-${index}`}
-                      className="flex-1 overflow-hidden cursor-pointer"
-                      style={{
-                        transform: `skew(${index % 2 === 0 ? '3deg' : '-3deg'})`,
-                        marginLeft: index > 0 ? '-2px' : '0'
-                      }}
-                      onClick={() => loadAnimeDetails(anime.id)}
-                    >
-                      <img
-                        src={anime.image}
-                        alt={anime.title}
-                        className="w-full h-full object-cover brightness-90 hover:brightness-110 transition-all duration-300"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                <>
+                  {/* Mobile: 5 images */}
+                  <div className="flex h-20 sm:hidden">
+                    {popularAnimes.categories.classiques.anime.slice(0, 5).map((anime: any, index: number) => (
+                      <div
+                        key={`hero-mosaic-mobile-${index}`}
+                        className="flex-1 overflow-hidden cursor-pointer"
+                        style={{
+                          transform: `skew(${index % 2 === 0 ? '3deg' : '-3deg'})`,
+                          marginLeft: index > 0 ? '-2px' : '0'
                         }}
-                      />
-                    </div>
-                  ))}
-                </div>
+                        onClick={() => loadAnimeDetails(anime.id)}
+                      >
+                        <img
+                          src={anime.image}
+                          alt={anime.title}
+                          className="w-full h-full object-cover brightness-90 hover:brightness-110 transition-all duration-300"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  {/* Desktop: 8 images */}
+                  <div className="hidden sm:flex h-28 md:h-32">
+                    {popularAnimes.categories.classiques.anime.slice(0, 8).map((anime: any, index: number) => (
+                      <div
+                        key={`hero-mosaic-desktop-${index}`}
+                        className="flex-1 overflow-hidden cursor-pointer"
+                        style={{
+                          transform: `skew(${index % 2 === 0 ? '3deg' : '-3deg'})`,
+                          marginLeft: index > 0 ? '-2px' : '0'
+                        }}
+                        onClick={() => loadAnimeDetails(anime.id)}
+                      >
+                        <img
+                          src={anime.image}
+                          alt={anime.title}
+                          className="w-full h-full object-cover brightness-90 hover:brightness-110 transition-all duration-300"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
 
               {/* Contenu principal */}
-              <div className="px-6 py-8 md:px-12 md:py-12 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
+              <div className="px-4 py-6 sm:px-8 sm:py-10 md:px-12 md:py-12 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -301,27 +328,28 @@ const AnimeSamaPage: React.FC = () => {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                    className="inline-block mb-4"
+                    className="inline-block mb-3 sm:mb-4"
                   >
-                    <div className="px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-2 border-cyan-400/50 rounded-full backdrop-blur-sm">
-                      <span className="text-cyan-400 font-bold text-sm tracking-wider">✨ STREAMING PREMIUM</span>
+                    <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-2 border-cyan-400/50 rounded-full backdrop-blur-sm">
+                      <span className="text-cyan-400 font-bold text-xs sm:text-sm tracking-wider">✨ STREAMING PREMIUM</span>
                     </div>
                   </motion.div>
 
-                  <h1 className="text-5xl md:text-7xl font-black mb-6 atomic-gradient-text drop-shadow-[0_0_30px_rgba(0,240,255,0.8)] tracking-tight leading-tight">
+                  <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 atomic-gradient-text drop-shadow-[0_0_30px_rgba(0,240,255,0.8)] tracking-tight leading-tight px-2">
                     ATOMIC FLIX<br />
-                    <span className="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+                    <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
                       Ta dose d'anime 🔥
                     </span>
                   </h1>
                   
-                  <p className="text-lg md:text-xl text-gray-300 mb-6 font-medium max-w-2xl mx-auto leading-relaxed">
-                    Plonge dans l'univers des <span className="text-cyan-400 font-bold">meilleurs animes</span> du moment.<br />
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 mb-5 sm:mb-6 font-medium max-w-2xl mx-auto leading-relaxed px-2">
+                    Plonge dans l'univers des <span className="text-cyan-400 font-bold">meilleurs animes</span> du moment.
+                    <br className="hidden sm:inline" /><span className="sm:hidden"> </span>
                     Des <span className="text-purple-400 font-bold">classiques légendaires</span> aux <span className="text-pink-400 font-bold">nouveautés épiques</span> !
                   </p>
 
                   {/* Tags Features */}
-                  <div className="flex flex-wrap justify-center gap-3">
+                  <div className="flex flex-wrap justify-center gap-2 sm:gap-3 px-2">
                     {[
                       { icon: '🎬', text: 'VOSTFR & VF', color: 'from-cyan-500 to-blue-500' },
                       { icon: '⚡', text: 'HD STREAMING', color: 'from-purple-500 to-pink-500' },
@@ -332,7 +360,7 @@ const AnimeSamaPage: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.6 + index * 0.1, type: "spring" }}
-                        className={`px-4 py-2 bg-gradient-to-r ${tag.color} rounded-lg font-bold text-white text-xs md:text-sm shadow-lg hover:scale-105 transition-transform duration-200`}
+                        className={`px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r ${tag.color} rounded-lg font-bold text-white text-xs sm:text-sm shadow-lg hover:scale-105 transition-transform duration-200`}
                       >
                         {tag.icon} {tag.text}
                       </motion.div>
@@ -342,11 +370,11 @@ const AnimeSamaPage: React.FC = () => {
               </div>
 
               {/* Logo en bas à droite */}
-              <div className="absolute bottom-4 right-6 opacity-60">
+              <div className="absolute bottom-3 right-4 sm:bottom-4 sm:right-6 opacity-60">
                 <img 
                   src="/assets/atomic-logo-round.png" 
                   alt="ATOMIC FLIX" 
-                  className="h-8 w-8 atomic-logo-round"
+                  className="h-6 w-6 sm:h-8 sm:w-8 atomic-logo-round"
                 />
               </div>
 
