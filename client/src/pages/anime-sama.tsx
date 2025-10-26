@@ -296,13 +296,48 @@ const AnimeSamaPage: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.6 }}
                 >
-                  <h1 className="text-4xl md:text-6xl font-black mb-4 atomic-gradient-text drop-shadow-[0_0_20px_rgba(0,240,255,0.6)] tracking-wider">
-                    ATOMIC FLIX
+                  {/* Badge Premium */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+                    className="inline-block mb-4"
+                  >
+                    <div className="px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-2 border-cyan-400/50 rounded-full backdrop-blur-sm">
+                      <span className="text-cyan-400 font-bold text-sm tracking-wider">✨ STREAMING PREMIUM</span>
+                    </div>
+                  </motion.div>
+
+                  <h1 className="text-5xl md:text-7xl font-black mb-6 atomic-gradient-text drop-shadow-[0_0_30px_rgba(0,240,255,0.8)] tracking-tight leading-tight">
+                    ATOMIC FLIX<br />
+                    <span className="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+                      Ta dose d'anime 🔥
+                    </span>
                   </h1>
-                  <p className="text-xl md:text-2xl text-gray-200 mb-4 font-light tracking-wide">
-                    Découvrez les classiques<br />
-                    incontournables de l'animation !
+                  
+                  <p className="text-lg md:text-xl text-gray-300 mb-6 font-medium max-w-2xl mx-auto leading-relaxed">
+                    Plonge dans l'univers des <span className="text-cyan-400 font-bold">meilleurs animes</span> du moment.<br />
+                    Des <span className="text-purple-400 font-bold">classiques légendaires</span> aux <span className="text-pink-400 font-bold">nouveautés épiques</span> !
                   </p>
+
+                  {/* Tags Features */}
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {[
+                      { icon: '🎬', text: 'VOSTFR & VF', color: 'from-cyan-500 to-blue-500' },
+                      { icon: '⚡', text: 'HD STREAMING', color: 'from-purple-500 to-pink-500' },
+                      { icon: '🌟', text: '100% GRATUIT', color: 'from-yellow-500 to-orange-500' }
+                    ].map((tag, index) => (
+                      <motion.div
+                        key={tag.text}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.6 + index * 0.1, type: "spring" }}
+                        className={`px-4 py-2 bg-gradient-to-r ${tag.color} rounded-lg font-bold text-white text-xs md:text-sm shadow-lg hover:scale-105 transition-transform duration-200`}
+                      >
+                        {tag.icon} {tag.text}
+                      </motion.div>
+                    ))}
+                  </div>
                 </motion.div>
               </div>
 
