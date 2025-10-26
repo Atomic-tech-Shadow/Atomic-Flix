@@ -281,10 +281,10 @@ const AnimePlayerPage: React.FC = () => {
               console.log('Sources embed reçues:', embedData);
               
               if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-                // Trier les sources pour mettre Sibnet en premier
+                // Trier pour mettre Sibnet en premier
                 const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
-                  const isSibnetA = a.server?.toLowerCase() === 'sibnet' && a.serverNumber === 1;
-                  const isSibnetB = b.server?.toLowerCase() === 'sibnet' && b.serverNumber === 1;
+                  const isSibnetA = a.server?.toLowerCase() === 'sibnet';
+                  const isSibnetB = b.server?.toLowerCase() === 'sibnet';
                   
                   if (isSibnetA && !isSibnetB) return -1;
                   if (!isSibnetA && isSibnetB) return 1;
@@ -300,7 +300,7 @@ const AnimePlayerPage: React.FC = () => {
                   availableServers: sortedSources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                // Toujours Sibnet (index 0) par défaut
+                // Toujours Sibnet en premier (index 0)
                 setSelectedPlayer(0);
                 console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
                 console.log('Lecteur par défaut (Sibnet):', sortedSources[0]?.server);
@@ -393,10 +393,10 @@ const AnimePlayerPage: React.FC = () => {
               console.log('Sources embed reçues:', embedData);
               
               if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-                // Trier les sources pour mettre Sibnet en premier
+                // Trier pour mettre Sibnet en premier
                 const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
-                  const isSibnetA = a.server?.toLowerCase() === 'sibnet' && a.serverNumber === 1;
-                  const isSibnetB = b.server?.toLowerCase() === 'sibnet' && b.serverNumber === 1;
+                  const isSibnetA = a.server?.toLowerCase() === 'sibnet';
+                  const isSibnetB = b.server?.toLowerCase() === 'sibnet';
                   
                   if (isSibnetA && !isSibnetB) return -1;
                   if (!isSibnetA && isSibnetB) return 1;
@@ -412,7 +412,7 @@ const AnimePlayerPage: React.FC = () => {
                   availableServers: sortedSources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                // Toujours Sibnet (index 0) par défaut
+                // Toujours Sibnet en premier (index 0)
                 setSelectedPlayer(0);
                 console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
                 console.log('Lecteur par défaut (Sibnet):', sortedSources[0]?.server);
@@ -463,17 +463,16 @@ const AnimePlayerPage: React.FC = () => {
       console.log('Sources streaming reçues de l\'API:', embedData);
       
       if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-        // Trier les sources pour mettre Sibnet en premier
+        // Trier pour mettre Sibnet en premier
         const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
-          const isSibnetA = a.server?.toLowerCase() === 'sibnet' && a.serverNumber === 1;
-          const isSibnetB = b.server?.toLowerCase() === 'sibnet' && b.serverNumber === 1;
+          const isSibnetA = a.server?.toLowerCase() === 'sibnet';
+          const isSibnetB = b.server?.toLowerCase() === 'sibnet';
           
           if (isSibnetA && !isSibnetB) return -1;
           if (!isSibnetA && isSibnetB) return 1;
           return 0;
         });
         
-        // Utiliser uniquement les sources authentiques de l'API (triées)
         setEpisodeDetails({
           id: episode.id,
           title: episode.title,
@@ -483,7 +482,7 @@ const AnimePlayerPage: React.FC = () => {
           availableServers: sortedSources.map((s: any) => s.server),
           url: episode.url
         });
-        // Toujours Sibnet (index 0) par défaut
+        // Toujours Sibnet en premier (index 0)
         setSelectedPlayer(0);
         console.log('Sources streaming chargées:', sortedSources.length, 'serveurs disponibles');
         console.log('Lecteur par défaut (Sibnet):', sortedSources[0]?.server);
