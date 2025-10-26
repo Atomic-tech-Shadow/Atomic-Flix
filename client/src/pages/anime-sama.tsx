@@ -329,7 +329,7 @@ const AnimeSamaPage: React.FC = () => {
                 <div className="mb-6">
                   <h2 className="atomic-gradient-text text-3xl md:text-4xl font-extrabold flex items-center gap-3 drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
                     <span className="text-4xl md:text-5xl">📺</span>
-                    <span className="tracking-tight">Épisodes Récents</span>
+                    <span className="tracking-tight">Nouveautés</span>
                   </h2>
                   <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-transparent mt-3 rounded-full"></div>
                 </div>
@@ -396,7 +396,7 @@ const AnimeSamaPage: React.FC = () => {
                 <div className="mb-6">
                   <h2 className="atomic-gradient-text text-3xl md:text-4xl font-extrabold flex items-center gap-3 drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
                     <span className="text-4xl md:text-5xl">🏆</span>
-                    <span className="tracking-tight">Classiques Incontournables</span>
+                    <span className="tracking-tight">Les Classiques</span>
                   </h2>
                   <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-transparent mt-3 rounded-full"></div>
                 </div>
@@ -444,7 +444,7 @@ const AnimeSamaPage: React.FC = () => {
                 <div className="mb-6">
                   <h2 className="atomic-gradient-text text-3xl md:text-4xl font-extrabold flex items-center gap-3 drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
                     <span className="text-4xl md:text-5xl">💎</span>
-                    <span className="tracking-tight">Pépites à Découvrir</span>
+                    <span className="tracking-tight">Pépites</span>
                   </h2>
                   <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-transparent mt-3 rounded-full"></div>
                 </div>
@@ -492,7 +492,7 @@ const AnimeSamaPage: React.FC = () => {
                 <div className="mb-6">
                   <h2 className="atomic-gradient-text text-3xl md:text-4xl font-extrabold flex items-center gap-3 drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
                     <span className="text-4xl md:text-5xl">✨</span>
-                    <span className="tracking-tight">Découvertes pour vous</span>
+                    <span className="tracking-tight">Découvertes</span>
                   </h2>
                   <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-transparent mt-3 rounded-full"></div>
                 </div>
@@ -540,7 +540,7 @@ const AnimeSamaPage: React.FC = () => {
                 <div className="mb-6">
                   <h2 className="atomic-gradient-text text-3xl md:text-4xl font-extrabold flex items-center gap-3 drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
                     <span className="text-4xl md:text-5xl">📅</span>
-                    <span className="tracking-tight">Planning du Jour ({planning.day})</span>
+                    <span className="tracking-tight">Aujourd'hui ({planning.day})</span>
                   </h2>
                   <div className="h-1 w-32 bg-gradient-to-r from-cyan-400 to-transparent mt-3 rounded-full"></div>
                 </div>
