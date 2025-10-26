@@ -75,10 +75,7 @@ const AnimePlayerPage: React.FC = () => {
     targetLang ? targetLang.toUpperCase() : 'VOSTFR'
   );
   const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
-  const [selectedPlayer, setSelectedPlayer] = useState<number>(() => {
-    const savedPlayer = localStorage.getItem('preferredPlayer');
-    return savedPlayer ? parseInt(savedPlayer) : 0;
-  });
+  const [selectedPlayer, setSelectedPlayer] = useState<number>(0);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [episodeDetails, setEpisodeDetails] = useState<EpisodeDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,13 +83,6 @@ const AnimePlayerPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  // Fonction pour changer de lecteur et mémoriser le choix
-  const handlePlayerChange = (playerIndex: number) => {
-    setSelectedPlayer(playerIndex);
-    localStorage.setItem('preferredPlayer', playerIndex.toString());
-    console.log('Lecteur préféré sauvegardé:', playerIndex);
-  };
 
   // Fonction pour les requêtes API externes uniquement
   const apiRequest = async (endpoint: string) => {
@@ -310,12 +300,10 @@ const AnimePlayerPage: React.FC = () => {
                   availableServers: sortedSources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                // Utiliser le lecteur préféré sauvegardé ou 0 par défaut
-                const preferredPlayer = parseInt(localStorage.getItem('preferredPlayer') || '0');
-                const playerIndex = preferredPlayer < sortedSources.length ? preferredPlayer : 0;
-                setSelectedPlayer(playerIndex);
+                // Toujours Sibnet (index 0) par défaut
+                setSelectedPlayer(0);
                 console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
-                console.log('Lecteur sélectionné (préférence utilisateur):', sortedSources[playerIndex]?.server, 'index:', playerIndex);
+                console.log('Lecteur par défaut (Sibnet):', sortedSources[0]?.server);
               } else {
                 console.warn('Aucune source trouvée dans la réponse embed:', embedData);
                 setError('Aucune source de streaming trouvée pour cet épisode');
@@ -424,12 +412,10 @@ const AnimePlayerPage: React.FC = () => {
                   availableServers: sortedSources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                // Utiliser le lecteur préféré sauvegardé ou 0 par défaut
-                const preferredPlayer = parseInt(localStorage.getItem('preferredPlayer') || '0');
-                const playerIndex = preferredPlayer < sortedSources.length ? preferredPlayer : 0;
-                setSelectedPlayer(playerIndex);
+                // Toujours Sibnet (index 0) par défaut
+                setSelectedPlayer(0);
                 console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
-                console.log('Lecteur sélectionné (préférence utilisateur):', sortedSources[playerIndex]?.server, 'index:', playerIndex);
+                console.log('Lecteur par défaut (Sibnet):', sortedSources[0]?.server);
               } else {
                 console.warn('Aucune source trouvée dans la réponse embed:', embedData);
                 setError('Aucune source de streaming trouvée pour cet épisode');
@@ -497,12 +483,10 @@ const AnimePlayerPage: React.FC = () => {
           availableServers: sortedSources.map((s: any) => s.server),
           url: episode.url
         });
-        // Utiliser le lecteur préféré sauvegardé ou 0 par défaut
-        const preferredPlayer = parseInt(localStorage.getItem('preferredPlayer') || '0');
-        const playerIndex = preferredPlayer < sortedSources.length ? preferredPlayer : 0;
-        setSelectedPlayer(playerIndex);
+        // Toujours Sibnet (index 0) par défaut
+        setSelectedPlayer(0);
         console.log('Sources streaming chargées:', sortedSources.length, 'serveurs disponibles');
-        console.log('Lecteur sélectionné (préférence utilisateur):', sortedSources[playerIndex]?.server, 'index:', playerIndex);
+        console.log('Lecteur par défaut (Sibnet):', sortedSources[0]?.server);
       } else {
         console.error('Aucune source trouvée dans la réponse API');
         setError('Aucune source de streaming disponible pour cet épisode');
@@ -1424,7 +1408,7 @@ const AnimePlayerPage: React.FC = () => {
               <div className="relative">
                 <select
                   value={selectedPlayer}
-                  onChange={(e) => handlePlayerChange(parseInt(e.target.value))}
+                  onChange={(e) => setSelectedPlayer(parseInt(e.target.value))}
                   className="w-full bg-gray-800 text-white px-4 py-3 rounded-lg appearance-none cursor-pointer border-2 border-cyan-500 font-bold uppercase text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 >
                   {episodeDetails.sources.map((source, index) => (
