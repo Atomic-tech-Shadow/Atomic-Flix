@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Home, Menu, X } from "lucide-react";
+import { Search, Menu, X, Info, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { SimpleNotificationButton } from "@/components/notifications/simple-notification-button";
@@ -14,7 +14,8 @@ export function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const navigation = [
-    { name: "Accueil", href: "/", icon: Home },
+    { name: "Accueil", href: "/", icon: Sparkles },
+    { name: "À propos", href: "/about", icon: Info },
   ];
 
   const handleSearch = (e: React.FormEvent) => {

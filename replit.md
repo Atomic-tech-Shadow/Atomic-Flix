@@ -4,7 +4,15 @@
 
 ATOMIC FLIX is a modern anime streaming platform built with React, TypeScript, and Vite, offering users the ability to search, browse, and stream anime content. The platform features a sleek, dark-themed interface with a comprehensive UI component library based on shadcn/ui and Radix UI primitives. The project is 100% frontend-only, using the external API `anime-sama-scraper.vercel.app` for all data.
 
-## Recent Changes (October 25, 2025)
+## Recent Changes (October 26, 2025)
+
+### Latest Updates
+- **Simplified Section Titles**: All homepage section titles shortened for better mobile display (e.g., "Classiques Incontournables" → "Les Classiques")
+- **Minimal Splash Screen**: Removed all text from loading screen, keeping only animated logo with pulse effect
+- **Modern Navigation Icons**: Updated menu icons - Sparkles for Home, Info for About page
+- **About Page Added**: New /about page with project information, features, and tech stack
+- **Sibnet Priority**: Video player always shows Sibnet server first in dropdown when available
+- **Removed Overflow**: Fixed video player container overflow issue
 
 ### Navigation & UI Improvements
 - **Ultra-Simplified Navigation**: Navigation menu reduced to only "Accueil" for maximum simplicity
