@@ -68,6 +68,18 @@ export function Navbar() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-2">
+            {/* Desktop Search Bar */}
+            <form onSubmit={handleSearch} className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Rechercher un anime..."
+                className="pl-10 w-64 atomic-input"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                data-testid="input-search-desktop"
+              />
+            </form>
             <SimpleNotificationButton />
           </div>
 
