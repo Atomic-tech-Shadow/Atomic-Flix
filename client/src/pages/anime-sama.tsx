@@ -349,7 +349,7 @@ const AnimeSamaPage: React.FC = () => {
                   </p>
 
                   {/* Tags Features */}
-                  <div className="flex flex-wrap justify-center gap-2 sm:gap-3 px-2">
+                  <div className="flex justify-center gap-2 px-2">
                     {[
                       { icon: '🎬', text: 'VOSTFR & VF', color: 'from-cyan-500 to-blue-500' },
                       { icon: '⚡', text: 'HD STREAMING', color: 'from-purple-500 to-pink-500' },
@@ -360,7 +360,7 @@ const AnimeSamaPage: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.6 + index * 0.1, type: "spring" }}
-                        className={`px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r ${tag.color} rounded-lg font-bold text-white text-xs sm:text-sm shadow-lg hover:scale-105 transition-transform duration-200`}
+                        className={`px-2 py-1 sm:px-3 sm:py-1.5 bg-gradient-to-r ${tag.color} rounded-lg font-bold text-white text-[10px] sm:text-xs shadow-lg hover:scale-105 transition-transform duration-200`}
                       >
                         {tag.icon} {tag.text}
                       </motion.div>
