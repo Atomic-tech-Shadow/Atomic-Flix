@@ -1442,11 +1442,11 @@ const AnimePlayerPage: React.FC = () => {
               />
               
               {/* Overlay avec informations de l'épisode */}
-              <div className="absolute top-4 left-4 bg-black/70 rounded-lg px-3 py-2">
-                <div className="text-white text-sm font-bold">
+              <div className="absolute top-4 left-4 right-4 bg-black/70 rounded-lg px-3 py-2 max-w-md">
+                <div className="text-white text-sm font-bold truncate">
                   {episodeDetails.animeTitle}
                 </div>
-                <div className="text-gray-300 text-xs">
+                <div className="text-gray-300 text-xs truncate">
                   Épisode {episodeDetails.episodeNumber} • {episodeDetails.sources[selectedPlayer]?.server} • {episodeDetails.sources[selectedPlayer]?.quality}
                 </div>
               </div>
