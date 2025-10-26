@@ -207,13 +207,21 @@ const AnimePage: React.FC = () => {
             <div className="flex items-center space-x-2 bg-cyan-500/20 backdrop-blur-sm rounded-full px-3 py-1">
               <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
               <span className="text-cyan-300 text-xs font-medium">
-                {animeData.seasons.length} saisons
+                {animeData.totalSeasons} {animeData.totalSeasons > 1 ? 'saisons' : 'saison'}
               </span>
             </div>
-            <div className="flex items-center space-x-2 bg-purple-500/20 backdrop-blur-sm rounded-full px-3 py-1">
-              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-              <span className="text-purple-300 text-xs font-medium">{animeData.year}</span>
-            </div>
+            {animeData.year && (
+              <div className="flex items-center space-x-2 bg-purple-500/20 backdrop-blur-sm rounded-full px-3 py-1">
+                <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                <span className="text-purple-300 text-xs font-medium">{animeData.year}</span>
+              </div>
+            )}
+            {animeData.status && (
+              <div className="flex items-center space-x-2 bg-green-500/20 backdrop-blur-sm rounded-full px-3 py-1">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-green-300 text-xs font-medium">{animeData.status}</span>
+              </div>
+            )}
           </div>
           
           <div className="flex flex-wrap gap-2">
