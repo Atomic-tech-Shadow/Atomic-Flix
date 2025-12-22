@@ -335,18 +335,6 @@ const AnimeSamaPage: React.FC = () => {
                     </div>
                   </motion.div>
 
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-1 sm:mb-2 atomic-gradient-text drop-shadow-[0_0_30px_rgba(0,240,255,0.8)] tracking-tight leading-tight px-2">
-                    ATOMIC FLIX<br />
-                    <span className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
-                      Ta dose d'anime 🔥
-                    </span>
-                  </h1>
-                  
-                  <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-300 mb-2 sm:mb-3 font-medium max-w-2xl mx-auto leading-relaxed px-2">
-                    Plonge dans l'univers des <span className="text-cyan-400 font-bold">meilleurs animes</span> du moment.
-                    <br className="hidden sm:inline" /><span className="sm:hidden"> </span>
-                    Des <span className="text-purple-400 font-bold">classiques légendaires</span> aux <span className="text-pink-400 font-bold">nouveautés épiques</span> !
-                  </p>
 
                   {/* Tags Features */}
                   <div className="flex justify-center gap-2 px-2">
