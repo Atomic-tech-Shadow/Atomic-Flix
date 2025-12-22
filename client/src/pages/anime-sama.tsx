@@ -63,8 +63,10 @@ const AnimeSamaPage: React.FC = () => {
   const loadRecentEpisodes = async () => {
     try {
       const response = await animeAPI.getRecent();
-      if (response && response.success && response.recentEpisodes) {
-        setRecentEpisodes(response.recentEpisodes.slice(0, 20));
+      if (response && response.success) {
+        // L'API retourne "recentEpisodes" ou directement une liste selon la version
+        const episodes = response.recentEpisodes || response.data || [];
+        setRecentEpisodes(episodes.slice(0, 20));
       }
     } catch (error) {
       console.error('Erreur chargement épisodes récents:', error);
@@ -75,8 +77,10 @@ const AnimeSamaPage: React.FC = () => {
   const loadRecommendations = async () => {
     try {
       const response = await animeAPI.getRecommendations(1, 30);
-      if (response && response.success && response.data) {
-        setRecommendations(response.data);
+      if (response && response.success) {
+        // Vérifier si les données sont dans "data" ou "recommendations"
+        const items = response.data || response.recommendations || [];
+        setRecommendations(items);
       }
     } catch (error) {
       console.error('Erreur chargement recommandations:', error);
