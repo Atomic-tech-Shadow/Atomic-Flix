@@ -393,7 +393,7 @@ const AnimeSamaPage: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
                         onClick={() => playEpisode(episode)}
-                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-recent-${episode.animeId}`}
                       >
                         <img
@@ -460,7 +460,7 @@ const AnimeSamaPage: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
                         onClick={() => loadAnimeDetails(anime.id)}
-                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-classique-${anime.id}`}
                       >
                         <img
@@ -508,7 +508,7 @@ const AnimeSamaPage: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
                         onClick={() => loadAnimeDetails(anime.id)}
-                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-pepite-${anime.id}`}
                       >
                         <img
@@ -556,7 +556,7 @@ const AnimeSamaPage: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
                         onClick={() => loadAnimeDetails(anime.id)}
-                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-recommendation-${anime.id}`}
                       >
                         <img
@@ -604,7 +604,7 @@ const AnimeSamaPage: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
                         onClick={() => loadAnimeDetails(item.animeId)}
-                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-planning-${item.animeId}`}
                       >
                         <img
