@@ -266,7 +266,7 @@ const AnimeSamaPage: React.FC = () => {
               {popularAnimes?.categories?.classiques?.anime?.length > 0 && (
                 <>
                   {/* Mobile: 5 images */}
-                  <div className="flex h-12 sm:hidden">
+                  <div className="flex h-16 sm:hidden">
                     {popularAnimes.categories.classiques.anime.slice(0, 5).map((anime: any, index: number) => (
                       <div
                         key={`hero-mosaic-mobile-${index}`}
@@ -290,7 +290,7 @@ const AnimeSamaPage: React.FC = () => {
                     ))}
                   </div>
                   {/* Desktop: 8 images */}
-                  <div className="hidden sm:flex h-16 md:h-20">
+                  <div className="hidden sm:flex h-24 md:h-28">
                     {popularAnimes.categories.classiques.anime.slice(0, 8).map((anime: any, index: number) => (
                       <div
                         key={`hero-mosaic-desktop-${index}`}
@@ -317,7 +317,7 @@ const AnimeSamaPage: React.FC = () => {
               )}
 
               {/* Contenu principal */}
-              <div className="px-4 py-2 sm:px-8 sm:py-3 md:px-12 md:py-4 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
+              <div className="px-4 py-4 sm:px-8 sm:py-6 md:px-12 md:py-8 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -328,16 +328,16 @@ const AnimeSamaPage: React.FC = () => {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                    className="inline-block mb-2 sm:mb-2"
+                    className="inline-block mb-3 sm:mb-4"
                   >
-                    <div className="px-2 py-1 sm:px-3 sm:py-1.5 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-2 border-cyan-400/50 rounded-full backdrop-blur-sm">
-                      <span className="text-cyan-400 font-bold text-[10px] sm:text-xs tracking-wider">✨ STREAMING PREMIUM</span>
+                    <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-2 border-cyan-400/50 rounded-full backdrop-blur-sm">
+                      <span className="text-cyan-400 font-bold text-xs sm:text-sm tracking-wider">✨ STREAMING PREMIUM</span>
                     </div>
                   </motion.div>
 
 
                   {/* Tags Features */}
-                  <div className="flex justify-center gap-2 px-2">
+                  <div className="flex justify-center gap-3 px-2">
                     {[
                       { icon: '🎬', text: 'VOSTFR & VF', color: 'from-cyan-500 to-blue-500' },
                       { icon: '⚡', text: 'HD STREAMING', color: 'from-purple-500 to-pink-500' },
@@ -348,7 +348,7 @@ const AnimeSamaPage: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.6 + index * 0.1, type: "spring" }}
-                        className={`px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gradient-to-r ${tag.color} rounded-lg font-bold text-white text-[8px] sm:text-[10px] shadow-lg hover:scale-105 transition-transform duration-200`}
+                        className={`px-2 py-1 sm:px-3 sm:py-1.5 bg-gradient-to-r ${tag.color} rounded-lg font-bold text-white text-[10px] sm:text-xs shadow-lg hover:scale-105 transition-transform duration-200`}
                       >
                         {tag.icon} {tag.text}
                       </motion.div>
