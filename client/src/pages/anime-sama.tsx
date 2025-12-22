@@ -270,7 +270,7 @@ const AnimeSamaPage: React.FC = () => {
                     {popularAnimes.categories.classiques.anime.slice(0, 5).map((anime: any, index: number) => (
                       <div
                         key={`hero-mosaic-mobile-${index}`}
-                        className="flex-1 overflow-hidden cursor-pointer"
+                        className="flex-1 overflow-hidden cursor-pointer bg-gradient-to-br from-cyan-900/50 to-purple-900/50"
                         style={{
                           transform: `skew(${index % 2 === 0 ? '3deg' : '-3deg'})`,
                           marginLeft: index > 0 ? '-2px' : '0'
@@ -283,7 +283,7 @@ const AnimeSamaPage: React.FC = () => {
                           className="w-full h-full object-cover brightness-90 hover:brightness-110 transition-all duration-300"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                            target.style.display = 'none';
                           }}
                         />
                       </div>
@@ -294,7 +294,7 @@ const AnimeSamaPage: React.FC = () => {
                     {popularAnimes.categories.classiques.anime.slice(0, 8).map((anime: any, index: number) => (
                       <div
                         key={`hero-mosaic-desktop-${index}`}
-                        className="flex-1 overflow-hidden cursor-pointer"
+                        className="flex-1 overflow-hidden cursor-pointer bg-gradient-to-br from-cyan-900/50 to-purple-900/50"
                         style={{
                           transform: `skew(${index % 2 === 0 ? '3deg' : '-3deg'})`,
                           marginLeft: index > 0 ? '-2px' : '0'
@@ -307,7 +307,7 @@ const AnimeSamaPage: React.FC = () => {
                           className="w-full h-full object-cover brightness-90 hover:brightness-110 transition-all duration-300"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                            target.style.display = 'none';
                           }}
                         />
                       </div>
@@ -396,15 +396,17 @@ const AnimeSamaPage: React.FC = () => {
                         className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-recent-${episode.animeId}`}
                       >
-                        <img
-                          src={episode.image}
-                          alt={episode.animeTitle}
-                          className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${episode.animeId}.jpg`;
-                          }}
-                        />
+                        <div className="w-full h-full bg-gradient-to-br from-cyan-900/60 to-purple-900/60 absolute inset-0">
+                          <img
+                            src={episode.image}
+                            alt={episode.animeTitle}
+                            className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        </div>
                         {/* Badges */}
                         <div className="absolute top-2 left-2 right-2 flex flex-wrap gap-1">
                           <div className={`text-white text-xs px-2 py-1 rounded-full font-semibold backdrop-blur-sm ${
@@ -463,15 +465,17 @@ const AnimeSamaPage: React.FC = () => {
                         className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-classique-${anime.id}`}
                       >
-                        <img
-                          src={anime.image}
-                          alt={anime.title}
-                          className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
-                          }}
-                        />
+                        <div className="w-full h-full bg-gradient-to-br from-cyan-900/60 to-purple-900/60 absolute inset-0">
+                          <img
+                            src={anime.image}
+                            alt={anime.title}
+                            className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        </div>
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
                           <h3 className="text-white font-semibold text-sm leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2">
                             {anime.title}
@@ -511,15 +515,17 @@ const AnimeSamaPage: React.FC = () => {
                         className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-pepite-${anime.id}`}
                       >
-                        <img
-                          src={anime.image}
-                          alt={anime.title}
-                          className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
-                          }}
-                        />
+                        <div className="w-full h-full bg-gradient-to-br from-cyan-900/60 to-purple-900/60 absolute inset-0">
+                          <img
+                            src={anime.image}
+                            alt={anime.title}
+                            className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        </div>
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
                           <h3 className="text-white font-semibold text-sm leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2">
                             {anime.title}
@@ -559,15 +565,17 @@ const AnimeSamaPage: React.FC = () => {
                         className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-recommendation-${anime.id}`}
                       >
-                        <img
-                          src={anime.image}
-                          alt={anime.title}
-                          className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
-                          }}
-                        />
+                        <div className="w-full h-full bg-gradient-to-br from-cyan-900/60 to-purple-900/60 absolute inset-0">
+                          <img
+                            src={anime.image}
+                            alt={anime.title}
+                            className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        </div>
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
                           <h3 className="text-white font-semibold text-sm leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2">
                             {anime.title}
