@@ -404,9 +404,16 @@ const AnimeSamaPage: React.FC = () => {
                           src={episode.image}
                           alt={episode.animeTitle}
                           className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                          referrerPolicy="no-referrer"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${episode.animeId}.jpg`;
+                            const animeId = episode.animeId || '';
+                            if (!target.src.includes('statically')) {
+                              target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${animeId}.jpg`;
+                            } else if (target.src.includes('statically')) {
+                                // Fallback ultime si même statically échoue
+                                target.src = 'https://placehold.co/300x450/0A0A1A/00F0FF?text=No+Image';
+                            }
                           }}
                         />
                         {/* Badges */}
@@ -471,9 +478,14 @@ const AnimeSamaPage: React.FC = () => {
                           src={anime.image}
                           alt={anime.title}
                           className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                          referrerPolicy="no-referrer"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                            if (!target.src.includes('statically')) {
+                              target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                            } else {
+                              target.src = 'https://placehold.co/300x450/0A0A1A/00F0FF?text=No+Image';
+                            }
                           }}
                         />
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
@@ -519,9 +531,14 @@ const AnimeSamaPage: React.FC = () => {
                           src={anime.image}
                           alt={anime.title}
                           className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                          referrerPolicy="no-referrer"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                            if (!target.src.includes('statically')) {
+                              target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                            } else {
+                              target.src = 'https://placehold.co/300x450/0A0A1A/00F0FF?text=No+Image';
+                            }
                           }}
                         />
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
@@ -567,9 +584,14 @@ const AnimeSamaPage: React.FC = () => {
                           src={anime.image}
                           alt={anime.title}
                           className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                          referrerPolicy="no-referrer"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                            if (!target.src.includes('statically')) {
+                              target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
+                            } else {
+                              target.src = 'https://placehold.co/300x450/0A0A1A/00F0FF?text=No+Image';
+                            }
                           }}
                         />
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
@@ -615,9 +637,14 @@ const AnimeSamaPage: React.FC = () => {
                           src={item.image}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
+                          referrerPolicy="no-referrer"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${item.animeId}.jpg`;
+                            if (!target.src.includes('statically')) {
+                              target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${item.animeId}.jpg`;
+                            } else {
+                              target.src = 'https://placehold.co/300x450/0A0A1A/00F0FF?text=No+Image';
+                            }
                           }}
                         />
                         {/* Badge heure */}
