@@ -328,21 +328,21 @@ const AnimeSamaPage: React.FC = () => {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                    className="inline-block mb-3 sm:mb-4"
+                    className="inline-block mb-2 sm:mb-2"
                   >
-                    <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-2 border-cyan-400/50 rounded-full backdrop-blur-sm">
-                      <span className="text-cyan-400 font-bold text-xs sm:text-sm tracking-wider">✨ STREAMING PREMIUM</span>
+                    <div className="px-2 py-1 sm:px-3 sm:py-1.5 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-2 border-cyan-400/50 rounded-full backdrop-blur-sm">
+                      <span className="text-cyan-400 font-bold text-[10px] sm:text-xs tracking-wider">✨ STREAMING PREMIUM</span>
                     </div>
                   </motion.div>
 
-                  <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black mb-3 sm:mb-4 atomic-gradient-text drop-shadow-[0_0_30px_rgba(0,240,255,0.8)] tracking-tight leading-tight px-2">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-1 sm:mb-2 atomic-gradient-text drop-shadow-[0_0_30px_rgba(0,240,255,0.8)] tracking-tight leading-tight px-2">
                     ATOMIC FLIX<br />
-                    <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+                    <span className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
                       Ta dose d'anime 🔥
                     </span>
                   </h1>
                   
-                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 mb-4 sm:mb-5 font-medium max-w-2xl mx-auto leading-relaxed px-2">
+                  <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-300 mb-2 sm:mb-3 font-medium max-w-2xl mx-auto leading-relaxed px-2">
                     Plonge dans l'univers des <span className="text-cyan-400 font-bold">meilleurs animes</span> du moment.
                     <br className="hidden sm:inline" /><span className="sm:hidden"> </span>
                     Des <span className="text-purple-400 font-bold">classiques légendaires</span> aux <span className="text-pink-400 font-bold">nouveautés épiques</span> !
@@ -360,7 +360,7 @@ const AnimeSamaPage: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.6 + index * 0.1, type: "spring" }}
-                        className={`px-2 py-1 sm:px-3 sm:py-1.5 bg-gradient-to-r ${tag.color} rounded-lg font-bold text-white text-[10px] sm:text-xs shadow-lg hover:scale-105 transition-transform duration-200`}
+                        className={`px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gradient-to-r ${tag.color} rounded-lg font-bold text-white text-[8px] sm:text-[10px] shadow-lg hover:scale-105 transition-transform duration-200`}
                       >
                         {tag.icon} {tag.text}
                       </motion.div>
