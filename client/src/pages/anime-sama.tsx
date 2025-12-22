@@ -266,7 +266,7 @@ const AnimeSamaPage: React.FC = () => {
               {popularAnimes?.categories?.classiques?.anime?.length > 0 && (
                 <>
                   {/* Mobile: 5 images */}
-                  <div className="flex h-20 sm:hidden">
+                  <div className="flex h-12 sm:hidden">
                     {popularAnimes.categories.classiques.anime.slice(0, 5).map((anime: any, index: number) => (
                       <div
                         key={`hero-mosaic-mobile-${index}`}
@@ -290,7 +290,7 @@ const AnimeSamaPage: React.FC = () => {
                     ))}
                   </div>
                   {/* Desktop: 8 images */}
-                  <div className="hidden sm:flex h-28 md:h-32">
+                  <div className="hidden sm:flex h-16 md:h-20">
                     {popularAnimes.categories.classiques.anime.slice(0, 8).map((anime: any, index: number) => (
                       <div
                         key={`hero-mosaic-desktop-${index}`}
@@ -317,7 +317,7 @@ const AnimeSamaPage: React.FC = () => {
               )}
 
               {/* Contenu principal */}
-              <div className="px-4 py-4 sm:px-8 sm:py-6 md:px-12 md:py-8 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
+              <div className="px-4 py-2 sm:px-8 sm:py-3 md:px-12 md:py-4 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
