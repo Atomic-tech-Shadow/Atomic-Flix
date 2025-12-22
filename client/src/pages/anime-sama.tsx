@@ -63,10 +63,8 @@ const AnimeSamaPage: React.FC = () => {
   const loadRecentEpisodes = async () => {
     try {
       const response = await animeAPI.getRecent();
-      if (response && response.success) {
-        // L'API retourne "recentEpisodes" ou directement une liste selon la version
-        const episodes = response.recentEpisodes || response.data || [];
-        setRecentEpisodes(episodes.slice(0, 20));
+      if (response && response.success && response.recentEpisodes) {
+        setRecentEpisodes(response.recentEpisodes.slice(0, 20));
       }
     } catch (error) {
       console.error('Erreur chargement épisodes récents:', error);
@@ -77,10 +75,8 @@ const AnimeSamaPage: React.FC = () => {
   const loadRecommendations = async () => {
     try {
       const response = await animeAPI.getRecommendations(1, 30);
-      if (response && response.success) {
-        // Vérifier si les données sont dans "data" ou "recommendations"
-        const items = response.data || response.recommendations || [];
-        setRecommendations(items);
+      if (response && response.success && response.data) {
+        setRecommendations(response.data);
       }
     } catch (error) {
       console.error('Erreur chargement recommandations:', error);
@@ -270,7 +266,7 @@ const AnimeSamaPage: React.FC = () => {
               {popularAnimes?.categories?.classiques?.anime?.length > 0 && (
                 <>
                   {/* Mobile: 5 images */}
-                  <div className="flex h-16 sm:hidden">
+                  <div className="flex h-12 sm:hidden">
                     {popularAnimes.categories.classiques.anime.slice(0, 5).map((anime: any, index: number) => (
                       <div
                         key={`hero-mosaic-mobile-${index}`}
@@ -294,7 +290,7 @@ const AnimeSamaPage: React.FC = () => {
                     ))}
                   </div>
                   {/* Desktop: 8 images */}
-                  <div className="hidden sm:flex h-24 md:h-28">
+                  <div className="hidden sm:flex h-16 md:h-20">
                     {popularAnimes.categories.classiques.anime.slice(0, 8).map((anime: any, index: number) => (
                       <div
                         key={`hero-mosaic-desktop-${index}`}
@@ -321,7 +317,7 @@ const AnimeSamaPage: React.FC = () => {
               )}
 
               {/* Contenu principal */}
-              <div className="px-4 py-4 sm:px-8 sm:py-6 md:px-12 md:py-8 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
+              <div className="px-4 py-2 sm:px-8 sm:py-3 md:px-12 md:py-4 text-center bg-gradient-to-t from-black via-black/95 to-black/80">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -332,16 +328,16 @@ const AnimeSamaPage: React.FC = () => {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                    className="inline-block mb-3 sm:mb-4"
+                    className="inline-block mb-2 sm:mb-2"
                   >
-                    <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-2 border-cyan-400/50 rounded-full backdrop-blur-sm">
-                      <span className="text-cyan-400 font-bold text-xs sm:text-sm tracking-wider">✨ STREAMING PREMIUM</span>
+                    <div className="px-2 py-1 sm:px-3 sm:py-1.5 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-2 border-cyan-400/50 rounded-full backdrop-blur-sm">
+                      <span className="text-cyan-400 font-bold text-[10px] sm:text-xs tracking-wider">✨ STREAMING PREMIUM</span>
                     </div>
                   </motion.div>
 
 
                   {/* Tags Features */}
-                  <div className="flex justify-center gap-3 px-2">
+                  <div className="flex justify-center gap-2 px-2">
                     {[
                       { icon: '🎬', text: 'VOSTFR & VF', color: 'from-cyan-500 to-blue-500' },
                       { icon: '⚡', text: 'HD STREAMING', color: 'from-purple-500 to-pink-500' },
@@ -352,7 +348,7 @@ const AnimeSamaPage: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.6 + index * 0.1, type: "spring" }}
-                        className={`px-2 py-1 sm:px-3 sm:py-1.5 bg-gradient-to-r ${tag.color} rounded-lg font-bold text-white text-[10px] sm:text-xs shadow-lg hover:scale-105 transition-transform duration-200`}
+                        className={`px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gradient-to-r ${tag.color} rounded-lg font-bold text-white text-[8px] sm:text-[10px] shadow-lg hover:scale-105 transition-transform duration-200`}
                       >
                         {tag.icon} {tag.text}
                       </motion.div>
@@ -397,23 +393,16 @@ const AnimeSamaPage: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
                         onClick={() => playEpisode(episode)}
-                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-recent-${episode.animeId}`}
                       >
                         <img
                           src={episode.image}
                           alt={episode.animeTitle}
                           className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
-                          referrerPolicy="no-referrer"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            const animeId = episode.animeId || '';
-                            if (!target.src.includes('statically')) {
-                              target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${animeId}.jpg`;
-                            } else if (target.src.includes('statically')) {
-                                // Fallback ultime si même statically échoue
-                                target.src = 'https://placehold.co/300x450/0A0A1A/00F0FF?text=No+Image';
-                            }
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${episode.animeId}.jpg`;
                           }}
                         />
                         {/* Badges */}
@@ -471,21 +460,16 @@ const AnimeSamaPage: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
                         onClick={() => loadAnimeDetails(anime.id)}
-                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-classique-${anime.id}`}
                       >
                         <img
                           src={anime.image}
                           alt={anime.title}
                           className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
-                          referrerPolicy="no-referrer"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            if (!target.src.includes('statically')) {
-                              target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
-                            } else {
-                              target.src = 'https://placehold.co/300x450/0A0A1A/00F0FF?text=No+Image';
-                            }
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
                           }}
                         />
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
@@ -524,21 +508,16 @@ const AnimeSamaPage: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
                         onClick={() => loadAnimeDetails(anime.id)}
-                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-pepite-${anime.id}`}
                       >
                         <img
                           src={anime.image}
                           alt={anime.title}
                           className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
-                          referrerPolicy="no-referrer"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            if (!target.src.includes('statically')) {
-                              target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
-                            } else {
-                              target.src = 'https://placehold.co/300x450/0A0A1A/00F0FF?text=No+Image';
-                            }
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
                           }}
                         />
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
@@ -577,21 +556,16 @@ const AnimeSamaPage: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
                         onClick={() => loadAnimeDetails(anime.id)}
-                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-recommendation-${anime.id}`}
                       >
                         <img
                           src={anime.image}
                           alt={anime.title}
                           className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
-                          referrerPolicy="no-referrer"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            if (!target.src.includes('statically')) {
-                              target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
-                            } else {
-                              target.src = 'https://placehold.co/300x450/0A0A1A/00F0FF?text=No+Image';
-                            }
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${anime.id}.jpg`;
                           }}
                         />
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3">
@@ -630,21 +604,16 @@ const AnimeSamaPage: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, duration: 0.3 }}
                         onClick={() => loadAnimeDetails(item.animeId)}
-                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-40 h-56 sm:w-44 sm:h-64 md:w-48 md:h-72 rounded-lg relative flex-shrink-0"
+                        className="cursor-pointer group overflow-hidden atomic-hover-scale w-48 h-72 rounded-lg relative flex-shrink-0"
                         data-testid={`card-planning-${item.animeId}`}
                       >
                         <img
                           src={item.image}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:opacity-90 transition-opacity absolute inset-0"
-                          referrerPolicy="no-referrer"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            if (!target.src.includes('statically')) {
-                              target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${item.animeId}.jpg`;
-                            } else {
-                              target.src = 'https://placehold.co/300x450/0A0A1A/00F0FF?text=No+Image';
-                            }
+                            target.src = `https://cdn.statically.io/gh/Anime-Sama/IMG/img/contenu/${item.animeId}.jpg`;
                           }}
                         />
                         {/* Badge heure */}
