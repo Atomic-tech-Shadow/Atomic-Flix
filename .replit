@@ -3,37 +3,17 @@ run = "npm run dev"
 hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
-channel = "stable-24_05"
+channel = "stable-25_05"
 packages = ["nodejs_20"]
 
 [deployment]
 deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
-run = ["npm", "run", "start"]
+run = ["node", "./dist/index.cjs"]
 
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 5002
-externalPort = 3001
-
-[[ports]]
-localPort = 33317
-externalPort = 3000
-
-[[ports]]
-localPort = 34275
-externalPort = 3003
-
-[[ports]]
-localPort = 37127
-externalPort = 3002
-
-[[ports]]
-localPort = 45523
-externalPort = 4200
 
 [workflows]
 runButton = "Project"
