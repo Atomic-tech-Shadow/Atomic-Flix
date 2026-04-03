@@ -124,20 +124,6 @@ const AnimePlayerPage: React.FC = () => {
 
 
 
-  // Fonction pour charger les saisons d'un anime selon la documentation API
-  const getAnimeSeasons = async (animeId: string) => {
-    try {
-      const response = await apiRequest(`https://anime-sama-scraper.vercel.app/api/seasons/${animeId}`);
-      return response;
-    } catch (error) {
-      console.error('Erreur chargement saisons:', error);
-      return null;
-    }
-  };
-
-  // Utilisation des fonctions définies pour éviter les erreurs TypeScript
-  console.log('Fonction saisons prête:', getAnimeSeasons);
-
   // Charger les données de l'anime
   useEffect(() => {
     if (!id) return;
@@ -146,59 +132,37 @@ const AnimePlayerPage: React.FC = () => {
       try {
         setLoading(true);
         
-        // Charger les données de base de l'anime avec API robuste
+        // Charger les données de base de l'anime
         const animeData = await getAnimeDetails(id);
         
         if (animeData && animeData.success && animeData.data) {
           setAnimeData(animeData.data);
           
-          // Utiliser les saisons retournées par l'API
           if (animeData.data.seasons && animeData.data.seasons.length > 0) {
-            // Utiliser toutes les saisons retournées par l'API sans filtrage
             const seasons = animeData.data.seasons;
-            
-            // Sélectionner la saison demandée ou la première disponible
             let seasonToSelect = seasons[0];
-            console.log('Saisons disponibles:', seasons.length);
-            console.log('Première saison:', seasonToSelect);
             
             if (targetSeason) {
               const requestedSeason = seasons.find((s: any) => s.value === targetSeason || s.number === parseInt(targetSeason));
-              if (requestedSeason) {
-                seasonToSelect = requestedSeason;
-              }
+              if (requestedSeason) seasonToSelect = requestedSeason;
             }
             
-            console.log('Saison sélectionnée:', seasonToSelect);
             setSelectedSeason(seasonToSelect);
-            console.log('Début chargement épisodes pour saison:', seasonToSelect?.name);
             
-            // Charger les épisodes via l'API automatiquement avec la langue demandée ou par défaut
             if (seasonToSelect) {
-              console.log('Chargement épisodes via API...');
-              
-              // Utiliser la langue depuis l'URL si disponible ET supportée par la saison
               let languageToUse: string;
               if (targetLang) {
                 const requestedLang = targetLang.toUpperCase();
-                // Vérifier que la langue demandée est disponible dans cette saison
-                if (seasonToSelect.languages.includes(requestedLang)) {
-                  languageToUse = requestedLang;
-                  console.log('Langue demandée disponible:', languageToUse);
-                } else {
-                  // Fallback vers une langue disponible
-                  languageToUse = seasonToSelect.languages[0] || 'VOSTFR';
-                  console.log('Langue demandée non disponible, fallback vers:', languageToUse);
-                }
+                languageToUse = seasonToSelect.languages.includes(requestedLang)
+                  ? requestedLang
+                  : (seasonToSelect.languages[0] || 'VOSTFR');
               } else {
-                // S'assurer qu'une langue est sélectionnée par défaut
-                languageToUse = seasonToSelect.languages.includes('VOSTFR') ? 'VOSTFR' : 
-                                seasonToSelect.languages[0] || 'VOSTFR';
+                languageToUse = seasonToSelect.languages.includes('VOSTFR')
+                  ? 'VOSTFR'
+                  : (seasonToSelect.languages[0] || 'VOSTFR');
               }
               
               setSelectedLanguage(languageToUse);
-              
-              // Charger directement avec la langue sélectionnée
               await loadSeasonEpisodesDirectly(animeData.data, seasonToSelect, true, languageToUse);
             }
           }
@@ -223,65 +187,44 @@ const AnimePlayerPage: React.FC = () => {
       const languageToUse = customLanguage || selectedLanguage;
       const languageCode = languageToUse.toLowerCase();
       
-      console.log('Chargement épisodes pour:', animeDataObj.id, 'saison:', season.value, 'langue:', languageToUse);
-      
-      // Utiliser uniquement l'API externe
       const data = await apiRequest(`https://anime-sama-scraper.vercel.app/api/episodes/${animeDataObj.id}?season=${season.value}&language=${languageCode}`);
-      console.log('Épisodes reçus de l\'API:', data);
       
       if (!data || !data.success) {
-        console.error('Erreur API épisodes:', data);
-        setError('Erreur lors du chargement des épisodes depuis l\'API');
+        setError('Erreur lors du chargement des épisodes');
         return;
       }
       
       if (data.episodes && Array.isArray(data.episodes) && data.episodes.length > 0) {
-        // Adapter les données de l'API au format attendu avec validation
         const formattedEpisodes: Episode[] = data.episodes.map((ep: any, index: number) => {
           const episodeNumber = ep.number || (index + 1);
-          const episodeTitle = ep.title || `Épisode ${episodeNumber}`;
-          const episodeUrl = ep.url || `https://anime-sama.fr/catalogue/${animeDataObj.id}/${season.value}/${languageCode}/episode-${episodeNumber}`;
-          
           return {
             id: `${animeDataObj.id}-${season.value}-ep${episodeNumber}-${languageCode}`,
-            title: episodeTitle,
-            episodeNumber: episodeNumber,
-            url: episodeUrl,
+            title: ep.title || `Épisode ${episodeNumber}`,
+            episodeNumber,
+            url: ep.url || `https://anime-sama.fr/catalogue/${animeDataObj.id}/${season.value}/${languageCode}/episode-${episodeNumber}`,
             language: data.language ? data.language.toUpperCase() : languageToUse.toUpperCase(),
-            available: ep.available !== false, // Default à true si non spécifié
+            available: ep.available !== false,
             streamingSources: ep.streamingSources || []
           };
         });
         
-        console.log('Épisodes formatés depuis API:', formattedEpisodes.length);
         setEpisodes(formattedEpisodes);
         
-        // Sélectionner l'épisode spécifié ou le premier
         let episodeToSelect = formattedEpisodes[0];
-        
         if (targetEpisode) {
-          const requestedEpisode = formattedEpisodes.find(
-            (ep: any) => ep.episodeNumber === parseInt(targetEpisode)
-          );
-          if (requestedEpisode) {
-            episodeToSelect = requestedEpisode;
-          }
+          const found = formattedEpisodes.find((ep: any) => ep.episodeNumber === parseInt(targetEpisode));
+          if (found) episodeToSelect = found;
         }
-        
-        console.log('Épisode sélectionné:', episodeToSelect.title);
         setSelectedEpisode(episodeToSelect);
         
-        // Auto-charger l'épisode avec l'API embed
         if (autoLoadEpisode) {
           try {
             const response = await fetch(`https://anime-sama-scraper.vercel.app/api/embed?url=${encodeURIComponent(episodeToSelect.url)}`);
             
             if (response.ok) {
               const embedData = await response.json();
-              console.log('Sources embed reçues:', embedData);
               
               if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-                // Trier pour mettre serverNumber 3 en premier
                 const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
                   if (a.serverNumber === 3 && b.serverNumber !== 3) return -1;
                   if (a.serverNumber !== 3 && b.serverNumber === 3) return 1;
@@ -297,20 +240,14 @@ const AnimePlayerPage: React.FC = () => {
                   availableServers: sortedSources.map((s: any) => s.server),
                   url: episodeToSelect.url
                 });
-                // Toujours le serveur numéro 3 en premier (index 0)
                 setSelectedPlayer(0);
-                console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
-                console.log('Lecteur par défaut:', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
               } else {
-                console.warn('Aucune source trouvée dans la réponse embed:', embedData);
                 setError('Aucune source de streaming trouvée pour cet épisode');
               }
             } else {
-              console.error('Erreur HTTP embed API:', response.status, response.statusText);
               setError('Erreur lors du chargement des sources de streaming');
             }
-          } catch (embedError) {
-            console.error('Erreur auto-chargement embed:', embedError);
+          } catch {
             setError('Erreur lors du chargement automatique des sources');
           }
         }
@@ -318,122 +255,13 @@ const AnimePlayerPage: React.FC = () => {
         setError('Aucun épisode trouvé pour cette saison et langue');
       }
     } catch (err) {
-      console.error('Erreur chargement épisodes API:', err);
-      setError('Erreur lors du chargement des épisodes depuis l\'API');
+      console.error('Erreur chargement épisodes:', err);
+      setError('Erreur lors du chargement des épisodes');
     } finally {
       setEpisodeLoading(false);
     }
   };
 
-
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _loadSeasonEpisodes = async (season: Season, autoLoadEpisode = false) => {
-    if (!animeData) {
-      console.log('Pas de données anime disponibles pour charger les épisodes');
-      return;
-    }
-    
-    try {
-      setEpisodeLoading(true);
-      const languageCode = selectedLanguage.toLowerCase();
-      
-      console.log('Chargement épisodes pour:', animeData.id, 'saison:', season.value, 'langue:', selectedLanguage);
-      
-      const data = await apiRequest(`https://anime-sama-scraper.vercel.app/api/episodes/${animeData.id}?season=${season.value}&language=${languageCode}`);
-      console.log('Épisodes reçus de l\'API:', data);
-      
-      if (!data || !data.success) {
-        console.error('Erreur API épisodes:', data);
-        setError('Erreur lors du chargement des épisodes depuis l\'API');
-        return;
-      }
-      
-      if (data.episodes && Array.isArray(data.episodes) && data.episodes.length > 0) {
-        const formattedEpisodes: Episode[] = data.episodes.map((ep: any, index: number) => {
-          const episodeNumber = ep.number || (index + 1);
-          const episodeTitle = ep.title || `Épisode ${episodeNumber}`;
-          const episodeUrl = ep.url || `https://anime-sama.fr/catalogue/${animeData.id}/${season.value}/${languageCode}/episode-${episodeNumber}`;
-          
-          return {
-            id: `${animeData.id}-${season.value}-ep${episodeNumber}-${languageCode}`,
-            title: episodeTitle,
-            episodeNumber: episodeNumber,
-            url: episodeUrl,
-            language: data.language ? data.language.toUpperCase() : selectedLanguage.toUpperCase(),
-            available: ep.available !== false,
-            streamingSources: ep.streamingSources || []
-          };
-        });
-        
-        console.log('Épisodes formatés depuis API:', formattedEpisodes.length);
-        setEpisodes(formattedEpisodes);
-        
-        let episodeToSelect = formattedEpisodes[0];
-        
-        if (targetEpisode) {
-          const requestedEpisode = formattedEpisodes.find(
-            (ep: any) => ep.episodeNumber === parseInt(targetEpisode)
-          );
-          if (requestedEpisode) {
-            episodeToSelect = requestedEpisode;
-          }
-        }
-        
-        setSelectedEpisode(episodeToSelect);
-        
-        if (autoLoadEpisode) {
-          try {
-            const response = await fetch(`https://anime-sama-scraper.vercel.app/api/embed?url=${encodeURIComponent(episodeToSelect.url)}`);
-            
-            if (response.ok) {
-              const embedData = await response.json();
-              console.log('Sources embed reçues:', embedData);
-              
-              if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-                // Trier pour mettre serverNumber 3 en premier
-                const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
-                  if (a.serverNumber === 3 && b.serverNumber !== 3) return -1;
-                  if (a.serverNumber !== 3 && b.serverNumber === 3) return 1;
-                  return a.serverNumber - b.serverNumber;
-                });
-                
-                setEpisodeDetails({
-                  id: episodeToSelect.id,
-                  title: episodeToSelect.title,
-                  animeTitle: animeData.title,
-                  episodeNumber: episodeToSelect.episodeNumber,
-                  sources: sortedSources,
-                  availableServers: sortedSources.map((s: any) => s.server),
-                  url: episodeToSelect.url
-                });
-                // Toujours le serveur numéro 3 en premier (index 0)
-                setSelectedPlayer(0);
-                console.log('Épisode chargé avec sources API embed:', sortedSources.length, 'sources');
-                console.log('Lecteur par défaut:', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
-              } else {
-                console.warn('Aucune source trouvée dans la réponse embed:', embedData);
-                setError('Aucune source de streaming trouvée pour cet épisode');
-              }
-            } else {
-              console.error('Erreur HTTP embed API:', response.status, response.statusText);
-              setError('Erreur lors du chargement des sources de streaming');
-            }
-          } catch (embedError) {
-            console.error('Erreur auto-chargement embed:', embedError);
-            setError('Erreur lors du chargement automatique des sources');
-          }
-        }
-      } else {
-        setError('Aucun épisode trouvé pour cette saison et langue');
-      }
-    } catch (err) {
-      console.error('Erreur chargement épisodes API:', err);
-      setError('Erreur lors du chargement des épisodes depuis l\'API');
-    } finally {
-      setEpisodeLoading(false);
-    }
-  };
 
 
   // Charger les sources directes via l'API embed uniquement
@@ -443,22 +271,16 @@ const AnimePlayerPage: React.FC = () => {
     try {
       setEpisodeLoading(true);
       
-      console.log('Récupération sources streaming pour épisode:', episode.episodeNumber);
-      
-      // Utiliser uniquement l'API embed externe selon la documentation
       const response = await fetch(`https://anime-sama-scraper.vercel.app/api/embed?url=${encodeURIComponent(episode.url)}`);
       
       if (!response.ok) {
-        console.error(`Erreur API embed: ${response.status}`);
         setError('Erreur lors du chargement des sources de streaming');
         return;
       }
       
       const embedData = await response.json();
-      console.log('Sources streaming reçues de l\'API:', embedData);
       
       if (embedData.success && embedData.sources && embedData.sources.length > 0) {
-        // Trier pour mettre serverNumber 3 en premier
         const sortedSources = [...embedData.sources].sort((a: any, b: any) => {
           if (a.serverNumber === 3 && b.serverNumber !== 3) return -1;
           if (a.serverNumber !== 3 && b.serverNumber === 3) return 1;
@@ -474,16 +296,12 @@ const AnimePlayerPage: React.FC = () => {
           availableServers: sortedSources.map((s: any) => s.server),
           url: episode.url
         });
-        // Toujours le serveur numéro 3 en premier (index 0)
         setSelectedPlayer(0);
-        console.log('Sources streaming chargées:', sortedSources.length, 'serveurs disponibles');
-        console.log('Lecteur par défaut:', sortedSources[0]?.server, 'serverNumber:', sortedSources[0]?.serverNumber);
       } else {
-        console.error('Aucune source trouvée dans la réponse API');
         setError('Aucune source de streaming disponible pour cet épisode');
       }
     } catch (err) {
-      console.error('Erreur récupération sources API:', err);
+      console.error('Erreur récupération sources:', err);
       setError('Erreur lors du chargement des sources de streaming');
     } finally {
       setEpisodeLoading(false);
@@ -1242,45 +1060,67 @@ const AnimePlayerPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full"></div>
-      </div>
+      <MainLayout>
+        <div className="-mx-4 -my-6">
+          <div className="h-48 sm:h-56 skeleton-shimmer" />
+          <div className="p-4 space-y-4">
+            <div className="h-5 w-32 rounded skeleton-shimmer" />
+            <div className="h-10 w-full rounded-lg skeleton-shimmer" />
+            <div className="aspect-video rounded-lg skeleton-shimmer" />
+          </div>
+        </div>
+      </MainLayout>
     );
   }
 
   if (error && !animeData) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-red-500 text-xl flex items-center gap-2">
-          {error}
+      <MainLayout>
+        <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 px-4 text-center">
+          <div className="p-4 rounded-full bg-red-500/10 border border-red-500/20">
+            <span className="text-red-400 text-2xl">⚠</span>
+          </div>
+          <h2 className="text-lg font-semibold text-white">{error}</h2>
+          <button
+            onClick={() => window.location.reload()}
+            className="atomic-button text-sm"
+          >
+            Réessayer
+          </button>
         </div>
-      </div>
+      </MainLayout>
     );
   }
 
   if (!animeData) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">Anime non trouvé</div>
-      </div>
+      <MainLayout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <p className="text-white/50">Anime non trouvé</p>
+        </div>
+      </MainLayout>
     );
   }
 
   return (
     <MainLayout>
       <div className="-mx-4 -my-6">
-        {/* Bannière avec titre de la saison - Pleine largeur */}
+        {/* Bannière avec titre de la saison */}
         <div className="relative overflow-hidden">
-          <div 
-            className="h-48 sm:h-56 md:h-64 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${animeData.image})`,
-            }}
-          />
-          <div className="absolute inset-0 bg-black/60" />
-          <div className="absolute bottom-4 left-4">
-            <h2 className="text-white text-2xl font-bold">{animeData.title}</h2>
-            <h3 className="text-gray-300 text-lg uppercase">{selectedSeason?.name}</h3>
+          <div className="absolute inset-0">
+            <img
+              src={animeData.image}
+              alt=""
+              className="w-full h-full object-cover scale-105 blur-sm"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+            <div className="absolute inset-0 bg-black/70" />
+          </div>
+          <div className="relative h-36 sm:h-44 flex flex-col justify-end px-5 pb-4">
+            <h2 className="text-xl sm:text-2xl font-black atomic-gradient-text leading-tight">{animeData.title}</h2>
+            {selectedSeason && (
+              <p className="text-white/60 text-sm font-medium mt-0.5 uppercase tracking-wide">{selectedSeason.name}</p>
+            )}
           </div>
         </div>
 
@@ -1412,10 +1252,12 @@ const AnimePlayerPage: React.FC = () => {
           </div>
         )}
 
-        {/* Dernière sélection */}
+        {/* Épisode actif */}
         {selectedEpisode && (
-          <div className="text-gray-300 text-sm">
-            <span className="font-bold">DERNIÈRE SÉLECTION :</span> ÉPISODE {selectedEpisode.episodeNumber}
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-white/40 uppercase tracking-wider text-[11px] font-semibold">En lecture :</span>
+            <span className="text-cyan-400 font-bold">Épisode {selectedEpisode.episodeNumber}</span>
+            <span className="px-1.5 py-0.5 rounded bg-white/6 border border-white/8 text-white/50 text-[10px] uppercase tracking-wide">{selectedLanguage}</span>
           </div>
         )}
 
@@ -1475,36 +1317,26 @@ const AnimePlayerPage: React.FC = () => {
                     initial={{ opacity: 0, scale: 0.9, y: -10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                    className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 rounded-lg border border-gray-700 shadow-xl overflow-hidden"
+                    className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 atomic-glass shadow-xl overflow-hidden min-w-[180px]"
                   >
-                    <div className="p-2 bg-gray-700 text-center">
-                      <span className="text-white text-sm font-bold">Télécharger en :</span>
+                    <div className="px-3 py-2 border-b border-white/8 text-center">
+                      <span className="text-white/70 text-xs font-semibold uppercase tracking-wider">Télécharger en</span>
                     </div>
-                    <div className="space-y-1 p-2">
-                      <motion.button
-                        whileHover={{ backgroundColor: '#374151' }}
-                        onClick={() => downloadVideo('faible')}
-                        className="w-full text-left px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors flex items-center gap-2"
-                      >
-                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        <span>Qualité Faible (360p)</span>
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ backgroundColor: '#374151' }}
-                        onClick={() => downloadVideo('moyenne')}
-                        className="w-full text-left px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors flex items-center gap-2"
-                      >
-                        <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
-                        <span>Qualité Moyenne (720p)</span>
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ backgroundColor: '#374151' }}
-                        onClick={() => downloadVideo('HD')}
-                        className="w-full text-left px-3 py-2 text-white hover:bg-gray-700 rounded transition-colors flex items-center gap-2"
-                      >
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-                        <span>Qualité HD (1080p)</span>
-                      </motion.button>
+                    <div className="p-2 space-y-1">
+                      {[
+                        { label: 'Faible (360p)', quality: 'faible' as const, color: 'bg-purple-500' },
+                        { label: 'Moyenne (720p)', quality: 'moyenne' as const, color: 'bg-cyan-500' },
+                        { label: 'HD (1080p)', quality: 'HD' as const, color: 'bg-cyan-400' },
+                      ].map(({ label, quality, color }) => (
+                        <button
+                          key={quality}
+                          onClick={() => downloadVideo(quality)}
+                          className="w-full text-left px-3 py-2 text-white/80 hover:text-white hover:bg-white/6 rounded-lg transition-colors flex items-center gap-2.5 text-sm"
+                        >
+                          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${color}`} />
+                          {label}
+                        </button>
+                      ))}
                     </div>
                   </motion.div>
                 )}

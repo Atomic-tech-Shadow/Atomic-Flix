@@ -450,7 +450,7 @@ const AnimeSamaPage: React.FC = () => {
               )}
 
               {/* ── Planning ── */}
-              {planning?.todayAnimes?.length > 0 && (
+              {planning?.items?.length > 0 && (
                 <motion.section
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -458,15 +458,15 @@ const AnimeSamaPage: React.FC = () => {
                 >
                   <SectionHeader icon={Calendar} title="Planning du jour" iconColor="text-cyan-400" />
                   <ScrollRow>
-                    {planning.todayAnimes.map((item: any, i: number) => (
+                    {planning.items.map((item: any, i: number) => (
                       <AnimeCard
-                        key={`plan-${item.id ?? i}-${i}`}
+                        key={`plan-${item.animeId ?? i}-${i}`}
                         image={item.image}
                         title={item.title}
-                        badge={item.isReported ? 'REPORTÉ' : undefined}
-                        badgeColor="bg-orange-500/90"
-                        sub={<span className="text-white/50 text-[11px]">{item.language}</span>}
-                        onClick={() => item.id ? goToAnime(item.id) : undefined}
+                        badge={item.isReported ? 'REPORTÉ' : item.releaseTime}
+                        badgeColor={item.isReported ? 'bg-orange-500/90' : 'bg-black/60'}
+                        sub={<span className="text-white/50 text-[11px] uppercase tracking-wide">{item.language}</span>}
+                        onClick={() => item.animeId ? goToAnime(item.animeId) : undefined}
                         testId={`card-planning-${i}`}
                         index={i}
                       />

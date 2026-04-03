@@ -84,62 +84,54 @@ export function NotificationWelcome() {
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <Card className="w-full max-w-md bg-gray-900 border-gray-700 atomic-card">
+      <Card className="w-full max-w-md atomic-glass border-white/10">
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-cyan-500/20 rounded-full">
-                <Bell className="w-6 h-6 text-cyan-400" />
-              </div>
-              <div>
-                <CardTitle className="text-white text-lg">
-                  Restez informé avec ATOMIC FLIX
-                </CardTitle>
-                <CardDescription className="text-gray-400 text-sm">
-                  Ne manquez plus aucune nouveauté
-                </CardDescription>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-cyan-500/15 rounded-full border border-cyan-500/20">
+              <Bell className="w-5 h-5 text-cyan-400" />
+            </div>
+            <div>
+              <CardTitle className="text-white text-base">
+                Restez informé avec ATOMIC FLIX
+              </CardTitle>
+              <CardDescription className="text-white/40 text-sm">
+                Ne manquez plus aucune nouveauté
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
         
         <CardContent className="space-y-4">
-          <div className="text-gray-300 text-sm space-y-2">
+          <div className="text-white/60 text-sm space-y-2">
             <p>Activez les notifications pour recevoir :</p>
-            <ul className="space-y-1 ml-4">
-              <li className="flex items-center gap-2">
-                <Check className="w-3 h-3 text-cyan-400" />
-                <span>Nouveaux épisodes ajoutés</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-3 h-3 text-cyan-400" />
-                <span>Nouveaux épisodes disponibles</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-3 h-3 text-cyan-400" />
-                <span>Mises à jour de contenu</span>
-              </li>
+            <ul className="space-y-1.5 ml-2 mt-2">
+              {['Nouveaux épisodes ajoutés', 'Nouveaux épisodes disponibles', 'Mises à jour de contenu'].map((item) => (
+                <li key={item} className="flex items-center gap-2">
+                  <Check className="w-3 h-3 text-cyan-400 flex-shrink-0" />
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
           </div>
           
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-2">
             <Button
               onClick={handleAccept}
-              className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white atomic-hover-scale"
+              className="flex-1 atomic-button"
             >
               Activer
             </Button>
             <Button
               onClick={handleDecline}
               variant="outline"
-              className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800"
+              className="flex-1 border-white/15 text-white/70 hover:text-white hover:bg-white/6 hover:border-white/25"
             >
               Plus tard
             </Button>
           </div>
           
-          <p className="text-xs text-gray-500 text-center">
-            Vous pouvez modifier ces paramètres à tout moment
+          <p className="text-xs text-white/30 text-center">
+            Modifiable à tout moment dans les paramètres
           </p>
         </CardContent>
       </Card>

@@ -4,6 +4,17 @@
 
 ATOMIC FLIX is a modern anime streaming platform built with React, TypeScript, and Vite, offering users the ability to search, browse, and stream anime content. The platform features a sleek, dark-themed interface with a comprehensive UI component library based on shadcn/ui and Radix UI primitives. The project is 100% frontend-only, using the external API `anime-sama-scraper.vercel.app` for all data.
 
+## Recent Changes (April 3, 2026)
+
+### Global Maintenance & Design Improvements
+- **Fixed Planning API Bug**: Section "Planning du jour" n'affichait jamais rien — le code utilisait `planning.todayAnimes` au lieu du bon champ API `planning.items`. Corrigé + utilisation de `item.animeId` au lieu de `item.id` (conforme au schéma `PlanningItem`)
+- **Player Loading/Error States**: Remplacement de `bg-gray-900` par le design system (`MainLayout` + classes atomic). États cohérents avec le reste de l'app
+- **Player Banner**: Améliorée avec fond flouté + overlay noir, comme la page `anime.tsx`. Titre en dégradé atomic
+- **Download Menu**: Passage de `bg-gray-800/700` vers `atomic-glass` + classes cohérentes
+- **"En lecture" Label**: Remplacement du texte brut "DERNIÈRE SÉLECTION" par un indicateur propre avec badge de langue
+- **Notification Welcome Dialog**: Remplacement de `bg-gray-900/border-gray-700` par `atomic-glass/border-white/10` — cohérent avec le design system
+- **Code Cleanup**: Suppression de la fonction morte `_loadSeasonEpisodes`, suppression de `getAnimeSeasons` + hack `console.log` TypeScript, nettoyage des `console.log` de debug dans les fonctions API (loadAnimeData, loadSeasonEpisodesDirectly, loadEpisodeSources)
+
 ## Recent Changes (October 26, 2025)
 
 ### Latest Updates
