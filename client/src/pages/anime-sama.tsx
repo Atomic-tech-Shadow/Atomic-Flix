@@ -262,10 +262,10 @@ const AnimeSamaPage: React.FC = () => {
                 style={{ background: 'linear-gradient(135deg, #050514 0%, #0A0A1E 50%, #0D0520 100%)' }}
               >
                 {/* Mosaic images */}
-                {popularAnimes?.categories?.classiques?.anime?.length > 0 && (
+                {popularAnimes?.categories?.classiques?.length > 0 && (
                   <>
                     <div className="flex sm:hidden h-20 overflow-hidden">
-                      {popularAnimes.categories.classiques.anime.slice(0, 5).map((a: any, i: number) => (
+                      {popularAnimes.categories.classiques.slice(0, 5).map((a: any, i: number) => (
                         <div
                           key={`hm-${i}`}
                           className="flex-1 overflow-hidden cursor-pointer"
@@ -277,7 +277,7 @@ const AnimeSamaPage: React.FC = () => {
                       ))}
                     </div>
                     <div className="hidden sm:flex h-28 md:h-32 overflow-hidden">
-                      {popularAnimes.categories.classiques.anime.slice(0, 8).map((a: any, i: number) => (
+                      {popularAnimes.categories.classiques.slice(0, 8).map((a: any, i: number) => (
                         <div
                           key={`hd-${i}`}
                           className="flex-1 overflow-hidden cursor-pointer"
@@ -374,7 +374,7 @@ const AnimeSamaPage: React.FC = () => {
               )}
 
               {/* ── Les Classiques ── */}
-              {popularAnimes?.categories?.classiques?.anime?.length > 0 ? (
+              {popularAnimes?.categories?.classiques?.length > 0 ? (
                 <motion.section
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -382,7 +382,7 @@ const AnimeSamaPage: React.FC = () => {
                 >
                   <SectionHeader icon={Trophy} title="Les Classiques" iconColor="text-amber-400" />
                   <ScrollRow>
-                    {popularAnimes.categories.classiques.anime.map((a: any, i: number) => (
+                    {popularAnimes.categories.classiques.map((a: any, i: number) => (
                       <AnimeCard
                         key={`cl-${a.id}-${i}`}
                         image={a.image}
@@ -404,7 +404,7 @@ const AnimeSamaPage: React.FC = () => {
               )}
 
               {/* ── Pépites ── */}
-              {popularAnimes?.categories?.pepites?.anime?.length > 0 && (
+              {popularAnimes?.categories?.pepites?.length > 0 && (
                 <motion.section
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -412,7 +412,7 @@ const AnimeSamaPage: React.FC = () => {
                 >
                   <SectionHeader icon={Gem} title="Pépites" iconColor="text-purple-400" />
                   <ScrollRow>
-                    {popularAnimes.categories.pepites.anime.map((a: any, i: number) => (
+                    {popularAnimes.categories.pepites.map((a: any, i: number) => (
                       <AnimeCard
                         key={`pp-${a.id}-${i}`}
                         image={a.image}

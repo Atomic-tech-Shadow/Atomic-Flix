@@ -14,18 +14,15 @@ export interface PopularAnime {
   extractedFrom?: string;
 }
 
-export interface PopularCategory {
-  count: number;
-  anime: PopularAnime[];
-}
-
+// ⚠️ L'API retourne les catégories comme tableaux directs, pas { count, anime }
 export interface PopularResponse {
   success: boolean;
-  totalCount: number;
   categories: {
-    classiques?: PopularCategory;
-    [key: string]: PopularCategory | undefined;
+    classiques?: PopularAnime[];
+    pepites?: PopularAnime[];
+    [key: string]: PopularAnime[] | undefined;
   };
+  allPopular?: PopularAnime[];
 }
 
 // ============================================
