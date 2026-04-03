@@ -6,73 +6,76 @@ export default function NotFound() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden bg-black">
-      {/* Vidéo en arrière-plan */}
+    <div className="min-h-screen w-full relative overflow-hidden" style={{ backgroundColor: 'var(--atomic-dark)' }}>
+      {/* Background video */}
       <video
         autoPlay
         muted
         loop
-        className="absolute inset-0 w-full h-full object-cover opacity-60"
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover opacity-30"
         src="/assets/error-404-video.mp4"
       />
-      
-      {/* Overlay sombre */}
-      <div className="absolute inset-0 bg-black/40"></div>
-      
-      {/* Contenu principal */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[var(--atomic-dark)]/60 via-transparent to-[var(--atomic-dark)]/80" />
+
+      {/* Particles */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-1.5 h-1.5 bg-cyan-400 rounded-full opacity-50 animate-pulse" />
+        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-cyan-400 rounded-full opacity-70 animate-pulse" style={{ animationDelay: '0.4s' }} />
+        <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-purple-400 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.8s' }} />
+        <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-cyan-300 rounded-full opacity-50 animate-pulse" style={{ animationDelay: '1.2s' }} />
+        <div className="absolute bottom-1/3 right-1/5 w-1 h-1 bg-purple-300 rounded-full opacity-40 animate-pulse" style={{ animationDelay: '0.6s' }} />
+      </div>
+
+      {/* Content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
-        <div className="text-center max-w-2xl">
-          {/* Logo ATOMIC FLIX */}
+        <div className="text-center max-w-lg w-full">
+
           <div className="mb-8">
-            <h1 className="text-6xl md:text-8xl font-bold atomic-gradient-text mb-4">
+            <h1 className="text-7xl sm:text-9xl font-black atomic-gradient-text leading-none mb-2">
               404
             </h1>
-            <div className="text-2xl md:text-3xl font-bold text-white mb-2">
-              ATOMIC FLIX
-            </div>
-            <div className="text-cyan-400 text-lg">
-              Page introuvable dans l'univers
-            </div>
+            <p className="text-white/40 text-sm sm:text-base tracking-widest uppercase">
+              Page introuvable dans l&apos;univers
+            </p>
           </div>
 
-          {/* Message d'erreur stylisé */}
-          <div className="atomic-glass p-8 rounded-2xl mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-              Oops ! Cette page n'existe pas
+          <div className="atomic-glass p-6 sm:p-8 rounded-2xl mb-6">
+            <div className="flex justify-center mb-4">
+              <img
+                src="/assets/atomic-logo-round.png"
+                alt="ATOMIC FLIX"
+                className="h-14 w-14 atomic-logo-round"
+                style={{ boxShadow: '0 0 24px rgba(0,240,255,0.35)' }}
+              />
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-white mb-2">
+              Cette page s&apos;est perdue dans l&apos;espace-temps
             </h2>
-            <p className="text-gray-300 text-lg mb-6">
-              Il semblerait que cette page se soit perdue dans l'espace-temps. 
-              Retournez à l'accueil pour découvrir nos animes.
+            <p className="text-white/50 text-sm mb-6 leading-relaxed">
+              Retournez à l&apos;accueil pour découvrir nos animes.
             </p>
-            
-            {/* Boutons d'action */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button
                 onClick={() => setLocation("/")}
-                className="atomic-button flex items-center gap-2"
+                className="atomic-button flex items-center gap-2 justify-center"
+                data-testid="button-go-home"
               >
-                <Home className="w-5 h-5" />
-                Retour à l'accueil
+                <Home className="w-4 h-4" />
+                Retour à l&apos;accueil
               </Button>
-              
               <Button
                 onClick={() => window.history.back()}
                 variant="outline"
-                className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 flex items-center gap-2"
+                className="border-white/15 text-white/60 hover:bg-white/6 hover:text-white hover:border-white/30 flex items-center gap-2 justify-center transition-all duration-200"
+                data-testid="button-go-back"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4" />
                 Page précédente
               </Button>
             </div>
           </div>
 
-          {/* Effet de particules/étoiles */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-cyan-400 rounded-full opacity-60 animate-pulse"></div>
-            <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-cyan-400 rounded-full opacity-80 animate-pulse delay-100"></div>
-            <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-purple-400 rounded-full opacity-70 animate-pulse delay-200"></div>
-            <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-cyan-300 rounded-full opacity-60 animate-pulse delay-300"></div>
-          </div>
         </div>
       </div>
     </div>

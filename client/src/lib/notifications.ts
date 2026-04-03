@@ -215,12 +215,12 @@ export class NotificationManager {
     try {
       // Vérifier s'il y a de nouveaux animes trending
       const { animeAPI } = await import('./api');
-      const response = await animeAPI.getTrending();
+      const response = await animeAPI.getRecommendations(1, 5);
       
-      if (response && response.success && response.results) {
+      if (response && response.success && response.data) {
         // Récupérer les derniers animes vus
         const lastSeenAnimes = JSON.parse(localStorage.getItem('atomic-flix-last-seen') || '[]');
-        const currentAnimes = response.results.slice(0, 5);
+        const currentAnimes = response.data.slice(0, 5);
         const currentAnimeIds = currentAnimes.map((anime: any) => anime.id);
         
         // Vérifier les nouveaux animes

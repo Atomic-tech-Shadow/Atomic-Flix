@@ -327,7 +327,8 @@ const AnimePlayerPage: React.FC = () => {
 
 
 
-  const loadSeasonEpisodes = async (season: Season, autoLoadEpisode = false) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _loadSeasonEpisodes = async (season: Season, autoLoadEpisode = false) => {
     if (!animeData) {
       console.log('Pas de données anime disponibles pour charger les épisodes');
       return;
@@ -766,7 +767,7 @@ const AnimePlayerPage: React.FC = () => {
                              (rect.width > window.innerWidth * 0.3 && rect.height > window.innerHeight * 0.3);
             
             if (hasAdKeywords || isOverlay) {
-              element.style.display = 'none';
+              (element as HTMLElement).style.display = 'none';
               element.remove();
             }
           });
@@ -774,7 +775,6 @@ const AnimePlayerPage: React.FC = () => {
 
         // Bloquer window.open et les nouvelles fenêtres popup
         if (iframeDoc.defaultView) {
-          const originalOpen = iframeDoc.defaultView.open;
           iframeDoc.defaultView.open = function() {
             return null; // Bloquer tous les window.open
           };
@@ -893,7 +893,6 @@ const AnimePlayerPage: React.FC = () => {
       
       if (iframeDoc && iframeWindow) {
         // Bloquer window.open complètement
-        const originalOpen = iframeWindow.open;
         iframeWindow.open = function(url?: string) { 
           // Bloquer les URLs publicitaires spécifiques
           if (url && adBlockerPatterns.some(pattern => url.includes(pattern))) {
